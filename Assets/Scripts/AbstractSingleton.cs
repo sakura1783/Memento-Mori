@@ -1,18 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class AbstractSingleton : MonoBehaviour
+/// <summary>
+/// 派生クラスに対するシングルトンの基本機能を提供する抽象クラス
+/// </summary>
+/// <typeparam name="T">シングルトンのインスタンスの型</typeparam>
+public abstract class AbstractSingleton<T> : MonoBehaviour where T : Component  // TがComponenrクラスまたはその継承クラスであることを指定(whereは型の制約を指定)
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public static T instance;
 
-    // Update is called once per frame
-    void Update()
+
+    protected virtual void Awake()
     {
-        
+        if (instance == null)
+        {
+            instance = this as T;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 }
