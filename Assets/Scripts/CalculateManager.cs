@@ -35,4 +35,30 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
 
         return damage;
     }
+
+    /// <summary>
+    /// TODO レベルアップ後の各ステータスの計算
+    /// </summary>
+    /// <param name="currentLevel"></param>
+    /// <param name="targetLevel"></param>
+    /// <returns></returns>
+    public int CalculateCharaStatus(int currentLevel, int targetLevel)
+    {
+        for (int i = currentLevel; i < targetLevel; i++)
+        {
+            if (i % 20 == 0)
+            {
+                // Lv20→21(40→41 etc...)の時だけ、限界突破として、現在の戦闘力の30%を足す
+                //combatPower += combatPower * 0.3f;
+            }
+            else
+            {
+                // 通常は現在の戦闘力の2.5064%を足す
+                //combatPower += combatPower * 0.025064f;
+            }
+        }
+
+        // TODO 適切な値を返す
+        return -1;
+    }
 }
