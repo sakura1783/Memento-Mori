@@ -44,7 +44,7 @@ public class GSSReader : MonoBehaviour
         for (int i = 0; i < sheetDatas.Length; i++)
         {
             // 毎回読み込むシートを変更し、取得
-            string url = "https://docs.google.com/spreadsheets/d" + SheetID + "/gviz/tq?tqx=out:csv&sheet=" + sheetDatas[i].sheetName.ToString();
+            string url = "https://docs.google.com/spreadsheets/d/" + SheetID + "/gviz/tq?tqx=out:csv&sheet=" + sheetDatas[i].sheetName.ToString();
             UnityWebRequest request = UnityWebRequest.Get(url);
 
             // 取得できるまで待機

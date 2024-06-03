@@ -448,7 +448,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 199077de88d1f4e0e8aa2e9cfeafb289, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f7858108fe57c40b093aa5450a8d978d, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3640,6 +3640,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1152863913}
   - component: {fileID: 1152863914}
+  - component: {fileID: 1152863915}
   m_Layer: 0
   m_Name: CalculateManager_Test
   m_TagString: Untagged
@@ -3674,6 +3675,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a69e544a3dad84c2fb8d09edbc4fffca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gssReceiver: {fileID: 750197301}
+--- !u!114 &1152863915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1152863911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fa5a24f6ce3c46b9bfe2f6cedbde0c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterDataSO: {fileID: 11400000, guid: 7f201d2cb4ca8463b92069dded54a737, type: 2}
 --- !u!1 &1160001094
 GameObject:
   m_ObjectHideFlags: 0
@@ -6705,7 +6720,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_AnchorMin.x
@@ -6713,7 +6728,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_SizeDelta.x
@@ -6753,11 +6768,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 250
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -110
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

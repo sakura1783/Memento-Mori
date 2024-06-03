@@ -10,12 +10,17 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
     private const float ATTRIBUTE_BONUS = 0.25f;  // 属性相性がいい場合、ダメージを25%増加
     private const float CRITICAL_BONUS = 0.5f;  // クリティカル発生時、ダメージを50%増加
 
+    // テスト
+    [SerializeField] private GSSReceiver gssReceiver;
+
 
     // テスト
-    //private void Start()
-    //{
-    //    Debug.Log(CalculateDamage(17000, 370, 11000));
-    //}
+    private async void Start()
+    {
+        //Debug.Log(CalculateDamage(17000, 370, 11000));
+
+        await gssReceiver.PrepareGSSLoadStartAsync();
+    }
 
     /// <summary>
     /// ダメージ計算
