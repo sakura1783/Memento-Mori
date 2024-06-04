@@ -18,4 +18,7 @@ public class GameData : AbstractSingleton<GameData>
     }
 
     public List<OwnedCharaData> ownedCharaDataList = new();
+
+
+    // TODO ownedCharaDataListへの追加処理(ガチャで新しいキャラを手に入れた際)
 }

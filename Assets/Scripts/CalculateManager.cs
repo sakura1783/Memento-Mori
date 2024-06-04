@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using static UnityEditorInternal.ReorderableList;
 
 public class CalculateManager : AbstractSingleton<CalculateManager>
 {
@@ -8,7 +7,6 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
     private const float ATTACK_MODIFIER = 1.7f;  // 攻撃力補正値
     private const float DEFENCE_MODIFIRE = 2f;
     private const float HP_MODIFIRE = 0.08f;
-
 
     private const float ATTRIBUTE_BONUS = 0.25f;  // 属性相性がいい場合、ダメージを25%増加
     private const float CRITICAL_BONUS = 0.5f;  // クリティカル発生時、ダメージを50%増加
@@ -45,7 +43,7 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
     }
 
     /// <summary>
-    /// レベルアップ後の各ステータスの計算
+    /// レベルアップ後のキャラの各ステータスを計算
     /// </summary>
     /// <param name="charaData"></param>
     /// <param name="targetLevel"></param>
@@ -54,12 +52,12 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
     {
         for (int i = charaData.level; i < targetLevel; i++)
         {
-            // TODO キャラのランクによってステータス上昇率を変更する
+            // TODO キャラのランク(や職業)によってステータス上昇率を変更する
 
             // 限界突破(Lv20→21,40→41 etc...)
             if (i % 20 == 0)
             {
-                // 攻撃力、防御力、HPの30%を足す
+                // 現在の攻撃力、防御力、HPの30%を足す
                 charaData.attackPower += (int)Math.Round(charaData.attackPower * 0.3f, 0, MidpointRounding.AwayFromZero);
                 charaData.defencePower += (int)Math.Round(charaData.defencePower * 0.3f, 0, MidpointRounding.AwayFromZero);
                 charaData.hp += (int)Math.Round(charaData.hp * 0.3f, 0, MidpointRounding.AwayFromZero);
@@ -67,9 +65,10 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
                 // クリティカル率は限界突破の際に1%ずつ上昇
                 charaData.criticalRate += 0.01f;
             }
+            // 通常
             else
             {
-                // 通常は現在の各ステータスの2.5%を足す
+                // 現在の攻撃力、防御力、HPの2.5%を足す
                 charaData.attackPower += (int)Math.Round(charaData.attackPower * 0.025f, 0, MidpointRounding.AwayFromZero);
                 charaData.defencePower += (int)Math.Round(charaData.defencePower * 0.025f, 0, MidpointRounding.AwayFromZero);
                 charaData.hp += (int)Math.Round(charaData.hp * 0.025f, 0, MidpointRounding.AwayFromZero);
