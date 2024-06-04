@@ -11,13 +11,14 @@ public class StageDataSO : ScriptableObject
     public class StageData
     {
         public int stageNo;
-        public List<EnemyData> enemyDataList = new();
+        //public List<EnemyData> enemyDataList = new();
+        public List<BattleManager.TeamCharaData> enemyDataList = new();
     }
 
-    [System.Serializable]
-    public class EnemyData
-    {
-        public CharaName name;
-        public int level;
-    }
+    //[System.Serializable]
+    //public class EnemyData
+    //{
+    //    public CharaName name;
+    //    public int level;
+    //}
 }
