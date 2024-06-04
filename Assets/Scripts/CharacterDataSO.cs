@@ -33,7 +33,6 @@ public enum Attribute
     冥,
 }
 
-
 [CreateAssetMenu(fileName = "CharacterDataSO", menuName = "Create CharacterDataSO")]
 public class CharacterDataSO : ScriptableObject
 {
