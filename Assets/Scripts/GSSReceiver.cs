@@ -40,8 +40,8 @@ public class GSSReceiver : MonoBehaviour
         if (sheetDatasList != null)
         {
             // 各スクリプタブルオブジェクトに代入
-            DataBaseManager.instance.characterDataSO.characterDataList =
-                new List<CharacterDataSO.CharacterData>(sheetDatasList.Find(x => x.sheetName == SheetName.CharacterData).datasList.Select(x => new CharacterDataSO.CharacterData(x)).ToList());
+            DataBaseManager.instance.charaInitialDataSO.characterDataList =
+                new List<CharaInitialDataSO.CharaInitialData>(sheetDatasList.Find(x => x.sheetName == SheetName.CharaInitialData).datasList.Select(x => new CharaInitialDataSO.CharaInitialData(x)).ToList());
         }
     }
 }

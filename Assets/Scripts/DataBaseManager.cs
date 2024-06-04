@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class DataBaseManager : AbstractSingleton<DataBaseManager>
 {
-    public CharacterDataSO characterDataSO;
+    public CharaInitialDataSO charaInitialDataSO;
 }

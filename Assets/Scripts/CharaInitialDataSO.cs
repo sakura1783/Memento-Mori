@@ -33,25 +33,25 @@ public enum Attribute
     冥,
 }
 
-[CreateAssetMenu(fileName = "CharacterDataSO", menuName = "Create CharacterDataSO")]
-public class CharacterDataSO : ScriptableObject
+[CreateAssetMenu(fileName = "CharaInitialDataSO", menuName = "Create CharaInitialDataSO")]
+public class CharaInitialDataSO : ScriptableObject
 {
-    public List<CharacterData> characterDataList = new();
+    public List<CharaInitialData> characterDataList = new();
 
 
     [System.Serializable]
-    public class CharacterData
+    public class CharaInitialData
     {
         public string name;
         public CharaName englishName;
         public Profession profession;
         public Attribute attribute;
 
-        public int defaultCombatPower;
-        public int defaultAttackPower;
-        public int defaultDefencePower;
-        public int defaultHp;
-        public float defaultCriticalRate;
+        public int initialCombatPower;
+        public int initialAttackPower;
+        public int initialDefencePower;
+        public int initialHp;
+        public float initialCriticalRate;
 
         // TODO 各ステータスの増加率、他のステータス追加
 
@@ -60,17 +60,17 @@ public class CharacterDataSO : ScriptableObject
         /// コンストラクタ
         /// </summary>
         /// <param name="datas"></param>
-        public CharacterData(string[] datas)
+        public CharaInitialData(string[] datas)
         {
             name = datas[0];
             englishName = (CharaName)System.Enum.Parse(typeof(CharaName), datas[1]);
             profession = (Profession)System.Enum.Parse(typeof(Profession), datas[2]);
             attribute = (Attribute)System.Enum.Parse(typeof(Attribute), datas[3]);
-            defaultCombatPower = int.Parse(datas[4]);
-            defaultAttackPower = int.Parse(datas[5]);
-            defaultDefencePower = int.Parse(datas[6]);
-            defaultHp = int.Parse(datas[7]);
-            defaultCriticalRate = float.Parse(datas[8]);
+            initialCombatPower = int.Parse(datas[4]);
+            initialAttackPower = int.Parse(datas[5]);
+            initialDefencePower = int.Parse(datas[6]);
+            initialHp = int.Parse(datas[7]);
+            initialCriticalRate = float.Parse(datas[8]);
         }
     }
 }

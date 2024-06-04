@@ -7,7 +7,7 @@ using Cysharp.Threading.Tasks;
 
 public enum SheetName
 {
-    CharacterData,
+    CharaInitialData,
 }
 
 [System.Serializable]

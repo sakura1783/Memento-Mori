@@ -10,15 +10,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e0508d586553e4ecfb2d6e120ba7747a, type: 3}
-  m_Name: CharacterDataSO
+  m_Name: CharaInitialDataSO
   m_EditorClassIdentifier: 
-  characterDataList:
-  - name: 
-    englishName: 0
-    profession: 0
-    attribute: 0
-    defaultCombatPower: 0
-    defaultAttackPower: 0
-    defaultDefencePower: 0
-    defaultHp: 0
-    defaultCriticalRate: 0
+  characterDataList: []
