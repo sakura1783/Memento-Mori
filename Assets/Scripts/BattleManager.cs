@@ -54,4 +54,6 @@ public class BattleManager : MonoBehaviour
 
     //    new TeamCharaData(teamData, targetTeam);
     //}
+
+    // TODO チームの情報から、初期のデータを計算してバトルで使う。バトルが終わったらその情報は破棄する。
 }
