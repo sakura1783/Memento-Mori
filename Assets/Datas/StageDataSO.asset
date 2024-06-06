@@ -21,6 +21,8 @@ MonoBehaviour:
     enemyDataList:
     - name: 0
       level: 0
+    - name: 0
+      level: 0
   - stageNo: 3
     enemyDataList:
     - name: 0
