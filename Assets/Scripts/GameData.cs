@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameData : AbstractSingleton<GameData>
 {
     [System.Serializable]
-    public class OwnedCharaData
+    public class CharaData
     {
         public CharaName name;
         public int level;
@@ -17,7 +17,7 @@ public class GameData : AbstractSingleton<GameData>
         public float criticalRate;
     }
 
-    public List<OwnedCharaData> ownedCharaDataList = new();
+    public List<CharaData> ownedCharaDataList = new();
 
     public int clearMapNo = 0;  // クリアしたマップの番号。この値+1が次のマップ番号
     public int clearStageNo = 0;

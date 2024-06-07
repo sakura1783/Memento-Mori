@@ -31,4 +31,12 @@ public class BattleManager : MonoBehaviour
 
 
     // TODO チームの情報から、初期のデータを計算してバトルで使う。バトルが終わったらその情報は破棄する。
+
+    /// <summary>
+    /// バトルの準備
+    /// </summary>
+    private void PrepareBattle()
+    {
+
+    }
 }

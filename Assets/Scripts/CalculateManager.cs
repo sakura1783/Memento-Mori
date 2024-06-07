@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 public class CalculateManager : AbstractSingleton<CalculateManager>
@@ -35,16 +36,22 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
     }
 
     /// <summary>
-    /// レベルアップ後のキャラの各ステータスを計算
+    /// キャラの各ステータスを計算
     /// </summary>
-    /// <param name="charaData"></param>
+    /// <param name="charaName"></param>
     /// <param name="targetLevel"></param>
-    /// <returns></returns>
-    public void CalculateCharaStatus(GameData.OwnedCharaData charaData, int targetLevel)
+    public GameData.CharaData CalculateCharaStatus(CharaName charaName, int targetLevel)
     {
-        // TODO バトル時、敵のステータス計算にも使えるようにする
+        // キャラの初期データを取得
+        var charaData = (CharaInitialDataSO.CharaInitialData)DataBaseManager.instance.charaInitialDataSO.characterDataList.Where(data => data.englishName == charaName);
 
-        for (int i = charaData.level; i < targetLevel; i++)
+        int combatPower = 0;
+        int attackPower = 0;
+        int defencePower = 0;
+        int hp = 0;
+        float criticalRate = 0;
+
+        for (int i = 1; i < targetLevel; i++)
         {
             // TODO キャラのランク(や職業)によってステータス上昇率を変更する
 
@@ -52,25 +59,35 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
             if (i % 20 == 0)
             {
                 // 現在の攻撃力、防御力、HPの30%を足す
-                charaData.attackPower += (int)Math.Round(charaData.attackPower * ConstData.POWER_INC_RATE_BREAK_LIMIT, 0, MidpointRounding.AwayFromZero);
-                charaData.defencePower += (int)Math.Round(charaData.defencePower * ConstData.POWER_INC_RATE_BREAK_LIMIT, 0, MidpointRounding.AwayFromZero);
-                charaData.hp += (int)Math.Round(charaData.hp * ConstData.POWER_INC_RATE_BREAK_LIMIT, 0, MidpointRounding.AwayFromZero);
+                attackPower += (int)Math.Round(charaData.initialAttackPower * ConstData.POWER_INC_RATE_BREAK_LIMIT, 0, MidpointRounding.AwayFromZero);
+                defencePower += (int)Math.Round(charaData.initialDefencePower * ConstData.POWER_INC_RATE_BREAK_LIMIT, 0, MidpointRounding.AwayFromZero);
+                hp += (int)Math.Round(charaData.initialHp * ConstData.POWER_INC_RATE_BREAK_LIMIT, 0, MidpointRounding.AwayFromZero);
 
                 // クリティカル率は限界突破の際に1%ずつ上昇
-                charaData.criticalRate += 0.01f;
+                criticalRate += charaData.initialCriticalRate + 0.01f;
             }
             // 通常
             else
             {
                 // 現在の攻撃力、防御力、HPの2.5%を足す
-                charaData.attackPower += (int)Math.Round(charaData.attackPower * ConstData.POWER_INC_RATE, 0, MidpointRounding.AwayFromZero);
-                charaData.defencePower += (int)Math.Round(charaData.defencePower * ConstData.POWER_INC_RATE, 0, MidpointRounding.AwayFromZero);
-                charaData.hp += (int)Math.Round(charaData.hp * ConstData.POWER_INC_RATE, 0, MidpointRounding.AwayFromZero);
+                attackPower += (int)Math.Round(charaData.initialAttackPower * ConstData.POWER_INC_RATE, 0, MidpointRounding.AwayFromZero);
+                defencePower += (int)Math.Round(charaData.initialDefencePower * ConstData.POWER_INC_RATE, 0, MidpointRounding.AwayFromZero);
+                hp += (int)Math.Round(charaData.initialHp * ConstData.POWER_INC_RATE, 0, MidpointRounding.AwayFromZero);
             }
+
+            // 上で求めた各ステータスから、戦闘力を計算。
+            // 戦闘力 = 攻撃力+防御力+補正後HP+補正後クリティカル率
+            combatPower = (int)Math.Round(attackPower + defencePower + (hp * ConstData.HP_MODIFIRE) + (attackPower + attackPower * 0.5) / ConstData.ATTACK_MODIFIER * criticalRate, 0, MidpointRounding.AwayFromZero);
         }
 
-        // 上で求めた各ステータスから、戦闘力を計算。
-        // 戦闘力 = 攻撃力+防御力+補正後HP+補正後クリティカル率
-        charaData.combatPower = (int)Math.Round(charaData.attackPower + charaData.defencePower + (charaData.hp * ConstData.HP_MODIFIRE) + (charaData.attackPower + charaData.attackPower * 0.5) / ConstData.ATTACK_MODIFIER * charaData.criticalRate, 0, MidpointRounding.AwayFromZero);
+        // 呼び出し元に計算後のステータスの情報を返す
+        return new GameData.CharaData
+        {
+            combatPower = combatPower,
+            attackPower = attackPower,
+            defencePower = defencePower,
+            hp = hp,
+            criticalRate = criticalRate,
+        };
     }
 }
