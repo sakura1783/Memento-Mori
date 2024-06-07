@@ -1,42 +1,36 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class BattleManager : MonoBehaviour
 {
-    /// <summary>
-    /// 編成されたキャラのデータ
-    /// </summary>
-    [System.Serializable]
-    public class TeamCharaData
-    {
-        public CharaName name;
-        public int level;
 
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="level"></param>
-        public TeamCharaData(CharaName name, int level)
-        {
-            this.name = name;
-            this.level = level;
-        }
-    }
+    public List<GameData.CharaData> playerTeam = new();
+    public List<GameData.CharaData> opponentTeam = new();
 
-    public List<TeamCharaData> playerTeam = new();
-    public List<TeamCharaData> opponentTeam = new();
+    [SerializeField] private TeamAssemblyPop teamAssemblyPop;
 
-
-    // TODO チームの情報から、初期のデータを計算してバトルで使う。バトルが終わったらその情報は破棄する。
 
     /// <summary>
     /// バトルの準備
     /// </summary>
     private void PrepareBattle()
     {
+        // TODO バトル後に移動
+        playerTeam.Clear();
+        opponentTeam.Clear();
 
+        // 各チーム各キャラのステータスを計算
+        foreach (var data in teamAssemblyPop.playerTeamInfo)
+        {
+            playerTeam.Add(CalculateManager.instance.CalculateCharaStatus(data.name, data.level));
+        }
+        foreach (var data in teamAssemblyPop.opponentTeamInfo)
+        {
+            opponentTeam.Add(CalculateManager.instance.CalculateCharaStatus(data.name, data.level));
+        }
+
+        // TODO PrepareNextTurn
     }
+
+    // TODO 味方1番手→敵1番手→味方2番手の順に攻撃。全てのキャラが1回攻撃し終わったら2ターン目に突入
 }

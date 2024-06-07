@@ -15,17 +15,17 @@ public class CharaButton : MonoBehaviour
 
     [SerializeField] private Text txtCharaLevel;
 
-    private GameData.OwnedCharaData charaData;
+    private GameData.CharaData charaData;
 
-    private BattleManager battleManager;
+    private TeamAssemblyPop teamAssemblyPop;
 
     private bool isSelected;
 
 
-    public void Setup(GameData.OwnedCharaData charaData, BattleManager battleManager)
+    public void Setup(GameData.CharaData charaData, TeamAssemblyPop teamAssemblyPop)
     {
         this.charaData = charaData;
-        this.battleManager = battleManager;
+        this.teamAssemblyPop = teamAssemblyPop;
 
         // TODO ImageやTextの設定、Observerでの監視処理
         button.OnClickAsObservable()
@@ -41,20 +41,20 @@ public class CharaButton : MonoBehaviour
     /// </summary>
     public void ModifyPlayerTeam()
     {
-        // TODO 画面上に追加・削除、一覧のボタンの見た目変更
+        // TODO 画面うえに追加・削除、一覧のボタンの見た目変更
 
         if (!isSelected)
         {
             // キャラをチームに追加
-            var chara = new BattleManager.TeamCharaData(charaData.name, charaData.level);
-            battleManager.playerTeam.Add(chara);
+            var chara = new TeamAssemblyPop.TeamMemberInfo(charaData.name, charaData.level);
+            teamAssemblyPop.playerTeamInfo.Add(chara);
 
             isSelected = true;
         }
         else
         {
             // キャラをチームから外す
-            battleManager.playerTeam.RemoveAll(data => data.name == charaData.name);  // RemoveではなくRemoveAllを使えば、ラムダ式を使ってより簡潔に記述できる
+            teamAssemblyPop.playerTeamInfo.RemoveAll(data => data.name == charaData.name);  // RemoveではなくRemoveAllを使えば、ラムダ式を使ってより簡潔に記述できる
 
             isSelected = false;
         }
