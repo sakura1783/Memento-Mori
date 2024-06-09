@@ -12,7 +12,7 @@ public class StageDataSO : ScriptableObject
     {
         public int stageNo;
         //public List<EnemyData> enemyDataList = new();
-        public List<BattleManager.TeamCharaData> enemyDataList = new();
+        public List<TeamAssemblyPop.TeamMemberInfo> enemyDataList = new();
     }
 
     //[System.Serializable]
