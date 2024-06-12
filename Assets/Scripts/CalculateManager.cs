@@ -43,7 +43,7 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
     public GameData.CharaData CalculateCharaStatus(CharaName charaName, int targetLevel)
     {
         // キャラの初期データを取得
-        var charaData = (CharaInitialDataSO.CharaInitialData)DataBaseManager.instance.charaInitialDataSO.characterDataList.Where(data => data.englishName == charaName);
+        var charaData = (CharaInitialDataSO.CharaInitialData)DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.Where(data => data.englishName == charaName);
 
         int combatPower = 0;
         int attackPower = 0;

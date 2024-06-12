@@ -36,7 +36,7 @@ public enum Attribute
 [CreateAssetMenu(fileName = "CharaInitialDataSO", menuName = "Create CharaInitialDataSO")]
 public class CharaInitialDataSO : ScriptableObject
 {
-    public List<CharaInitialData> characterDataList = new();
+    public List<CharaInitialData> charaInitialDataList = new();
 
 
     [System.Serializable]

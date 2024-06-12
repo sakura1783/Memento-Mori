@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using UniRx;
 
 /// <summary>
-/// キャラ一覧、キャラ編成画面で使うキャラ選択用ボタン
+/// キャラ選択用ボタン(キャラ一覧、キャラ編成画面)
 /// </summary>
 public class CharaButton : MonoBehaviour
 {
@@ -27,7 +27,7 @@ public class CharaButton : MonoBehaviour
         this.charaData = charaData;
         this.teamAssemblyPop = teamAssemblyPop;
 
-        // TODO ImageやTextの設定、Observerでの監視処理
+        // TODO ImageやTextの設定
         button.OnClickAsObservable()
             .ThrottleFirst(System.TimeSpan.FromSeconds(0.5f))
             .Subscribe(_ =>

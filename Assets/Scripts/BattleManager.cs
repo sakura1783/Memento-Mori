@@ -25,6 +25,8 @@ public class BattleManager : MonoBehaviour
             opponentTeam.Add(CalculateManager.instance.CalculateCharaStatus(data.name, data.level));
         }
 
+        // TODO CharaStatusPannelの生成。リストで管理
+
         Battle();
     }
 
