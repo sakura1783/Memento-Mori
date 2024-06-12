@@ -4,7 +4,21 @@ using UnityEngine;
 
 public class CalculateManager : AbstractSingleton<CalculateManager>
 {
-    // テスト
+    /// <summary>
+    /// レベルやバフに応じて変動するステータスを管理するクラス
+    /// </summary>
+    public class VariableStatus
+    {
+        public int combatPower;
+        public int attackPower;
+        public int defencePower;
+        public int hp;
+        public float criticalRate;
+
+        // TODO 複数の場所で使うのであれば、コンストラクタを作成しても良い
+    }
+
+    // TODO テスト。他の場所に移す
     [SerializeField] private GSSReceiver gssReceiver;
 
 
@@ -40,7 +54,7 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
     /// </summary>
     /// <param name="charaName"></param>
     /// <param name="targetLevel"></param>
-    public GameData.CharaData CalculateCharaStatus(CharaName charaName, int targetLevel)
+    public VariableStatus CalculateCharaStatus(CharaName charaName, int targetLevel)
     {
         // キャラの初期データを取得
         var charaData = (CharaInitialDataSO.CharaInitialData)DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.Where(data => data.englishName == charaName);
@@ -81,7 +95,7 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
         }
 
         // 呼び出し元に計算後のステータスの情報を返す
-        return new GameData.CharaData
+        return new VariableStatus
         {
             combatPower = combatPower,
             attackPower = attackPower,

@@ -15,14 +15,14 @@ public class CharaButton : MonoBehaviour
 
     [SerializeField] private Text txtCharaLevel;
 
-    private GameData.CharaData charaData;
+    private GameData.OwnedCharaData charaData;
 
     private TeamAssemblyPop teamAssemblyPop;
 
     private bool isSelected;
 
 
-    public void Setup(GameData.CharaData charaData, TeamAssemblyPop teamAssemblyPop)
+    public void Setup(GameData.OwnedCharaData charaData, TeamAssemblyPop teamAssemblyPop)
     {
         this.charaData = charaData;
         this.teamAssemblyPop = teamAssemblyPop;
