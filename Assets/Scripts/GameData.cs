@@ -1,9 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class GameData : AbstractSingleton<GameData>
 {
+    /// <summary>
+    /// 所持しているキャラのデータ。
+    /// バトルでは、nameやlevelなどバトル中に変更されない値のみを参照し、ステータスは都度計算する。
+    /// バトル中に変更されるデータは参照しないように注意する(参照元(ここ)のデータも一緒に変更されてしまうので)。
+    /// </summary>
     [System.Serializable]
     public class OwnedCharaData
     {
