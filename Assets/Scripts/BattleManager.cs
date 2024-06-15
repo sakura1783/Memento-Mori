@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class BattleManager : MonoBehaviour
@@ -19,7 +20,7 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     private void PrepareBattle()
     {
-        // 各チーム各キャラのステータスを計算し、各チームのリストに追加
+        // 各チーム各キャラのステータスを計算し、リストに追加
         foreach (var data in teamAssemblyPop.playerTeamInfo)
         {
             // CharaControllerの作成(キャラの制御)
@@ -49,15 +50,45 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     private void Battle()
     {
-        // TODO 味方1番手→敵1番手→味方2番手の順に攻撃。全てのキャラが1回攻撃し終わったら2ターン目に突入
-
-        // TODO while (敵もしくは味方全員のHPが0になるまでループ)
+        // TODO 味方1番手→敵1番手→味方2番手の順に攻撃
 
         for (int i = 0; i < playerTeam.Count; i++)
         {
             // TODO 味方の攻撃
 
             // TODO 敵の攻撃
+
+            // TODO 各攻撃後、IsBattleOverでバトルを終了するか判定する
+
+            // TODO ターン制を導入する必要があるか考える(全てのキャラが一回攻撃し終えたらターンを進める)
+        }
+    }
+
+    /// <summary>
+    /// バトルを終了させるかどうか判断する
+    /// </summary>
+    /// <returns></returns>
+    private bool IsBattleOver()
+    {
+        // どちらのチームが敗北したかを判定
+        bool isPlayerDefeated = playerTeam.All(chara => chara.CharaController.Hp.Value <= 0);  // All(条件)で、要素全てがその条件を満たしているかを判定する
+        bool isOpponentDefeated = opponentTeam.All(chara => chara.CharaController.Hp.Value <= 0);
+
+        if (isPlayerDefeated)
+        {
+            // TODO プレイヤーが勝った際の処理、または勝ったことが分かるようにする
+
+            return true;
+        }
+        else if (isOpponentDefeated)
+        {
+            // TODO
+
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 

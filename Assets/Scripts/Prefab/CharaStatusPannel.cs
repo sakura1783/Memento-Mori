@@ -7,6 +7,9 @@ using UniRx;
 /// </summary>
 public class CharaStatusPannel : MonoBehaviour
 {
+    private CharaController charaController;
+    public CharaController CharaController => charaController;
+
     [SerializeField] private Image imgChara;
 
     [SerializeField] private Text txtCharaInfo;  // txtCharaLv,Nameをアサイン
@@ -19,6 +22,8 @@ public class CharaStatusPannel : MonoBehaviour
 
     public void Setup(CharaController charaController, TeamAssemblyPop.TeamMemberInfo charaInfo)
     {
+        this.charaController = charaController;
+
         imgChara.sprite = SpriteManager.instance.GetCharaSprite(charaInfo.name, CharaSpriteType.Face);
         txtCharaInfo.text = $"{charaInfo.level}Lv {charaInfo.name}";
         txtHpValue.text = $"{charaController.Hp} / {charaController.MaxHp}";
