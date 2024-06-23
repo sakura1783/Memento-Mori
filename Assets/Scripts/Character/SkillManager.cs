@@ -8,5 +8,10 @@ using UnityEngine;
 /// </summary>
 public static class SkillManager
 {
+    // 発動対象を決めるメソッド(敵or味方or自分or隣接する味方etc... ?名)
 
+    // 攻撃力、Hp、クリティカル率等を処理するメソッド
+    // まとめるか、それとも各値ごとに分けた方がやりやすいか。
+
+    // レベルアップ後の追加処理は各キャラスクリプト内に記述する
 }
