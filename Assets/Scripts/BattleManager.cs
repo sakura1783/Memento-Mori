@@ -2,10 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+
 public class BattleManager : MonoBehaviour
 {
-    public List<CharaStatusPannel> playerTeam = new();
-    public List<CharaStatusPannel> opponentTeam = new();
+    public List<CharaController> playerTeam = new();  // TODO CharaStatusPannelクラスからCharaControllerクラスに変更！=> SkillManager等の処理がうまくいく気がする！
+    public List<CharaController> opponentTeam = new();
 
     [SerializeField] private CharaStatusPannel charaStatusPennel;
 
@@ -25,21 +26,19 @@ public class BattleManager : MonoBehaviour
         {
             // CharaControllerの作成(キャラの制御)
             var chara = new CharaController(CalculateManager.instance.CalculateCharaStatus(data.name, data.level));
+            playerTeam.Add(chara);  // チームのリストにキャラを追加
 
             // CharaPannelの生成(キャラの状態の可視化)
             var charaPannel = Instantiate(charaStatusPennel, playerTran);
             charaPannel.Setup(chara, data);
-
-            playerTeam.Add(charaPannel);
         }
         foreach (var data in teamAssemblyPop.opponentTeamInfo)
         {
             var chara = new CharaController(CalculateManager.instance.CalculateCharaStatus(data.name, data.level));
+            opponentTeam.Add(chara);
 
             var charaPannel = Instantiate(charaStatusPennel, opponentTran);
             charaPannel.Setup(chara, data);
-
-            opponentTeam.Add(charaPannel);
         }
 
         Battle();
@@ -60,7 +59,7 @@ public class BattleManager : MonoBehaviour
 
             // TODO 各攻撃後、IsBattleOverでバトルを終了するか判定する
 
-            // TODO ターン制を導入する必要があるか考える(全てのキャラが一回攻撃し終えたらターンを進める)
+            // TODO 次のターンへ(全てのキャラが一回攻撃し終えたらターンを進める)
         }
     }
 
@@ -71,13 +70,13 @@ public class BattleManager : MonoBehaviour
     private bool IsBattleOver()
     {
         // どちらのチームが敗北したかを判定
-        bool isPlayerDefeated = playerTeam.All(chara => chara.CharaController.Hp.Value <= 0);  // All(条件)で、要素全てがその条件を満たしているかを判定する
-        bool isOpponentDefeated = opponentTeam.All(chara => chara.CharaController.Hp.Value <= 0);
+        bool isPlayerDefeated = playerTeam.All(chara => chara.Hp.Value <= 0);  // All(条件)で、要素全てがその条件を満たしているかを判定する
+        bool isOpponentDefeated = opponentTeam.All(chara => chara.Hp.Value <= 0);
 
         if (isPlayerDefeated)
         {
             // TODO プレイヤーが勝った際の処理、または勝ったことが分かるようにする
-
+            // TODO 勝敗(勝ったか、負けたか)を何かしらの形で返す
             return true;
         }
         else if (isOpponentDefeated)

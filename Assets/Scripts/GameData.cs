@@ -24,9 +24,11 @@ public class GameData : AbstractSingleton<GameData>
 
     public List<OwnedCharaData> ownedCharaDataList = new();
 
+    public List<TeamAssemblyPop.TeamMemberInfo> playerTeamInfo;
+    public List<TeamAssemblyPop.TeamMemberInfo> opponentTeamInfo;
+
     public int clearMapNo = 0;  // クリアしたマップの番号。この値+1が次のマップ番号
     public int clearStageNo = 0;
-
 
     // TODO ownedCharaDataListへの追加処理(ガチャで新しいキャラを手に入れた際)
 }

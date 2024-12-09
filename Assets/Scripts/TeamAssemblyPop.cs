@@ -47,7 +47,14 @@ public class TeamAssemblyPop : MonoBehaviour
 
         btnFight.OnClickAsObservable()
             .ThrottleFirst(System.TimeSpan.FromSeconds(2f))
-            .Subscribe(_ => AssembleOpponentTeam());
+            .Subscribe(_ => 
+            {
+                AssembleOpponentTeam();
+
+                // TODO 編成したそれぞれのチームの情報を(BattleManagerか)GameDataへ渡す←GameDataかな
+
+                // TODO ポップアップを閉じて、バトルへ
+            });
     }
 
     /// <summary>

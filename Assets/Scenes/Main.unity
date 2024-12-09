@@ -674,6 +674,7 @@ GameObject:
   - component: {fileID: 242925306}
   - component: {fileID: 242925308}
   - component: {fileID: 242925307}
+  - component: {fileID: 242925309}
   m_Layer: 5
   m_Name: CharacterPannel
   m_TagString: Untagged
@@ -740,6 +741,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 242925305}
   m_CullTransparentMesh: 1
+--- !u!114 &242925309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 242925305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8f4af5335b5248069039961bc620b1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  imgChara: {fileID: 0}
+  txtCharaInfo: {fileID: 0}
+  txtHpValue: {fileID: 0}
+  hpSlider: {fileID: 0}
+  buffPlace: {fileID: 0}
 --- !u!1 &257462026
 GameObject:
   m_ObjectHideFlags: 0
@@ -1858,7 +1876,7 @@ GameObject:
   - component: {fileID: 522686839}
   - component: {fileID: 522686838}
   m_Layer: 5
-  m_Name: btnBossBattle
+  m_Name: btnToBattle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3954,6 +3972,7 @@ GameObject:
   - component: {fileID: 1015797303}
   - component: {fileID: 1015797302}
   - component: {fileID: 1015797304}
+  - component: {fileID: 1015797305}
   m_Layer: 5
   m_Name: Battle
   m_TagString: Untagged
@@ -4094,6 +4113,24 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &1015797305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1015797297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 979909b1235864f4389000e078c8c5c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerTeam: []
+  opponentTeam: []
+  charaStatusPennel: {fileID: 0}
+  playerTran: {fileID: 0}
+  opponentTran: {fileID: 0}
+  teamAssemblyPop: {fileID: 0}
 --- !u!1 &1065538052
 GameObject:
   m_ObjectHideFlags: 0
@@ -6506,7 +6543,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1858127314}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -7412,7 +7449,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2044851251}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -7528,7 +7565,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000017593005}
+  m_AnchoredPosition: {x: 0, y: 0.000013318615}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2051304981
@@ -8018,7 +8055,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_AnchorMin.x
@@ -8026,7 +8063,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_SizeDelta.x
@@ -8066,11 +8103,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 250
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -110
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

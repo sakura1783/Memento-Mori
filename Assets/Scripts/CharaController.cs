@@ -3,12 +3,13 @@ using UniRx;
 
 /// <summary>
 /// バトル時、キャラクター制御クラス
+/// (このクラスはバトルで使われるキャラクターの数だけインスタンスが作られるので、singletonやstaticにはしない)
 /// </summary>
-public class CharaController : MonoBehaviour
+public class CharaController
 {
     private int attackPower;
     private int defencePower;
-    private readonly int maxHp;
+    private int maxHp;
     public int MaxHp => maxHp;
     public ReactiveProperty<int> Hp = new();
     private float criticalRate;
