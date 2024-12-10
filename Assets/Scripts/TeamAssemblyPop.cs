@@ -23,6 +23,8 @@ public class TeamAssemblyPop : MonoBehaviour
         {
             this.name = name;
             this.level = level;
+
+            // TODO ここでplayerTeamInfoに追加？(現在はCharaButton.cs内で行っている)、ただしopponentTeamInfoへの追加処理でここを使わないのであれば。確認してから決める
         }
     }
 
@@ -31,14 +33,23 @@ public class TeamAssemblyPop : MonoBehaviour
 
     [SerializeField] private Button btnFight;
 
-    [SerializeField] private Transform charactersTran;
+    [SerializeField] private Transform charactersTran;  // 所持キャラ一覧
+
+    [SerializeField] private Transform[] playerTeamCharaTran = new Transform[5];
+    [SerializeField] private Transform[] opponentTeamCharaTran = new Transform[5];
+
+    [SerializeField] private Text txtPlayerTeamCombat;
+    [SerializeField] private Text txtOpponentTeamCombat;
 
     [SerializeField] private CharaButton charaButtonPrefab;
 
 
+    /// <summary>
+    /// ポップアップが開かれる時毎回行う処理
+    /// </summary>
     public void Setup()
     {
-        // キャラボタンを生成
+        // キャラ一覧にキャラボタンを生成
         foreach (var data in GameData.instance.ownedCharaDataList)
         {
             var charaButton = Instantiate(charaButtonPrefab, charactersTran);
