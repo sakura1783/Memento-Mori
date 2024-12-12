@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
+using UnityEngine.UIElements.Experimental;
 
 /// <summary>
 /// キャラ選択用ボタン(キャラ一覧、キャラ編成画面)
@@ -24,13 +25,20 @@ public class CharaButton : MonoBehaviour
 
     private TeamAssemblyPop teamAssemblyPop;
 
-    private bool isSelected;
+    private bool isSelected = false;  // コピーと本体で独立した値を持っているので、一方の値を変えてももう一方の値は変わらない。また、コピー側ではこの値は常にfalseにしておく(監視処理の影響を受けたくないので)
 
-    private CharaButton copyButton;  // 画面うえに生成した、コピーされたボタン。本体かコピーいずれかを押した時、処理が紐付くようにする
-    public CharaButton CopyButton
+    private GameObject copyButton;  // 画面うえに生成した、コピーされたCharaButtonのゲームオブジェクト
+    public GameObject CopyButton
     {
         get => copyButton;
         set => copyButton = value;
+    }
+
+    private bool isCopied;  // コピーされた(画面うえに生成された)ものかどうか
+    public bool IsCopied
+    {
+        get => isCopied;
+        set => isCopied = value;
     }
 
 
@@ -41,7 +49,7 @@ public class CharaButton : MonoBehaviour
 
         // TODO ImageやTextの設定
         button.OnClickAsObservable()
-            .ThrottleFirst(System.TimeSpan.FromSeconds(0.5f))
+            .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
             .Subscribe(_ =>
             {
                 ModifyPlayerTeam();
@@ -55,9 +63,22 @@ public class CharaButton : MonoBehaviour
     /// </summary>
     public void ModifyPlayerTeam()
     {
-        // TODO 画面うえに追加・削除、一覧のボタンの見た目変更
+        // TODO 本体のボタンの見た目変更
 
-        if (!isSelected)
+        // すでに選択されているボタン、またはコピーのボタンを押した場合
+        if (isSelected || isCopied)
+        {
+            // キャラをチームから外す
+            teamAssemblyPop.playerTeamInfo.RemoveAll(data => data.name == charaData.name);  // RemoveではなくRemoveAllを使えば、ラムダ式を使ってより簡潔に記述できる
+
+            // 画面うえからCharaButtonを破棄
+            teamAssemblyPop.SetCharaButton(false, this);
+
+            isSelected = false;
+
+            return;
+        }
+        else
         {
             // キャラをチームに追加
             var chara = new TeamAssemblyPop.TeamMemberInfo(charaData.name, charaData.level);
@@ -67,16 +88,6 @@ public class CharaButton : MonoBehaviour
             teamAssemblyPop.SetCharaButton(true, this);
 
             isSelected = true;
-        }
-        else
-        {
-            // キャラをチームから外す
-            teamAssemblyPop.playerTeamInfo.RemoveAll(data => data.name == charaData.name);  // RemoveではなくRemoveAllを使えば、ラムダ式を使ってより簡潔に記述できる
-
-            // 画面うえからCharaButtonを破棄
-            teamAssemblyPop.SetCharaButton(false, this);
-
-            isSelected = false;
         }
     }
 }

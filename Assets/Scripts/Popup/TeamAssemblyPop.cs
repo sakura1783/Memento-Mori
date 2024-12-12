@@ -94,26 +94,23 @@ public class TeamAssemblyPop : MonoBehaviour
     }
 
     /// <summary>
-    /// CharaButtonの生成・破棄
+    /// CharaButtonを画面うえに生成・破棄
     /// </summary>
     /// <param name="isAssembled"></param>
-    /// <param name="charaButton">コピーするCharaButtonゲームオブジェクト</param>
+    /// <param name="charaButton">コピーするCharaButton</param>
     public void SetCharaButton(bool isAssembled, CharaButton charaButton)
     {
         if (isAssembled)
         {
             // CharaButtonを生成
             var generateTran = playerTeamCharaTran.FirstOrDefault(x => x.transform.childCount <= 0).transform;
-            var copyObj = Instantiate(charaButton.gameObject, generateTran);
-            charaButton.CopyButton = copyObj.GetComponent<CharaButton>();  // TODO ここのGetComponentどうにかできないか
-
-            // TODO interactableを切らない。その際、挙動も考えて処理を追加
-            charaButton.CopyButton.Button.interactable = false;
+            charaButton.CopyButton = Instantiate(charaButton.gameObject, generateTran);
+            charaButton.IsCopied = true;
         }
         else
         {
             // CharaButtonを破棄
-            Destroy(charaButton.CopyButton.gameObject);
+            Destroy(charaButton.CopyButton);
             charaButton.CopyButton = null;
 
             // TODO SortCharaButton()
