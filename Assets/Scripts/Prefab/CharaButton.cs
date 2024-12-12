@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
-using UnityEngine.UIElements.Experimental;
 
 /// <summary>
 /// キャラ選択用ボタン(キャラ一覧、キャラ編成画面)
@@ -54,8 +53,6 @@ public class CharaButton : MonoBehaviour
             {
                 ModifyPlayerTeam();
             });
-
-        // TODO isSelectedの値でコピーボタンの処理を追加、本体ボタンの挙動をコピーボタンと紐付け
     }
 
     /// <summary>

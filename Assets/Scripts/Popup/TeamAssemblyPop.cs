@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -113,13 +114,24 @@ public class TeamAssemblyPop : MonoBehaviour
             Destroy(charaButton.CopyButton);
             charaButton.CopyButton = null;
 
-            // TODO SortCharaButton()
+            // CharaButtonの並び替え
+            SortCharaButton(Array.FindIndex(playerTeamCharaTran, x => x == charaButton.CopyButton.transform.parent));
         }
     }
 
-    public void SortCharaButton()
+    /// <summary>
+    /// 画面うえに生成されているCharaButtonの並び替え
+    /// </summary>
+    /// <param name="removedIndex">破棄されたCharaButtonの要素番号</param>
+    public void SortCharaButton(int removedIndex)
     {
-
+        for (int i = removedIndex; i < playerTeamCharaTran.Length; i++)
+        {
+            // オブジェクトをそれぞれ左に1個ずつずらす
+            playerTeamCharaTran[i + 1].GetChild(0).position = playerTeamCharaTran[i].position;
+            // 親を再設定
+            playerTeamCharaTran[i + 1].GetChild(0).SetParent(playerTeamCharaTran[i]);
+        }
     }
 
 
