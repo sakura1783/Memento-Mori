@@ -8,6 +8,11 @@ using UniRx;
 public class CharaButton : MonoBehaviour
 {
     [SerializeField] private Button button;
+    public Button Button
+    {
+        get => button;
+        set => button = value;
+    }
 
     [SerializeField] private Image imgChara;
     [SerializeField] private Image imgRank;
@@ -20,6 +25,13 @@ public class CharaButton : MonoBehaviour
     private TeamAssemblyPop teamAssemblyPop;
 
     private bool isSelected;
+
+    private CharaButton copyButton;  // 画面うえに生成した、コピーされたボタン。本体かコピーいずれかを押した時、処理が紐付くようにする
+    public CharaButton CopyButton
+    {
+        get => copyButton;
+        set => copyButton = value;
+    }
 
 
     public void Setup(GameData.OwnedCharaData charaData, TeamAssemblyPop teamAssemblyPop)
@@ -34,6 +46,8 @@ public class CharaButton : MonoBehaviour
             {
                 ModifyPlayerTeam();
             });
+
+        // TODO isSelectedの値でコピーボタンの処理を追加、本体ボタンの挙動をコピーボタンと紐付け
     }
 
     /// <summary>
@@ -49,12 +63,18 @@ public class CharaButton : MonoBehaviour
             var chara = new TeamAssemblyPop.TeamMemberInfo(charaData.name, charaData.level);
             teamAssemblyPop.playerTeamInfo.Add(chara);
 
+            // 画面うえにCharaButtonを生成
+            teamAssemblyPop.SetCharaButton(true, this);
+
             isSelected = true;
         }
         else
         {
             // キャラをチームから外す
             teamAssemblyPop.playerTeamInfo.RemoveAll(data => data.name == charaData.name);  // RemoveではなくRemoveAllを使えば、ラムダ式を使ってより簡潔に記述できる
+
+            // 画面うえからCharaButtonを破棄
+            teamAssemblyPop.SetCharaButton(false, this);
 
             isSelected = false;
         }

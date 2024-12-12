@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
@@ -23,8 +24,6 @@ public class TeamAssemblyPop : MonoBehaviour
         {
             this.name = name;
             this.level = level;
-
-            // TODO ここでplayerTeamInfoに追加？(現在はCharaButton.cs内で行っている)、ただしopponentTeamInfoへの追加処理でここを使わないのであれば。確認してから決める
         }
     }
 
@@ -36,6 +35,8 @@ public class TeamAssemblyPop : MonoBehaviour
     [SerializeField] private Transform charactersTran;  // 所持キャラ一覧
 
     [SerializeField] private Transform[] playerTeamCharaTran = new Transform[5];
+    public Transform[] PlayerTeamCharaTran => playerTeamCharaTran;
+
     [SerializeField] private Transform[] opponentTeamCharaTran = new Transform[5];
 
     [SerializeField] private Text txtPlayerTeamCombat;
@@ -49,6 +50,10 @@ public class TeamAssemblyPop : MonoBehaviour
     /// </summary>
     public void Setup()
     {
+        AssembleOpponentTeam();
+
+        // TODO 保存しておいた前回のチーム編成でキャラのボタンを画面うえに生成
+    
         // キャラ一覧にキャラボタンを生成
         foreach (var data in GameData.instance.ownedCharaDataList)
         {
@@ -60,10 +65,6 @@ public class TeamAssemblyPop : MonoBehaviour
             .ThrottleFirst(System.TimeSpan.FromSeconds(2f))
             .Subscribe(_ => 
             {
-                AssembleOpponentTeam();
-
-                // TODO 編成したそれぞれのチームの情報を(BattleManagerか)GameDataへ渡す←GameDataかな
-
                 // TODO ポップアップを閉じて、バトルへ
             });
     }
@@ -83,5 +84,47 @@ public class TeamAssemblyPop : MonoBehaviour
             var enemy = new TeamMemberInfo(enemyData.name, enemyData.level);
             opponentTeamInfo.Add(enemy);
         }
+
+        // 画面うえにキャラのボタン(interactableは切る)を生成
+        for (int i = 0; i < opponentTeamInfo.Count; i++)
+        {
+            var prefab = Instantiate(charaButtonPrefab, opponentTeamCharaTran[i], false);
+            prefab.Button.interactable = false;
+        }
     }
+
+    /// <summary>
+    /// CharaButtonの生成・破棄
+    /// </summary>
+    /// <param name="isAssembled"></param>
+    /// <param name="charaButton">コピーするCharaButtonゲームオブジェクト</param>
+    public void SetCharaButton(bool isAssembled, CharaButton charaButton)
+    {
+        if (isAssembled)
+        {
+            // CharaButtonを生成
+            var generateTran = playerTeamCharaTran.FirstOrDefault(x => x.transform.childCount <= 0).transform;
+            var copyObj = Instantiate(charaButton.gameObject, generateTran);
+            charaButton.CopyButton = copyObj.GetComponent<CharaButton>();  // TODO ここのGetComponentどうにかできないか
+
+            // TODO interactableを切らない。その際、挙動も考えて処理を追加
+            charaButton.CopyButton.Button.interactable = false;
+        }
+        else
+        {
+            // CharaButtonを破棄
+            Destroy(charaButton.CopyButton.gameObject);
+            charaButton.CopyButton = null;
+
+            // TODO SortCharaButton()
+        }
+    }
+
+    public void SortCharaButton()
+    {
+
+    }
+
+
+    // TODO ポップアップを閉じるタイミングで編成したチームの情報を保存(次回開いた時に使う)
 }
