@@ -17,18 +17,7 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
 
         // TODO 複数の場所で使うのであれば、コンストラクタを作成しても良い
     }
-
-    // TODO テスト。他の場所に移す
-    [SerializeField] private GSSReceiver gssReceiver;
-
-
-    // テスト
-    private async void Start()
-    {
-        //Debug.Log(CalculateDamage(17000, 370, 11000));
-
-        await gssReceiver.PrepareGSSLoadStartAsync();
-    }
+    
 
     /// <summary>
     /// ダメージ計算

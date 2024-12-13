@@ -12,4 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0508d586553e4ecfb2d6e120ba7747a, type: 3}
   m_Name: CharaInitialDataSO
   m_EditorClassIdentifier: 
-  characterDataList: []
+  charaInitialDataList:
+  - name: 
+    englishName: 0
+    profession: 0
+    attribute: 0
+    initialCombatPower: 0
+    initialAttackPower: 0
+    initialDefencePower: 0
+    initialHp: 0
+    initialCriticalRate: 0

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -28,6 +27,7 @@ public class TeamAssemblyPop : MonoBehaviour
         }
     }
 
+    // TODO privateにしてプロパティに変更
     public List<TeamMemberInfo> playerTeamInfo;  // プレイヤーチームに編成されたキャラの、最低限の情報群。この情報を使ってバトルの最初で各キャラのステータスを計算する
     public List<TeamMemberInfo> opponentTeamInfo;
 
@@ -45,6 +45,19 @@ public class TeamAssemblyPop : MonoBehaviour
 
     [SerializeField] private CharaButton charaButtonPrefab;
 
+
+    // TODO テスト。他の場所に移す
+    [SerializeField] private GSSReceiver gssReceiver;
+
+    // テスト
+    private async void Start()
+    {
+        //Debug.Log(CalculateDamage(17000, 370, 11000));
+
+        await gssReceiver.PrepareGSSLoadStartAsync();
+
+        Setup();
+    }
 
     /// <summary>
     /// ポップアップが開かれる時毎回行う処理
@@ -76,10 +89,12 @@ public class TeamAssemblyPop : MonoBehaviour
     private void AssembleOpponentTeam()
     {
         // 現在のマップを取得
-        var stageData = DataBaseManager.instance.mapDataSO.mapDataList[GameData.instance.clearMapNo + 1].stageDataSO;
+        //var stageData = DataBaseManager.instance.mapDataSO.mapDataList[GameData.instance.clearMapNo + 1].stageDataSO;  // <= 間違い。Listの要素番号は0から始まる
+        var stageData = DataBaseManager.instance.mapDataSO.mapDataList.FirstOrDefault(data => data.mapNo == GameData.instance.clearMapNo + 1).stageDataSO;
 
         // 現在のステージの敵のリストを取得
-        foreach (var enemyData in stageData.stageDataList[GameData.instance.clearStageNo + 1].enemyDataList)
+        //foreach (var enemyData in stageData.stageDataList[GameData.instance.clearStageNo + 1].enemyDataList)  // <= 上記と同じ間違い
+        foreach (var enemyData in stageData.stageDataList.FirstOrDefault(data => data.stageNo == GameData.instance.clearStageNo + 1).enemyDataList)
         {
             // 敵チームを編成
             var enemy = new TeamMemberInfo(enemyData.name, enemyData.level);
@@ -90,6 +105,7 @@ public class TeamAssemblyPop : MonoBehaviour
         for (int i = 0; i < opponentTeamInfo.Count; i++)
         {
             var prefab = Instantiate(charaButtonPrefab, opponentTeamCharaTran[i], false);
+            //prefab.Setup()  // TODO ボタンのSetUpメソッド、引数はownedCharaクラスではなく、名前やレベルなどボタンの見た目に必要な情報だけ渡せばいいかも。そうでないと、敵のボタンも生成する必要があるためその時にうまくいかない。Home画面のキャラ詳細ポップアップではその都度計算が必要になるのかも。
             prefab.Button.interactable = false;
         }
     }
@@ -115,7 +131,7 @@ public class TeamAssemblyPop : MonoBehaviour
             charaButton.CopyButton = null;
 
             // CharaButtonの並び替え
-            SortCharaButton(Array.FindIndex(playerTeamCharaTran, x => x == charaButton.CopyButton.transform.parent));
+            SortCharaButton(System.Array.FindIndex(playerTeamCharaTran, x => x == charaButton.CopyButton.transform.parent));
         }
     }
 

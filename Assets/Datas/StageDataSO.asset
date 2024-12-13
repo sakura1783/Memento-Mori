@@ -15,14 +15,16 @@ MonoBehaviour:
   stageDataList:
   - stageNo: 1
     enemyDataList:
-    - name: 0
-      level: 0
+    - name: 3
+      level: 1
+    - name: 2
+      level: 1
   - stageNo: 2
     enemyDataList:
     - name: 0
-      level: 0
+      level: 1
     - name: 0
-      level: 0
+      level: 1
   - stageNo: 3
     enemyDataList:
     - name: 0
