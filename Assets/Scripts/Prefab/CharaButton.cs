@@ -20,7 +20,7 @@ public class CharaButton : MonoBehaviour
 
     [SerializeField] private Text txtCharaLevel;
 
-    private GameData.OwnedCharaData charaData;
+    private GameData.CharaConstData charaData;
 
     private TeamAssemblyPop teamAssemblyPop;
 
@@ -41,7 +41,7 @@ public class CharaButton : MonoBehaviour
     }
 
 
-    public void Setup(GameData.OwnedCharaData charaData, TeamAssemblyPop teamAssemblyPop)
+    public void Setup(GameData.CharaConstData charaData, TeamAssemblyPop teamAssemblyPop)
     {
         this.charaData = charaData;
         this.teamAssemblyPop = teamAssemblyPop;
@@ -78,7 +78,7 @@ public class CharaButton : MonoBehaviour
         else
         {
             // キャラをチームに追加
-            var chara = new TeamAssemblyPop.TeamMemberInfo(charaData.name, charaData.level);
+            var chara = new GameData.CharaConstData(charaData.name, charaData.level);
             teamAssemblyPop.playerTeamInfo.Add(chara);
 
             // 画面うえにCharaButtonを生成

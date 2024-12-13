@@ -6,30 +6,9 @@ using UniRx;
 
 public class TeamAssemblyPop : MonoBehaviour
 {
-    /// <summary>
-    /// 編成されたキャラの名前とレベル
-    /// </summary>
-    [System.Serializable]
-    public class TeamMemberInfo
-    {
-        public CharaName name;
-        public int level;
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="level"></param>
-        public TeamMemberInfo(CharaName name, int level)
-        {
-            this.name = name;
-            this.level = level;
-        }
-    }
-
     // TODO privateにしてプロパティに変更
-    public List<TeamMemberInfo> playerTeamInfo;  // プレイヤーチームに編成されたキャラの、最低限の情報群。この情報を使ってバトルの最初で各キャラのステータスを計算する
-    public List<TeamMemberInfo> opponentTeamInfo;
+    public List<GameData.CharaConstData> playerTeamInfo;  // プレイヤーチームに編成されたキャラの、最低限の情報群。この情報を使ってバトルの最初で各キャラのステータスを計算する
+    public List<GameData.CharaConstData> opponentTeamInfo;
 
     [SerializeField] private Button btnFight;
 
@@ -97,7 +76,7 @@ public class TeamAssemblyPop : MonoBehaviour
         foreach (var enemyData in stageData.stageDataList.FirstOrDefault(data => data.stageNo == GameData.instance.clearStageNo + 1).enemyDataList)
         {
             // 敵チームを編成
-            var enemy = new TeamMemberInfo(enemyData.name, enemyData.level);
+            var enemy = new GameData.CharaConstData(enemyData.name, enemyData.level);
             opponentTeamInfo.Add(enemy);
         }
 

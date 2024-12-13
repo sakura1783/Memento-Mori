@@ -20,12 +20,12 @@ public class CharaStatusPannel : MonoBehaviour
     [SerializeField] private Transform buffPlace;
 
 
-    public void Setup(CharaController charaController, TeamAssemblyPop.TeamMemberInfo charaInfo)
+    public void Setup(CharaController charaController, GameData.CharaConstData charaData)
     {
         this.charaController = charaController;
 
-        imgChara.sprite = SpriteManager.instance.GetCharaSprite(charaInfo.name, CharaSpriteType.Face);
-        txtCharaInfo.text = $"{charaInfo.level}Lv {charaInfo.name}";
+        imgChara.sprite = SpriteManager.instance.GetCharaSprite(charaData.name, CharaSpriteType.Face);
+        txtCharaInfo.text = $"{charaData.level}Lv {charaData.name}";
         txtHpValue.text = $"{charaController.Hp} / {charaController.MaxHp}";
         hpSlider.value = 1;
 
