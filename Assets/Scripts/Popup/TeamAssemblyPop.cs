@@ -29,14 +29,14 @@ public class TeamAssemblyPop : MonoBehaviour
     [SerializeField] private GSSReceiver gssReceiver;
 
     // テスト
-    private async void Start()
-    {
-        //Debug.Log(CalculateDamage(17000, 370, 11000));
+    // private async void Start()
+    // {
+    //     //Debug.Log(CalculateDamage(17000, 370, 11000));
 
-        await gssReceiver.PrepareGSSLoadStartAsync();
+    //     await gssReceiver.PrepareGSSLoadStartAsync();
 
-        Setup();
-    }
+    //     Setup();
+    // }
 
     /// <summary>
     /// ポップアップが開かれる時毎回行う処理
@@ -48,10 +48,19 @@ public class TeamAssemblyPop : MonoBehaviour
         // TODO 保存しておいた前回のチーム編成でキャラのボタンを画面うえに生成
     
         // キャラ一覧にキャラボタンを生成
-        foreach (var data in GameData.instance.ownedCharaDataList)
+        // foreach (var data in GameData.instance.ownedCharaDataList)
+        // {
+        //     var charaButton = Instantiate(charaButtonPrefab, charactersTran);
+        //     charaButton.Setup(data, this);
+        // }
+
+        for (int i = 0; i < 10; i++)
+        {
+            foreach (var data in GameData.instance.ownedCharaDataList)
         {
             var charaButton = Instantiate(charaButtonPrefab, charactersTran);
             charaButton.Setup(data, this);
+        }
         }
 
         btnFight.OnClickAsObservable()

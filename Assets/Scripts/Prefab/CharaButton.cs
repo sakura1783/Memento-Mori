@@ -24,7 +24,7 @@ public class CharaButton : MonoBehaviour
 
     private TeamAssemblyPop teamAssemblyPop;
 
-    private bool isSelected = false;  // コピーと本体で独立した値を持っているので、一方の値を変えてももう一方の値は変わらない。また、コピー側ではこの値は常にfalseにしておく(監視処理の影響を受けたくないので)
+    private bool isSelected = false;  // コピーと本体で独立した値を持っているので、一方の値を変えてももう一方の値は変わらない
 
     private GameObject copyButton;  // 画面うえに生成した、コピーされたCharaButtonのゲームオブジェクト
     public GameObject CopyButton
@@ -53,6 +53,8 @@ public class CharaButton : MonoBehaviour
             .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
             .Subscribe(_ =>
             {
+                Debug.Log("ボタンが押されました");
+
                 ModifyPlayerTeam();
             });
     }
