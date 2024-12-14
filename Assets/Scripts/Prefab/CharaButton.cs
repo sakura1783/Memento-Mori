@@ -46,7 +46,9 @@ public class CharaButton : MonoBehaviour
         this.charaData = charaData;
         this.teamAssemblyPop = teamAssemblyPop;
 
-        // TODO ImageやTextの設定
+        // TODO 見た目の設定
+        imgChara.sprite = SpriteManager.instance.GetCharaSprite(charaData.name, CharaSpriteType.Face);
+
         button.OnClickAsObservable()
             .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
             .Subscribe(_ =>

@@ -1,8 +1,6 @@
 using System.Linq;
 using UnityEngine;
 
-
-
 /// <summary>
 /// 画像取得用クラス
 /// </summary>

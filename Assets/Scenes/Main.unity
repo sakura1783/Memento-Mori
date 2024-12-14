@@ -6869,6 +6869,7 @@ GameObject:
   - component: {fileID: 1692895452}
   - component: {fileID: 1692895454}
   - component: {fileID: 1692895453}
+  - component: {fileID: 1692895455}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -6906,25 +6907,10 @@ MonoBehaviour:
   ownedCharaDataList:
   - name: 0
     level: 5
-    combatPower: 0
-    attackPower: 0
-    defencePower: 0
-    hp: 0
-    criticalRate: 0
   - name: 1
     level: 5
-    combatPower: 0
-    attackPower: 0
-    defencePower: 0
-    hp: 0
-    criticalRate: 0
   - name: 4
     level: 5
-    combatPower: 0
-    attackPower: 0
-    defencePower: 0
-    hp: 0
-    criticalRate: 0
   clearMapNo: 0
   clearStageNo: 0
 --- !u!114 &1692895453
@@ -6954,6 +6940,19 @@ MonoBehaviour:
   charaInitialDataSO: {fileID: 11400000, guid: 50da83abfc2f349cfa950851bdb53cbf, type: 2}
   mapDataSO: {fileID: 11400000, guid: 4f724b21f2b22438b8a62ed9d9debd0c, type: 2}
   stageDataSO: {fileID: 11400000, guid: c8cf2d71619134fefaeb0baf019ab388, type: 2}
+--- !u!114 &1692895455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1692895450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa08466680b9f4fc1b67b62d8e739c79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  charaSpriteDataSO: {fileID: 11400000, guid: 735dfb0dcdf5f4c0ca9e6fae5d1268c6, type: 2}
 --- !u!1 &1701532777
 GameObject:
   m_ObjectHideFlags: 0
@@ -9043,7 +9042,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.00007746191}
+  m_AnchoredPosition: {x: 0, y: 0.000019616804}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2051304981
@@ -9533,7 +9532,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_AnchorMin.x
@@ -9541,7 +9540,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_SizeDelta.x
@@ -9581,11 +9580,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 250
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -110
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6401546835044482702, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
