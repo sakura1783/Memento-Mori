@@ -84,7 +84,7 @@ public class TeamAssemblyPop : MonoBehaviour
         for (int i = 0; i < opponentTeamInfo.Count; i++)
         {
             var prefab = Instantiate(charaButtonPrefab, opponentTeamCharaTran[i], false);
-            //prefab.Setup()  // TODO ボタンのSetUpメソッド、引数はownedCharaクラスではなく、名前やレベルなどボタンの見た目に必要な情報だけ渡せばいいかも。そうでないと、敵のボタンも生成する必要があるためその時にうまくいかない。Home画面のキャラ詳細ポップアップではその都度計算が必要になるのかも。
+            prefab.Setup(opponentTeamInfo[i], this);
             prefab.Button.interactable = false;
         }
     }
