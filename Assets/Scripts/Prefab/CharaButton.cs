@@ -30,6 +30,11 @@ public class CharaButton : MonoBehaviour
     private TeamAssemblyPop teamAssemblyPop;
 
     private bool isSelected = false;  // コピーと本体で独立した値を持っているので、一方の値を変えてももう一方の値は変わらない
+    public bool IsSelected
+    {
+        get => isSelected;
+        set => isSelected = value;
+    }
 
     private CharaButton copyButton;  // 画面うえに生成した、コピーされたCharaButtonのゲームオブジェクト
     public CharaButton CopyButton
@@ -38,12 +43,12 @@ public class CharaButton : MonoBehaviour
         set => copyButton = value;
     }
 
-    private bool isCopied;  // コピーされた(画面うえに生成された)ものかどうか
-    public bool IsCopied
-    {
-        get => isCopied;
-        set => isCopied = value;
-    }
+    // private bool isCopied;  // コピーされた(画面うえに生成された)ものかどうか
+    // public bool IsCopied
+    // {
+    //     get => isCopied;
+    //     set => isCopied = value;
+    // }
 
 
     public void Setup(GameData.CharaConstData charaData, TeamAssemblyPop teamAssemblyPop)
@@ -76,7 +81,7 @@ public class CharaButton : MonoBehaviour
         // TODO 本体のボタンの見た目変更(選択されていることがわかるようにする)
 
         // すでに選択されているボタン、またはコピーのボタンを押した場合
-        if (isSelected || isCopied)
+        if (isSelected) //|| isCopied)
         {
             // キャラをチームから外す
             teamAssemblyPop.playerTeamInfo.RemoveAll(data => data.name == charaData.name);  // RemoveではなくRemoveAllを使えば、ラムダ式を使ってより簡潔に記述できる

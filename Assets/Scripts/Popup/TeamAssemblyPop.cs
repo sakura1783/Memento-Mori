@@ -3,6 +3,8 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
+using UnityEngine.Animations;
+using Unity.VisualScripting;
 
 public class TeamAssemblyPop : MonoBehaviour
 {
@@ -112,31 +114,48 @@ public class TeamAssemblyPop : MonoBehaviour
             var generateTran = playerTeamCharaTran.FirstOrDefault(x => x.transform.childCount <= 0);
             charaButton.CopyButton = Instantiate(charaButtonPrefab, generateTran, false);
             charaButton.CopyButton.Setup(charaButton.CharaData, this);
-            charaButton.CopyButton.IsCopied = true;
+            //charaButton.CopyButton.IsCopied = true;
+            charaButton.CopyButton.IsSelected = true;
+            charaButton.CopyButton.CopyButton = charaButton.CopyButton;  // TODO ややこしい。どうにかしたい
         }
         else
         {
-            // CharaButtonを破棄
+            SortCharaButton(System.Array.FindIndex(playerTeamCharaTran, x => x == charaButton.CopyButton.transform.parent));
+
             Destroy(charaButton.CopyButton.gameObject);
             charaButton.CopyButton = null;
-
-            // CharaButtonの並び替え
-            SortCharaButton(System.Array.FindIndex(playerTeamCharaTran, x => x == charaButton.CopyButton.transform.parent));
+            charaButton.IsSelected = false;
         }
     }
 
     /// <summary>
-    /// 画面うえに生成されているCharaButtonの並び替え
+    /// 画面うえのCharaButtonを並び替え
     /// </summary>
     /// <param name="removedIndex">破棄されたCharaButtonの要素番号</param>
     public void SortCharaButton(int removedIndex)
     {
+        // オブジェクトをそれぞれ左に1個ずつずらす
         for (int i = removedIndex; i < playerTeamCharaTran.Length; i++)
         {
-            // オブジェクトをそれぞれ左に1個ずつずらす
-            playerTeamCharaTran[i + 1].GetChild(0).position = playerTeamCharaTran[i].position;
+            if (playerTeamCharaTran[i + 1].childCount <= 0)
+            {
+                // CharaTranに子(CharaButton)が存在しない場合、処理しない
+                return;
+            }
+
             // 親を再設定
             playerTeamCharaTran[i + 1].GetChild(0).SetParent(playerTeamCharaTran[i]);
+            
+            // positionを再設定(新しい親の位置にずらす)
+            if (i == removedIndex)
+            {
+                // 最初の要素の場合、CharaTran[i]には破壊する予定のCharaButtonがまだいるので、2番目の子を参照する
+                playerTeamCharaTran[i].GetChild(1).localPosition = Vector2.zero;
+            }
+            else
+            {
+                playerTeamCharaTran[i].GetChild(0).localPosition = Vector2.zero;
+            }
         }
     }
 
