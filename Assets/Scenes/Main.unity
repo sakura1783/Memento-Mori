@@ -8894,7 +8894,8 @@ MonoBehaviour:
   - {fileID: 1519456743}
   txtPlayerTeamCombat: {fileID: 516293662}
   txtOpponentTeamCombat: {fileID: 658684526}
-  charaButtonPrefab: {fileID: 3258061684216097395, guid: 31880dd8a4fda4f52b51115f10f67bc0, type: 3}
+  charaButtonPrefab: {fileID: 3258061684216097395, guid: becee1d292cac4d2580caac5e938e3f5, type: 3}
+  copyButtonPrefab: {fileID: 7122701190368898673, guid: 31880dd8a4fda4f52b51115f10f67bc0, type: 3}
   gssReceiver: {fileID: 750197301}
 --- !u!114 &2044851258
 MonoBehaviour:

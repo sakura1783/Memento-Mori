@@ -3,8 +3,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
-using UnityEngine.Animations;
-using Unity.VisualScripting;
 
 public class TeamAssemblyPop : MonoBehaviour
 {
@@ -24,8 +22,9 @@ public class TeamAssemblyPop : MonoBehaviour
     [SerializeField] private Text txtPlayerTeamCombat;
     [SerializeField] private Text txtOpponentTeamCombat;
 
-    [SerializeField] private CharaButton charaButtonPrefab;
+    [SerializeField] private CharaButton charaButtonPrefab;  // Characters下に生成するキャラのボタン
 
+    [SerializeField] private CopyButton copyButtonPrefab;  // 画面うえに生成するキャラのボタン
 
     // TODO テスト。他の場所に移す
     [SerializeField] private GSSReceiver gssReceiver;
@@ -95,9 +94,9 @@ public class TeamAssemblyPop : MonoBehaviour
         // 画面うえにキャラのボタン(interactableは切る)を生成
         for (int i = 0; i < opponentTeamInfo.Count; i++)
         {
-            var prefab = Instantiate(charaButtonPrefab, opponentTeamCharaTran[i], false);
-            prefab.Setup(opponentTeamInfo[i], this);
-            prefab.Button.interactable = false;
+            var charaButton = Instantiate(charaButtonPrefab, opponentTeamCharaTran[i], false);
+            charaButton.Setup(opponentTeamInfo[i], this);
+            charaButton.Button.interactable = false;
         }
     }
 
@@ -106,25 +105,29 @@ public class TeamAssemblyPop : MonoBehaviour
     /// </summary>
     /// <param name="isAssembled"></param>
     /// <param name="charaButton">コピーするCharaButton</param>
-    public void SetCharaButton(bool isAssembled, CharaButton charaButton)
+    public void SetCopyButton(bool isAssembled, CharaButton charaButton)
     {
         if (isAssembled)
         {
-            // CharaButtonを生成
+            // CopyButtonを生成
             var generateTran = playerTeamCharaTran.FirstOrDefault(x => x.transform.childCount <= 0);
-            charaButton.CopyButton = Instantiate(charaButtonPrefab, generateTran, false);
-            charaButton.CopyButton.Setup(charaButton.CharaData, this);
+            charaButton.CopyButton = Instantiate(copyButtonPrefab, generateTran);
+            charaButton.CopyButton.Setup(charaButton, this);
             //charaButton.CopyButton.IsCopied = true;
-            charaButton.CopyButton.IsSelected = true;
-            charaButton.CopyButton.CopyButton = charaButton.CopyButton;  // TODO ややこしい。どうにかしたい
+            // charaButton.CopyButton.IsSelected = true;
+            // charaButton.CopyButton.CopyButton = charaButton.CopyButton;
         }
         else
         {
-            SortCharaButton(System.Array.FindIndex(playerTeamCharaTran, x => x == charaButton.CopyButton.transform.parent));
+            // SortCharaButton(System.Array.FindIndex(playerTeamCharaTran, x => x == charaButton.CopyButton.transform.parent));
 
-            Destroy(charaButton.CopyButton.gameObject);
-            charaButton.CopyButton = null;
-            charaButton.IsSelected = false;
+            // // ボタンを破棄
+            // Destroy(charaButton.CopyButton.gameObject);
+            // charaButton.CopyButton = null;
+            // charaButton.IsSelected = false;
+            // 破壊時、コピーを押した時本体のisSelectedがtrueのまま。次にもう一度編成しようとしてタップした際にMissingエラーになってしまう
+
+            charaButton.CopyButton.RemoveCopyButton();
         }
     }
 
@@ -135,7 +138,7 @@ public class TeamAssemblyPop : MonoBehaviour
     public void SortCharaButton(int removedIndex)
     {
         // オブジェクトをそれぞれ左に1個ずつずらす
-        for (int i = removedIndex; i < playerTeamCharaTran.Length; i++)
+        for (int i = removedIndex; i < playerTeamCharaTran.Length - 1; i++)  // <= 繰り返しの条件として、6番目の要素を参照するとIndexOutOfRangeエラーになるので配列-1を指定。
         {
             if (playerTeamCharaTran[i + 1].childCount <= 0)
             {
@@ -145,7 +148,7 @@ public class TeamAssemblyPop : MonoBehaviour
 
             // 親を再設定
             playerTeamCharaTran[i + 1].GetChild(0).SetParent(playerTeamCharaTran[i]);
-            
+
             // positionを再設定(新しい親の位置にずらす)
             if (i == removedIndex)
             {

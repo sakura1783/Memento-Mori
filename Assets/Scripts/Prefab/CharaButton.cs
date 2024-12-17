@@ -36,8 +36,8 @@ public class CharaButton : MonoBehaviour
         set => isSelected = value;
     }
 
-    private CharaButton copyButton;  // 画面うえに生成した、コピーされたCharaButtonのゲームオブジェクト
-    public CharaButton CopyButton
+    private CopyButton copyButton;  // 画面うえに生成した、コピーされたCharaButtonのゲームオブジェクト
+    public CopyButton CopyButton
     {
         get => copyButton;
         set => copyButton = value;
@@ -63,14 +63,9 @@ public class CharaButton : MonoBehaviour
             .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
             .Subscribe(_ =>
             {
-                // チームがすでに満員の場合、処理しない
-                if (teamAssemblyPop.IsTeamAtMaxCapacity()) return;
-                // {
-                //     return;
-                // }
-
                 ModifyPlayerTeam();
-            });
+            })
+            .AddTo(this);
     }
 
     /// <summary>
@@ -86,8 +81,8 @@ public class CharaButton : MonoBehaviour
             // キャラをチームから外す
             teamAssemblyPop.playerTeamInfo.RemoveAll(data => data.name == charaData.name);  // RemoveではなくRemoveAllを使えば、ラムダ式を使ってより簡潔に記述できる
 
-            // 画面うえからCharaButtonを破棄
-            teamAssemblyPop.SetCharaButton(false, this);
+            // 画面うえからCopyButtonを破棄
+            teamAssemblyPop.SetCopyButton(false, this);
 
             isSelected = false;
 
@@ -95,12 +90,18 @@ public class CharaButton : MonoBehaviour
         }
         else
         {
+            // チームがすでに満員の場合、処理しない
+            if (teamAssemblyPop.IsTeamAtMaxCapacity()) return;
+            // {
+            //     return;
+            // }
+
             // キャラをチームに追加
             var chara = new GameData.CharaConstData(charaData.name, charaData.level);
             teamAssemblyPop.playerTeamInfo.Add(chara);
 
-            // 画面うえにCharaButtonを生成
-            teamAssemblyPop.SetCharaButton(true, this);
+            // 画面うえにCopyButtonを生成
+            teamAssemblyPop.SetCopyButton(true, this);
 
             isSelected = true;
         }
