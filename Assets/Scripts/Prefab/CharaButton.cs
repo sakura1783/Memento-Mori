@@ -58,7 +58,11 @@ public class CharaButton : MonoBehaviour
             .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
             .Subscribe(_ =>
             {
-                Debug.Log("ボタンが押されました");
+                // チームがすでに満員の場合、処理しない
+                if (teamAssemblyPop.IsTeamAtMaxCapacity()) return;
+                // {
+                //     return;
+                // }
 
                 ModifyPlayerTeam();
             });

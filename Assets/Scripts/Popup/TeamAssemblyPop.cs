@@ -108,8 +108,6 @@ public class TeamAssemblyPop : MonoBehaviour
     {
         if (isAssembled)
         {
-            // TODO 5体編成されてもワールド空間に生成できてしまうので直す
-
             // CharaButtonを生成
             var generateTran = playerTeamCharaTran.FirstOrDefault(x => x.transform.childCount <= 0);
             charaButton.CopyButton = Instantiate(charaButtonPrefab, generateTran, false);
@@ -140,6 +138,15 @@ public class TeamAssemblyPop : MonoBehaviour
             // 親を再設定
             playerTeamCharaTran[i + 1].GetChild(0).SetParent(playerTeamCharaTran[i]);
         }
+    }
+
+    /// <summary>
+    /// チームが満員かどうかを調べる。trueで満員
+    /// </summary>
+    /// <returns></returns>
+    public bool IsTeamAtMaxCapacity()
+    {
+        return !playerTeamCharaTran.FirstOrDefault(x => x.transform.childCount <= 0);
     }
 
 
