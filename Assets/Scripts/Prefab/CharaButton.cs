@@ -21,13 +21,18 @@ public class CharaButton : MonoBehaviour
     [SerializeField] private Text txtCharaLevel;
 
     private GameData.CharaConstData charaData;
+    public GameData.CharaConstData CharaData
+    {
+        get => charaData;
+        set => charaData = value;
+    }
 
     private TeamAssemblyPop teamAssemblyPop;
 
     private bool isSelected = false;  // コピーと本体で独立した値を持っているので、一方の値を変えてももう一方の値は変わらない
 
-    private GameObject copyButton;  // 画面うえに生成した、コピーされたCharaButtonのゲームオブジェクト
-    public GameObject CopyButton
+    private CharaButton copyButton;  // 画面うえに生成した、コピーされたCharaButtonのゲームオブジェクト
+    public CharaButton CopyButton
     {
         get => copyButton;
         set => copyButton = value;
@@ -64,7 +69,7 @@ public class CharaButton : MonoBehaviour
     /// </summary>
     public void ModifyPlayerTeam()
     {
-        // TODO 本体のボタンの見た目変更
+        // TODO 本体のボタンの見た目変更(選択されていることがわかるようにする)
 
         // すでに選択されているボタン、またはコピーのボタンを押した場合
         if (isSelected || isCopied)

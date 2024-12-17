@@ -29,14 +29,14 @@ public class TeamAssemblyPop : MonoBehaviour
     [SerializeField] private GSSReceiver gssReceiver;
 
     // テスト
-    // private async void Start()
-    // {
-    //     //Debug.Log(CalculateDamage(17000, 370, 11000));
+    private async void Start()
+    {
+        //Debug.Log(CalculateDamage(17000, 370, 11000));
 
-    //     await gssReceiver.PrepareGSSLoadStartAsync();
+        await gssReceiver.PrepareGSSLoadStartAsync();
 
-    //     Setup();
-    // }
+        Setup();
+    }
 
     /// <summary>
     /// ポップアップが開かれる時毎回行う処理
@@ -54,13 +54,14 @@ public class TeamAssemblyPop : MonoBehaviour
         //     charaButton.Setup(data, this);
         // }
 
+        // テスト。たくさん生成
         for (int i = 0; i < 10; i++)
         {
             foreach (var data in GameData.instance.ownedCharaDataList)
-        {
-            var charaButton = Instantiate(charaButtonPrefab, charactersTran);
-            charaButton.Setup(data, this);
-        }
+            {
+                var charaButton = Instantiate(charaButtonPrefab, charactersTran);
+                charaButton.Setup(data, this);
+            }
         }
 
         btnFight.OnClickAsObservable()
@@ -107,15 +108,18 @@ public class TeamAssemblyPop : MonoBehaviour
     {
         if (isAssembled)
         {
+            // TODO 5体編成されてもワールド空間に生成できてしまうので直す
+
             // CharaButtonを生成
-            var generateTran = playerTeamCharaTran.FirstOrDefault(x => x.transform.childCount <= 0).transform;
-            charaButton.CopyButton = Instantiate(charaButton.gameObject, generateTran);
-            charaButton.IsCopied = true;
+            var generateTran = playerTeamCharaTran.FirstOrDefault(x => x.transform.childCount <= 0);
+            charaButton.CopyButton = Instantiate(charaButtonPrefab, generateTran, false);
+            charaButton.CopyButton.Setup(charaButton.CharaData, this);
+            charaButton.CopyButton.IsCopied = true;
         }
         else
         {
             // CharaButtonを破棄
-            Destroy(charaButton.CopyButton);
+            Destroy(charaButton.CopyButton.gameObject);
             charaButton.CopyButton = null;
 
             // CharaButtonの並び替え
