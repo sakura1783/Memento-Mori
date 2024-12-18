@@ -12,7 +12,7 @@ public class CopyButton : MonoBehaviour
     [SerializeField] private Image imgChara;
     [SerializeField] private Image imgRank;
     [SerializeField] private Image imgAttribute;
-    
+
     [SerializeField] private Text txtCharaLevel;
 
     private TeamAssemblyPop teamAssemblyPop;
@@ -45,7 +45,7 @@ public class CopyButton : MonoBehaviour
         // このゲームオブジェクトを破壊
         Destroy(gameObject);
 
-        baseButton.IsSelected = false;
+        baseButton.IsSelected.Value = false;
         baseButton.CopyButton = null;
     }
 }

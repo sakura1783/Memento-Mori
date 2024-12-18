@@ -20,6 +20,8 @@ public class CharaButton : MonoBehaviour
 
     [SerializeField] private Text txtCharaLevel;
 
+    [SerializeField] private CanvasGroup selectedSet;
+
     private GameData.CharaConstData charaData;
     public GameData.CharaConstData CharaData
     {
@@ -29,12 +31,13 @@ public class CharaButton : MonoBehaviour
 
     private TeamAssemblyPop teamAssemblyPop;
 
-    private bool isSelected = false;  // コピーと本体で独立した値を持っているので、一方の値を変えてももう一方の値は変わらない
-    public bool IsSelected
-    {
-        get => isSelected;
-        set => isSelected = value;
-    }
+    // private bool isSelected = false;  // コピーと本体で独立した値を持っているので、一方の値を変えてももう一方の値は変わらない
+    // public bool IsSelected
+    // {
+    //     get => isSelected;
+    //     set => isSelected = value;
+    // }
+    public ReactiveProperty<bool> IsSelected = new();
 
     private CopyButton copyButton;  // 画面うえに生成した、コピーされたCharaButtonのゲームオブジェクト
     public CopyButton CopyButton
@@ -61,10 +64,11 @@ public class CharaButton : MonoBehaviour
 
         button.OnClickAsObservable()
             .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
-            .Subscribe(_ =>
-            {
-                ModifyPlayerTeam();
-            })
+            .Subscribe(_ => ModifyPlayerTeam())
+            .AddTo(this);
+        
+        IsSelected
+            .Subscribe(IsSelected => selectedSet.alpha = IsSelected ? 1 : 0)
             .AddTo(this);
     }
 
@@ -76,7 +80,7 @@ public class CharaButton : MonoBehaviour
         // TODO 本体のボタンの見た目変更(選択されていることがわかるようにする)
 
         // すでに選択されているボタン、またはコピーのボタンを押した場合
-        if (isSelected) //|| isCopied)
+        if (IsSelected.Value) //|| isCopied)
         {
             // キャラをチームから外す
             teamAssemblyPop.playerTeamInfo.RemoveAll(data => data.name == charaData.name);  // RemoveではなくRemoveAllを使えば、ラムダ式を使ってより簡潔に記述できる
@@ -84,7 +88,7 @@ public class CharaButton : MonoBehaviour
             // 画面うえからCopyButtonを破棄
             teamAssemblyPop.SetCopyButton(false, this);
 
-            isSelected = false;
+            IsSelected.Value = false;
 
             return;
         }
@@ -103,7 +107,7 @@ public class CharaButton : MonoBehaviour
             // 画面うえにCopyButtonを生成
             teamAssemblyPop.SetCopyButton(true, this);
 
-            isSelected = true;
+            IsSelected.Value = true;
         }
     }
 }
