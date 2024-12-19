@@ -43,18 +43,14 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
     /// </summary>
     /// <param name="charaName"></param>
     /// <param name="targetLevel"></param>
-    public VariableStatus CalculateCharaStatus(CharaName charaName, int targetLevel)
+    public VariableStatus CalculateCharaStatus(CharaName charaName, int level)
     {
         // キャラの初期データを取得
         var charaData = (CharaInitialDataSO.CharaInitialData)DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.Where(data => data.englishName == charaName);
 
-        int combatPower = 0;
-        int attackPower = 0;
-        int defencePower = 0;
-        int hp = 0;
-        float criticalRate = 0;
+        var status = new VariableStatus();
 
-        for (int i = 1; i < targetLevel; i++)
+        for (int i = 1; i < level; i++)
         {
             // TODO キャラのランク(や職業)によってステータス上昇率を変更する
 
@@ -62,35 +58,28 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
             if (i % 20 == 0)
             {
                 // 現在の攻撃力、防御力、HPの30%を足す
-                attackPower += (int)Math.Round(charaData.initialAttackPower * ConstData.POWER_INC_RATE_BREAK_LIMIT, 0, MidpointRounding.AwayFromZero);
-                defencePower += (int)Math.Round(charaData.initialDefencePower * ConstData.POWER_INC_RATE_BREAK_LIMIT, 0, MidpointRounding.AwayFromZero);
-                hp += (int)Math.Round(charaData.initialHp * ConstData.POWER_INC_RATE_BREAK_LIMIT, 0, MidpointRounding.AwayFromZero);
+                status.attackPower += (int)Math.Round(charaData.initialAttackPower * ConstData.POWER_INC_RATE_BREAK_LIMIT, 0, MidpointRounding.AwayFromZero);
+                status.defencePower += (int)Math.Round(charaData.initialDefencePower * ConstData.POWER_INC_RATE_BREAK_LIMIT, 0, MidpointRounding.AwayFromZero);
+                status.hp += (int)Math.Round(charaData.initialHp * ConstData.POWER_INC_RATE_BREAK_LIMIT, 0, MidpointRounding.AwayFromZero);
 
                 // クリティカル率は限界突破の際に1%ずつ上昇
-                criticalRate += charaData.initialCriticalRate + 0.01f;
+                status.criticalRate += charaData.initialCriticalRate + 0.01f;
             }
             // 通常
             else
             {
                 // 現在の攻撃力、防御力、HPの2.5%を足す
-                attackPower += (int)Math.Round(charaData.initialAttackPower * ConstData.POWER_INC_RATE, 0, MidpointRounding.AwayFromZero);
-                defencePower += (int)Math.Round(charaData.initialDefencePower * ConstData.POWER_INC_RATE, 0, MidpointRounding.AwayFromZero);
-                hp += (int)Math.Round(charaData.initialHp * ConstData.POWER_INC_RATE, 0, MidpointRounding.AwayFromZero);
+                status.attackPower += (int)Math.Round(charaData.initialAttackPower * ConstData.POWER_INC_RATE, 0, MidpointRounding.AwayFromZero);
+                status.defencePower += (int)Math.Round(charaData.initialDefencePower * ConstData.POWER_INC_RATE, 0, MidpointRounding.AwayFromZero);
+                status.hp += (int)Math.Round(charaData.initialHp * ConstData.POWER_INC_RATE, 0, MidpointRounding.AwayFromZero);
             }
 
             // 上で求めた各ステータスから、戦闘力を計算。
             // 戦闘力 = 攻撃力+防御力+補正後HP+補正後クリティカル率
-            combatPower = (int)Math.Round(attackPower + defencePower + (hp * ConstData.HP_MODIFIRE) + (attackPower + attackPower * 0.5) / ConstData.ATTACK_MODIFIER * criticalRate, 0, MidpointRounding.AwayFromZero);
+            status.combatPower = (int)Math.Round(status.attackPower + status.defencePower + (status.hp * ConstData.HP_MODIFIRE) + (status.attackPower + status.attackPower * 0.5) / ConstData.ATTACK_MODIFIER * status.criticalRate, 0, MidpointRounding.AwayFromZero);
         }
 
         // 呼び出し元に計算後のステータスの情報を返す
-        return new VariableStatus
-        {
-            combatPower = combatPower,
-            attackPower = attackPower,
-            defencePower = defencePower,
-            hp = hp,
-            criticalRate = criticalRate,
-        };
+        return status;
     }
 }
