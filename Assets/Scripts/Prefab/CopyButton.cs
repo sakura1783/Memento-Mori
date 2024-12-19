@@ -42,6 +42,9 @@ public class CopyButton : MonoBehaviour
         // 画面うえのCharaButton群を並び替え
         teamAssemblyPop.SortCharaButton(System.Array.FindIndex(teamAssemblyPop.PlayerTeamCharaTran, x => x == transform.parent));
 
+        // キャラをチームから外す
+        teamAssemblyPop.playerTeamInfo.RemoveAll(chara => chara.name == baseButton.CharaData.name);
+
         // このゲームオブジェクトを破壊
         Destroy(gameObject);
 

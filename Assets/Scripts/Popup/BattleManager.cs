@@ -55,22 +55,42 @@ public class BattleManager : PopupBase
     /// </summary>
     private void Battle()
     {
-        // TODO 味方1番手→敵1番手→味方2番手の順に攻撃
+        // 無限ループになるので一旦コメントアウト
+        // do
+        // {
+        //     ExecuteTurn();
 
-        for (int i = 0; i < playerTeam.Count; i++)
-        {
-            // TODO 味方の攻撃
-
-            // TODO 敵の攻撃
-
-            // TODO 各攻撃後、IsBattleOverでバトルを終了するか判定する
-
-            // TODO 次のターンへ(全てのキャラが一回攻撃し終えたらターンを進める)
-        }
+        // } while (!IsBattleOver());
     }
 
     /// <summary>
-    /// バトルを終了させるかどうか判断する
+    /// バトルのターン内で行う処理
+    /// </summary>
+    private void ExecuteTurn()
+    {
+        int count = 0;  // do-while文が何回回ったか
+
+        // TODO 味方1番手→敵1番手→味方2番手...の順に攻撃  // TODO 素早さの順に攻撃
+
+        do
+        {
+            // 味方の攻撃
+            // playerTeam[count].//スキルを使用
+            // CharaControllerに
+
+            // 敵の攻撃
+
+            // 各攻撃後、IsBattleOverでバトルを終了するか判定する
+
+            // 次のターンへ(全てのキャラが一回攻撃し終えたらターンを進める)
+
+            count++;
+
+        } while (count < playerTeam.Count && count < opponentTeam.Count);  // 全員が1回行動するまで繰り返す
+    }
+
+    /// <summary>
+    /// バトルを終了させるかどうか判断する。trueで終了
     /// </summary>
     /// <returns></returns>
     private bool IsBattleOver()
@@ -81,13 +101,13 @@ public class BattleManager : PopupBase
 
         if (isPlayerDefeated)
         {
-            // TODO プレイヤーが勝った際の処理、または勝ったことが分かるようにする
-            // TODO 勝敗(勝ったか、負けたか)を何かしらの形で返す
+            // プレイヤーが負けた際の処理、または負けたことが分かるようにする
+            // 勝敗(勝ったか、負けたか)を何かしらの形で返す
             return true;
         }
         else if (isOpponentDefeated)
         {
-            // TODO
+            //
 
             return true;
         }
