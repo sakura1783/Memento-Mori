@@ -9,6 +9,9 @@ public class PopupBase : MonoBehaviour
     [SerializeField] protected Button btnClose;
 
 
+    /// <summary>
+    /// 初期設定。ゲーム実行時、最初に行う
+    /// </summary>
     public virtual void Setup()
     {
         canvasGroup.alpha = 0;

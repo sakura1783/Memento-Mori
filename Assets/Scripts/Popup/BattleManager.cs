@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 
 
-public class BattleManager : MonoBehaviour
+public class BattleManager : PopupBase
 {
     public List<CharaController> playerTeam = new();  // TODO CharaStatusPannelクラスからCharaControllerクラスに変更！=> SkillManager等の処理がうまくいく気がする！
     public List<CharaController> opponentTeam = new();
@@ -15,6 +15,12 @@ public class BattleManager : MonoBehaviour
 
     [SerializeField] private TeamAssemblyPop teamAssemblyPop;
 
+
+    public override void ShowPopup()
+    {
+        base.ShowPopup();
+        PrepareBattle();
+    }
 
     /// <summary>
     /// バトルの準備

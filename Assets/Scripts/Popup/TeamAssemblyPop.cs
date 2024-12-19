@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 
-public class TeamAssemblyPop : MonoBehaviour
+public class TeamAssemblyPop : PopupBase
 {
     // TODO privateにしてプロパティに変更
     public List<GameData.CharaConstData> playerTeamInfo;  // プレイヤーチームに編成されたキャラの、最低限の情報群。この情報を使ってバトルの最初で各キャラのステータスを計算する
@@ -26,51 +26,49 @@ public class TeamAssemblyPop : MonoBehaviour
 
     [SerializeField] private CopyButton copyButtonPrefab;  // 画面うえに生成するキャラのボタン
 
-    // TODO テスト。他の場所に移す
-    [SerializeField] private GSSReceiver gssReceiver;
 
-    // テスト
-    private async void Start()
+    public override void Setup()
     {
-        //Debug.Log(CalculateDamage(17000, 370, 11000));
+        base.Setup();
 
-        await gssReceiver.PrepareGSSLoadStartAsync();
+        btnFight.OnClickAsObservable()
+            .ThrottleFirst(System.TimeSpan.FromSeconds(2f))
+            .Subscribe(_ => 
+            {
+                HidePopup();
 
-        Setup();
+                // バトル画面を表示
+                PopupManager.instance.Show<BattleManager>();
+            });
     }
 
     /// <summary>
     /// ポップアップが開かれる時毎回行う処理
     /// </summary>
-    public void Setup()
+    public override void ShowPopup()
     {
         AssembleOpponentTeam();
 
         // TODO 保存しておいた前回のチーム編成でキャラのボタンを画面うえに生成
     
         // キャラ一覧にキャラボタンを生成
-        // foreach (var data in GameData.instance.ownedCharaDataList)
-        // {
-        //     var charaButton = Instantiate(charaButtonPrefab, charactersTran);
-        //     charaButton.Setup(data, this);
-        // }
-
-        // テスト。たくさん生成
-        for (int i = 0; i < 10; i++)
+        foreach (var data in GameData.instance.ownedCharaDataList)
         {
-            foreach (var data in GameData.instance.ownedCharaDataList)
-            {
-                var charaButton = Instantiate(charaButtonPrefab, charactersTran);
-                charaButton.Setup(data, this);
-            }
+            var charaButton = Instantiate(charaButtonPrefab, charactersTran);
+            charaButton.Setup(data, this);
         }
 
-        btnFight.OnClickAsObservable()
-            .ThrottleFirst(System.TimeSpan.FromSeconds(2f))
-            .Subscribe(_ => 
-            {
-                // TODO ポップアップを閉じて、バトルへ
-            });
+        // テスト。たくさん生成
+        // for (int i = 0; i < 10; i++)
+        // {
+        //     foreach (var data in GameData.instance.ownedCharaDataList)
+        //     {
+        //         var charaButton = Instantiate(charaButtonPrefab, charactersTran);
+        //         charaButton.Setup(data, this);
+        //     }
+        // }
+
+        base.ShowPopup();
     }
 
     /// <summary>
