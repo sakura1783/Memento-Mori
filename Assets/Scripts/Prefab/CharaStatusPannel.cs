@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
+using System.Linq;
 
 /// <summary>
 /// キャラの状態の可視化のみを担う
@@ -25,7 +26,7 @@ public class CharaStatusPannel : MonoBehaviour
         this.charaController = charaController;
 
         imgChara.sprite = SpriteManager.instance.GetCharaSprite(charaData.name, CharaSpriteType.Face);
-        txtCharaInfo.text = $"{charaData.level}Lv {charaData.name}";
+        txtCharaInfo.text = $"Lv{charaData.level} {DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.FirstOrDefault(data => data.englishName == charaData.name).name}";
         txtHpValue.text = $"{charaController.Hp} / {charaController.MaxHp}";
         hpSlider.value = 1;
 

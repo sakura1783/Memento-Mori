@@ -282,11 +282,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8f4af5335b5248069039961bc620b1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imgChara: {fileID: 0}
-  txtCharaInfo: {fileID: 0}
-  txtHpValue: {fileID: 0}
-  hpSlider: {fileID: 0}
-  buffPlace: {fileID: 0}
+  imgChara: {fileID: 1963139232839983605}
+  txtCharaInfo: {fileID: 1963139233034913265}
+  txtHpValue: {fileID: 1963139233061827163}
+  hpSlider: {fileID: 1963139233129353613}
+  buffPlace: {fileID: 1963139233649768847}
 --- !u!1 &1963139232839983611
 GameObject:
   m_ObjectHideFlags: 0
