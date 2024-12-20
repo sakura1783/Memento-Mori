@@ -48,9 +48,6 @@ public class GameData : AbstractSingleton<GameData>
 
     public List<CharaConstData> ownedCharaDataList = new();
 
-    // public List<TeamAssemblyPop.TeamMemberInfo> playerTeamInfo;
-    // public List<TeamAssemblyPop.TeamMemberInfo> opponentTeamInfo;  // TODO いらない？
-
     public int clearMapNo = 0;  // クリアしたマップの番号。この値+1が次のマップ番号
     public int clearStageNo = 0;
 

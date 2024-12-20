@@ -55,7 +55,7 @@ public class BattleManager : PopupBase
     /// </summary>
     private void Battle()
     {
-        // 無限ループになるので一旦コメントアウト
+        // TODO 無限ループになるので一旦コメントアウト
         // do
         // {
         //     ExecuteTurn();
@@ -96,8 +96,8 @@ public class BattleManager : PopupBase
     private bool IsBattleOver()
     {
         // どちらのチームが敗北したかを判定
-        bool isPlayerDefeated = playerTeam.All(chara => chara.Hp.Value <= 0);  // All(条件)で、要素全てがその条件を満たしているかを判定する
-        bool isOpponentDefeated = opponentTeam.All(chara => chara.Hp.Value <= 0);
+        bool isPlayerDefeated = playerTeam.All(chara => chara.Status.Hp.Value <= 0);  // All(条件)で、要素全てがその条件を満たしているかを判定する
+        bool isOpponentDefeated = opponentTeam.All(chara => chara.Status.Hp.Value <= 0);
 
         if (isPlayerDefeated)
         {

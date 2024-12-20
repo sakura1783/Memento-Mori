@@ -27,15 +27,15 @@ public class CharaStatusPannel : MonoBehaviour
 
         imgChara.sprite = SpriteManager.instance.GetCharaSprite(charaData.name, CharaSpriteType.Face);
         txtCharaInfo.text = $"Lv{charaData.level} {DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.FirstOrDefault(data => data.englishName == charaData.name).name}";
-        txtHpValue.text = $"{charaController.Hp} / {charaController.MaxHp}";
+        txtHpValue.text = $"{charaController.Status.Hp} / {charaController.MaxHp}";
         hpSlider.value = 1;
 
         // 購読処理
-        charaController.Hp
+        charaController.Status.Hp
             .Subscribe(value =>
             {
-                txtHpValue.text = $"{charaController.Hp} / {charaController.MaxHp}";
-                hpSlider.value = charaController.Hp.Value / charaController.MaxHp;
+                txtHpValue.text = $"{charaController.Status.Hp} / {charaController.MaxHp}";
+                hpSlider.value = charaController.Status.Hp.Value / charaController.MaxHp;
             });
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using UniRx;
 
 public class CalculateManager : AbstractSingleton<CalculateManager>
 {
@@ -11,7 +12,7 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
         public int combatPower;
         public int attackPower;
         public int defencePower;
-        public int hp;
+        public ReactiveProperty<int> Hp;
         public float criticalRate;
 
         // TODO 複数の場所で使うのであれば、コンストラクタを作成しても良い
@@ -54,7 +55,8 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
             combatPower = charaData.initialCombatPower,
             attackPower = charaData.initialAttackPower,
             defencePower = charaData.initialDefencePower,
-            hp = charaData.initialHp,
+            //Hp.Value = charaData.initialHp,
+            Hp = { Value = charaData.initialHp },  // ReactivePropertyの場合、初期化はこのように記述する。↑だとエラーになる
             criticalRate = charaData.initialCriticalRate,
         };
 
@@ -68,7 +70,7 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
                 // 現在の攻撃力、防御力、HPの30%を足す
                 status.attackPower += (int)Math.Round(status.attackPower * ConstData.POWER_INC_RATE_BREAK_LIMIT, 0, MidpointRounding.AwayFromZero);
                 status.defencePower += (int)Math.Round(status.defencePower * ConstData.POWER_INC_RATE_BREAK_LIMIT, 0, MidpointRounding.AwayFromZero);
-                status.hp += (int)Math.Round(status.hp * ConstData.POWER_INC_RATE_BREAK_LIMIT, 0, MidpointRounding.AwayFromZero);
+                status.Hp.Value += (int)Math.Round(status.Hp.Value * ConstData.POWER_INC_RATE_BREAK_LIMIT, 0, MidpointRounding.AwayFromZero);
 
                 // クリティカル率は限界突破の際に1%ずつ上昇
                 status.criticalRate += 0.01f;
@@ -79,12 +81,12 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
                 // 現在の攻撃力、防御力、HPの2.5%を足す
                 status.attackPower += (int)Math.Round(status.attackPower * ConstData.POWER_INC_RATE, 0, MidpointRounding.AwayFromZero);
                 status.defencePower += (int)Math.Round(status.defencePower * ConstData.POWER_INC_RATE, 0, MidpointRounding.AwayFromZero);
-                status.hp += (int)Math.Round(status.hp * ConstData.POWER_INC_RATE, 0, MidpointRounding.AwayFromZero);
+                status.Hp.Value += (int)Math.Round(status.Hp.Value * ConstData.POWER_INC_RATE, 0, MidpointRounding.AwayFromZero);
             }
 
             // 上で求めた各ステータスから、戦闘力を計算。
             // 戦闘力 = 攻撃力+防御力+補正後HP+補正後クリティカル率
-            status.combatPower = (int)Math.Round(status.attackPower + status.defencePower + (status.hp * ConstData.HP_MODIFIRE) + (status.attackPower + status.attackPower * 0.5) / ConstData.ATTACK_MODIFIER * status.criticalRate, 0, MidpointRounding.AwayFromZero);
+            status.combatPower = (int)Math.Round(status.attackPower + status.defencePower + (status.Hp.Value * ConstData.HP_MODIFIRE) + (status.attackPower + status.attackPower * 0.5) / ConstData.ATTACK_MODIFIER * status.criticalRate, 0, MidpointRounding.AwayFromZero);
         }
 
         // 呼び出し元に計算後のステータスの情報を返す

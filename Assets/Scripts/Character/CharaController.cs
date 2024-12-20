@@ -7,12 +7,13 @@ using UniRx;
 /// </summary>
 public class CharaController
 {
-    private int attackPower;
-    private int defencePower;
+    private CharaName charaName;
+
+    private CalculateManager.VariableStatus status = new();
+    public CalculateManager.VariableStatus Status => status;
+
     private int maxHp;
     public int MaxHp => maxHp;
-    public ReactiveProperty<int> Hp = new();
-    private float criticalRate;
 
     // TODO バフなど
 
@@ -24,11 +25,8 @@ public class CharaController
     /// <param name="statusData"></param>
     public CharaController(CalculateManager.VariableStatus statusData)
     {
-        attackPower = statusData.attackPower;
-        defencePower = statusData.defencePower;
-        maxHp = statusData.hp;
-        Hp.Value = maxHp;
-        criticalRate = statusData.criticalRate;
+        status = statusData;
+        maxHp = status.Hp.Value;
     }
 
     /// <summary>
@@ -37,14 +35,22 @@ public class CharaController
     /// <param name="amount"></param>
     public void UpdateHp(int amount)
     {
-        Hp.Value += amount;
+        status.Hp.Value += amount;
     }
 
-    // BattleManagerの各チームListの型をこのクラスに変更
+    /// <summary>
+    /// 
+    /// </summary>
+    public void ExecuteAction()
+    {
+        // スキル使用(スキル1、スキル2...の順番、全てのスキルがクールタイム中の場合、通常攻撃。)
+    }
 
-    // GameDataのCharaDataは所持キャラの情報の管理のみに充てる
+    /// <summary>
+    /// 
+    /// </summary>
+    public void ExecutePassiveSkill()  // TODO 全てのパネルとCharaControllerを生成し終わって、バトルの一番最初で実行
+    {
 
-    // 上記もまだちょっと良いかわからない。CharaDataを利用している各箇所を見直す。CalculateStatus()など、型を一致させた方が良いかもしれない
-
-    // GameDataの中にCharaDataがあるのは不便であり、わかりづらくもある
+    }
 }
