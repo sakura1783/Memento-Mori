@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
+using Cysharp.Threading.Tasks;
 
 public class BattleManager : PopupBase
 {
-    public List<CharaController> playerTeam = new();  // TODO CharaStatusPannelクラスからCharaControllerクラスに変更！=> SkillManager等の処理がうまくいく気がする！
+    public List<CharaController> playerTeam = new();  // CharaStatusPannelクラスからCharaControllerクラスに変更！=> SkillManager等の処理がうまくいく気がする！
     public List<CharaController> opponentTeam = new();
 
     [SerializeField] private CharaStatusPannel charaStatusPennel;
@@ -48,45 +48,69 @@ public class BattleManager : PopupBase
         }
 
         Battle();
+
+        // TODO バトル後の処理
     }
 
     /// <summary>
     /// バトルの本処理
     /// </summary>
-    private void Battle()
+    private async void Battle()
     {
         // TODO 無限ループになるので一旦コメントアウト
-        // do
-        // {
-        //     ExecuteTurn();
+        while (true)
+        {
+            // IsBattleOver()でバトル終了判定が出たら、バトルを終了
+            if (!ExecuteTurn())
+            {
+                return;
+            }
+            
+            // TODO この場合、ExecuteTurnしっかり動く？if文の中に入ってるけど
 
-        // } while (!IsBattleOver());
+            // クールタイムを減らす
+            playerTeam.ForEach(chara => chara.ReduceCoolTimeByTurn());
+            opponentTeam.ForEach(chara => chara.ReduceCoolTimeByTurn());
+
+            // 無限ループになるので1フレーム待機  // TODO 確かめる
+            await UniTask.DelayFrame(1);
+        }
     }
 
     /// <summary>
     /// バトルのターン内で行う処理
     /// </summary>
-    private void ExecuteTurn()
+    /// <returns>バトルを終わるかどうか。trueでバトル続行(ターンを繰り返す)、falseでバトル終了(このメソッドだけでなく、Battle()からも抜ける)</returns>
+    private bool ExecuteTurn()
     {
         int count = 0;  // do-while文が何回回ったか
 
-        // TODO 味方1番手→敵1番手→味方2番手...の順に攻撃  // TODO 素早さの順に攻撃
-
+        // 味方1番手→敵1番手→味方2番手...の順に行動。各行動後、IsBattleOverでバトルを終了するか判定する // TODO 素早さの順に攻撃
         do
         {
-            // 味方の攻撃
-            // playerTeam[count].//スキルを使用
-            // CharaControllerに
+            // 味方の行動
+            if (playerTeam[count] != null)
+            {
+                playerTeam[count].ExecuteAction();
 
-            // 敵の攻撃
+                // 行動後にバトル終了かどうかを判定。終了の場合falseを返し、Battle()内の処理によって、Battle()内からも抜け出す
+                if (IsBattleOver()) return false;  
+            }
 
-            // 各攻撃後、IsBattleOverでバトルを終了するか判定する
+            // 敵の行動
+            if (opponentTeam[count] != null)
+            {
+                opponentTeam[count].ExecuteAction();
 
-            // 次のターンへ(全てのキャラが一回攻撃し終えたらターンを進める)
+                if (IsBattleOver()) return false;
+            }
 
             count++;
 
         } while (count < playerTeam.Count && count < opponentTeam.Count);  // 全員が1回行動するまで繰り返す
+
+        // 次のターンへ(全てのキャラが一回攻撃し終えたらターンを進める)
+        return true;
     }
 
     /// <summary>
