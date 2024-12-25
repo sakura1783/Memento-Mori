@@ -13,6 +13,7 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
         public int attackPower;
         public int defencePower;
         public ReactiveProperty<int> Hp;
+        // TODO MaxHp;
         public float criticalRate;
 
         // TODO 複数の場所で使うのであれば、コンストラクタを作成しても良い
@@ -49,6 +50,7 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
         //var charaData = (CharaInitialDataSO.CharaInitialData)DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.Where(data => data.englishName == charaName);  // <= Whereは複数の要素を保持する可能性があり、左辺var CharaDataは単一のデータを指す。よって、(CharaInitialDataSO.CharaInitialData)でキャストできないため、エラーになる。
         var charaData = DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.FirstOrDefault(data => data.englishName == charaName);  // ↑より、FirstOrDefaultを使う
 
+        // TODO 元のデータを参照しているので書き換えられてしまうのでは？スクリプタブル・オブジェクトを確認する
         // キャラの各ステータスの初期値(Lv1のとき)を設定
         var status = new VariableStatus
         {

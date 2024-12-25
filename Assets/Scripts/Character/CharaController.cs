@@ -1,5 +1,6 @@
 using UnityEngine;
 using UniRx;
+using System;
 
 /// <summary>
 /// バトル時、キャラクター制御クラス
@@ -7,8 +8,6 @@ using UniRx;
 /// </summary>
 public class CharaController
 {
-    //private CharaName charaName;
-
     private CharacterBase chara;
 
     private CalculateManager.VariableStatus status = new();
@@ -33,10 +32,33 @@ public class CharaController
     /// 計算後の各ステータスの値を受け取り、キャラに反映させる
     /// </summary>
     /// <param name="statusData"></param>
-    public CharaController(CalculateManager.VariableStatus statusData)
+    public CharaController(CalculateManager.VariableStatus statusData, CharaName charaName)
     {
         status = statusData;
         maxHp = status.Hp.Value;
+
+        // キャラクターとスキルを紐付け
+        CreateSkillEffect(charaName);
+    }
+
+    /// <summary>
+    /// 該当キャラクターのクラスのインスタンスを生成し、変数に代入して、キャラとスキルを紐付ける
+    /// </summary>
+    /// <param name="charaName"></param>
+    private void CreateSkillEffect(CharaName charaName)
+    {
+        // 引数で指定された型のクラスを取得
+        Type type = Type.GetType(charaName.ToString());
+
+        // クラスが見つからないか、CharacterBaseを継承していない場合
+        if (type == null || !typeof(CharacterBase).IsAssignableFrom(type))  // typeofで、指定したクラスの型情報を取得。IsAssignableFromで、指定した型が先ほど取得した型情報に代入可能か(=継承しているか)を判定。typeof(基底クラス).IsAssignableFrom(派生クラス)。
+        {
+            Debug.Log("キャラクターのクラスを取得できません");
+            return;
+        }
+
+        // type型のインスタンスを生成し、変数に代入 (CharacterBaseを継承しているクラス(該当のキャラの名前のクラス)が代入される)
+        chara = (CharacterBase)Activator.CreateInstance(type);  // Activator.CreateInstance()は、new()と同じ処理。インスタンスするクラスのコンストラクタが引数を持つ場合、第二引数以降に記述する
     }
 
     /// <summary>
