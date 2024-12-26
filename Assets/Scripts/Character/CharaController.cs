@@ -73,7 +73,7 @@ public class CharaController
     /// <summary>
     /// アクティブスキルを発動
     /// </summary>
-    public void ExecuteAction()
+    public void ExecuteActiveSkill()
     {
          // スキル使用(スキル1、スキル2...の順番、全てのスキルがクールタイム中の場合、通常攻撃。)
         if (active1RemainingCoolTime <= 0)

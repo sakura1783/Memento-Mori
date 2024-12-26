@@ -83,22 +83,22 @@ public class BattleManager : PopupBase
     {
         int count = 0;  // do-while文が何回回ったか
 
-        // 味方1番手→敵1番手→味方2番手...の順に行動。各行動後、IsBattleOverでバトルを終了するか判定する // TODO 素早さの順に攻撃
+        // 味方1番手→敵1番手→味方2番手...の順に行動  // TODO 素早さの順に攻撃
         do
         {
             // 味方の行動
             if (playerTeam[count] != null)
             {
-                playerTeam[count].ExecuteAction();
+                playerTeam[count].ExecuteActiveSkill();
 
-                // 行動後にバトル終了かどうかを判定。終了の場合falseを返し、Battle()内の処理によって、Battle()内からも抜け出す
+                // 行動後、バトル終了かどうかを判定。終了の場合falseを返し、Battle()内の処理によって、Battle()内からも抜け出す
                 if (IsBattleOver()) return false;  
             }
 
             // 敵の行動
             if (opponentTeam[count] != null)
             {
-                opponentTeam[count].ExecuteAction();
+                opponentTeam[count].ExecuteActiveSkill();
 
                 if (IsBattleOver()) return false;
             }
