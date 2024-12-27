@@ -91,10 +91,17 @@ public static class SkillManager
         return neighbors;
     }
 
-    // 攻撃力、Hp、クリティカル率等を処理するメソッド
-    // まとめるか、それとも各値ごとに分けた方がやりやすいか。
-
-    // レベルアップ後の追加処理は各キャラスクリプト内に記述する
+    /// <summary>
+    /// 基本攻撃
+    /// </summary>
+    /// <param name="targetType"></param>
+    /// <param name="attackPower">自身の攻撃力</param>
+    /// <param name="damagePercentage">攻撃力の何%分のダメージを与えるか</param>
+    /// <param name="targetDefencePower">攻撃対象の防御力</param>
+    public static void Attack(TargetType targetType, CalculateManager.VariableStatus charaStatus)
+    {
+        
+    }
 
 
     // TODO

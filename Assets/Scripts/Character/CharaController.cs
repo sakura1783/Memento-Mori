@@ -78,14 +78,14 @@ public class CharaController
          // スキル使用(スキル1、スキル2...の順番、全てのスキルがクールタイム中の場合、通常攻撃。)
         if (active1RemainingCoolTime <= 0)
         {
-            chara.ActiveSkill1();
+            chara.ActiveSkill1(status);
 
             // クールタイムを追加
             active1RemainingCoolTime += chara.Active1CoolTime;
         }
         else if (active2RemainingCoolTime <= 0)
         {
-            chara.ActiveSkill2();
+            chara.ActiveSkill2(status);
             active2RemainingCoolTime += chara.Active2CoolTime;
         }
         //else  // TODO 通常攻撃
@@ -101,7 +101,7 @@ public class CharaController
             .Where(coolTime => coolTime <= 0)
             .Subscribe(_ =>
             {
-                chara.PassiveSkill1();
+                chara.PassiveSkill1(status);
                 Passive1RemainingCoolTime.Value += chara.Passive1CoolTime;
             })
             .AddTo(disposables);
@@ -110,7 +110,7 @@ public class CharaController
             .Where(coolTime => coolTime <= 0)
             .Subscribe(_ =>
             {
-                chara.PassiveSkill2();
+                chara.PassiveSkill2(status);
                 Passive2RemainingCoolTime.Value += chara.Passive2CoolTime;
             })
             .AddTo(disposables);  

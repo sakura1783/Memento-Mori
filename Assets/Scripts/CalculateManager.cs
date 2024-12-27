@@ -25,14 +25,14 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
     /// </summary>
     /// <param name="attackPower"></param>
     /// <param name="damagePercentage">攻撃力の何%分のダメージを与えるか</param>
-    /// <param name="enemyDefencePower">敵の防御力</param>
+    /// <param name="targetDefencePower">攻撃対象の防御力</param>
     /// <returns></returns>
-    public int CalculateDamage(int attackPower, float damagePercentage, int enemyDefencePower)
+    public int CalculateDamage(int attackPower, float damagePercentage, int targetDefencePower)
     {
         int damage;
 
         // 通常(攻撃力*技/補正値)-(敵の防御力/補正値)
-        damage = (int)Math.Round(attackPower * (damagePercentage / 100) / ConstData.ATTACK_MODIFIER - (enemyDefencePower / ConstData.DEFENCE_MODIFIRE), 0, MidpointRounding.AwayFromZero);  // 少数第一位を四捨五入
+        damage = (int)Math.Round(attackPower * (damagePercentage / 100) / ConstData.ATTACK_MODIFIER - (targetDefencePower / ConstData.DEFENCE_MODIFIRE), 0, MidpointRounding.AwayFromZero);  // 少数第一位を四捨五入
 
         // TODO クリティカルボーナス、属性ボーナス
 
