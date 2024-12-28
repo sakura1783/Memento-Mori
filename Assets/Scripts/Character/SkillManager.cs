@@ -35,9 +35,9 @@ public static class SkillManager
     /// </summary>
     /// <param name="user">スキルを使うキャラ</param>
     /// <param name="targetType"></param>
-    /// <param name="count"></param>
+    /// <param name="count">取得するターゲットの数。敵?人、隣接する味方?人、など。count=-1(初期値、値を設定しない場合)で全員、それ以外は指定された数だけターゲットを取得</param>
     /// <returns></returns>
-    public static List<CharaController> PickTarget(CharaController user, TargetType targetType, int count)
+    public static List<CharaController> PickTarget(CharaController user, TargetType targetType, int count = -1)
     {
         List<CharaController> targetList = new();
 
@@ -58,9 +58,19 @@ public static class SkillManager
             case TargetType.Neighbor:
                 targetList.AddRange(PickNeighbor(user));
                 break;
-
-            // TODO 追加：攻撃力などの値が上位?人など
         }
+
+        // 取得するターゲットの数が指定されている場合
+        if (count != -1)
+        {
+            // リストの要素数を超えたターゲットの取得をしないように制御(必ず、count <= targetList.Count となる)
+            count = targetList.Count >= count ? count : targetList.Count;
+
+            // countだけランダムに抽出
+            targetList = targetList.OrderBy(_ => Random.value).Take(count).ToList();
+        }
+
+        // TODO 追加：攻撃力などの値が上位?人など
 
         return targetList;
     }
@@ -95,16 +105,14 @@ public static class SkillManager
     /// 基本攻撃
     /// </summary>
     /// <param name="targetType"></param>
-    /// <param name="attackPower">自身の攻撃力</param>
-    /// <param name="damagePercentage">攻撃力の何%分のダメージを与えるか</param>
-    /// <param name="targetDefencePower">攻撃対象の防御力</param>
-    public static void Attack(TargetType targetType, CalculateManager.VariableStatus charaStatus)
+    /// <param name="charaStatus">使用者のステータス</param>
+    public static void Attack()
     {
-        
+        //var targets = PickTarget(targetType)
     }
 
 
-    // TODO
+    /* */
     // 単純な攻撃
     // 回復
     // 最大HP増加

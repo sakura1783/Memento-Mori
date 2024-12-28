@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using UniRx;
 
-public class CalculateManager : AbstractSingleton<CalculateManager>
+public static class CalculateManager
 {
     /// <summary>
     /// レベルやバフに応じて変動するステータスを管理するクラス
@@ -21,30 +21,11 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
     
 
     /// <summary>
-    /// ダメージ計算
-    /// </summary>
-    /// <param name="attackPower"></param>
-    /// <param name="damagePercentage">攻撃力の何%分のダメージを与えるか</param>
-    /// <param name="targetDefencePower">攻撃対象の防御力</param>
-    /// <returns></returns>
-    public int CalculateDamage(int attackPower, float damagePercentage, int targetDefencePower)
-    {
-        int damage;
-
-        // 通常(攻撃力*技/補正値)-(敵の防御力/補正値)
-        damage = (int)Math.Round(attackPower * (damagePercentage / 100) / ConstData.ATTACK_MODIFIER - (targetDefencePower / ConstData.DEFENCE_MODIFIRE), 0, MidpointRounding.AwayFromZero);  // 少数第一位を四捨五入
-
-        // TODO クリティカルボーナス、属性ボーナス
-
-        return damage;
-    }
-
-    /// <summary>
     /// キャラの各ステータスを計算
     /// </summary>
     /// <param name="charaName"></param>
     /// <param name="targetLevel"></param>
-    public VariableStatus CalculateCharaStatus(CharaName charaName, int level)
+    public static VariableStatus CalculateCharaStatus(CharaName charaName, int level)
     {
         // キャラの初期データを取得
         //var charaData = (CharaInitialDataSO.CharaInitialData)DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.Where(data => data.englishName == charaName);  // <= Whereは複数の要素を保持する可能性があり、左辺var CharaDataは単一のデータを指す。よって、(CharaInitialDataSO.CharaInitialData)でキャストできないため、エラーになる。
@@ -93,5 +74,24 @@ public class CalculateManager : AbstractSingleton<CalculateManager>
 
         // 呼び出し元に計算後のステータスの情報を返す
         return status;
+    }
+
+    /// <summary>
+    /// ダメージ計算
+    /// </summary>
+    /// <param name="attackPower"></param>
+    /// <param name="damagePercentage">攻撃力の何%分のダメージを与えるか</param>
+    /// <param name="targetDefencePower">攻撃対象の防御力</param>
+    /// <returns></returns>
+    public static int CalculateDamage(int attackPower, float damagePercentage, int targetDefencePower)
+    {
+        int damage;
+
+        // 通常(攻撃力*技/補正値)-(敵の防御力/補正値)
+        damage = (int)Math.Round(attackPower * (damagePercentage / 100) / ConstData.ATTACK_MODIFIER - (targetDefencePower / ConstData.DEFENCE_MODIFIRE), 0, MidpointRounding.AwayFromZero);  // 少数第一位を四捨五入
+
+        // TODO クリティカルボーナス、属性ボーナス
+
+        return damage;
     }
 }

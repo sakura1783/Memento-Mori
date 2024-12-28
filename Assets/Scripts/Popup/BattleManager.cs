@@ -31,7 +31,7 @@ public class BattleManager : PopupBase
         foreach (var data in teamAssemblyPop.playerTeamInfo)
         {
             // CharaControllerの作成(キャラの制御)
-            var chara = new CharaController(CalculateManager.instance.CalculateCharaStatus(data.name, data.level), data.name);
+            var chara = new CharaController(CalculateManager.CalculateCharaStatus(data.name, data.level), data.name);
             playerTeam.Add(chara);  // チームのリストにキャラを追加
 
             // CharaPannelの生成(キャラの状態の可視化)
@@ -40,7 +40,7 @@ public class BattleManager : PopupBase
         }
         foreach (var data in teamAssemblyPop.opponentTeamInfo)
         {
-            var chara = new CharaController(CalculateManager.instance.CalculateCharaStatus(data.name, data.level), data.name);
+            var chara = new CharaController(CalculateManager.CalculateCharaStatus(data.name, data.level), data.name);
             opponentTeam.Add(chara);
 
             var charaPannel = Instantiate(charaStatusPennel, opponentTran);
