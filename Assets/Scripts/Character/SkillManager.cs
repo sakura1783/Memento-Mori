@@ -109,6 +109,10 @@ public static class SkillManager
     public static void Attack()
     {
         //var targets = PickTarget(targetType)
+
+        // ターゲットの抽出は各キャラのメソッド内で行う。
+
+
     }
 
 

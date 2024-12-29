@@ -77,21 +77,30 @@ public static class CalculateManager
     }
 
     /// <summary>
-    /// ダメージ計算
+    /// スキルが与えるステータスの変化量を計算
+    /// (例えば、「攻撃力の30%の値を回復」の場合、baseValue=攻撃力、rate=30を指定する)
     /// </summary>
-    /// <param name="attackPower"></param>
-    /// <param name="damagePercentage">攻撃力の何%分のダメージを与えるか</param>
-    /// <param name="targetDefencePower">攻撃対象の防御力</param>
+    /// <param name="baseValue">基準となる値</param>
+    /// <param name="rate">baseValueの何%分か</param>
+    /// <param name="targetDefencePower">攻撃時のみ使用</param>
     /// <returns></returns>
-    public static int CalculateDamage(int attackPower, float damagePercentage, int targetDefencePower)
+    public static int CalculateSkillEffectValue(int baseValue, int rate, int targetDefencePower = 0)
     {
-        int damage;
+        int value;
 
-        // 通常(攻撃力*技/補正値)-(敵の防御力/補正値)
-        damage = (int)Math.Round(attackPower * (damagePercentage / 100) / ConstData.ATTACK_MODIFIER - (targetDefencePower / ConstData.DEFENCE_MODIFIRE), 0, MidpointRounding.AwayFromZero);  // 少数第一位を四捨五入
+        if (targetDefencePower == 0)
+        {
+            value = (int)Math.Round((float)baseValue * (rate / 100), 0, MidpointRounding.AwayFromZero);  // 少数第一位を四捨五入。Math.Round(四捨五入したい値, 少数第何位で(0で少数第一位), MidpointRounding.AwayFromZeroで通常の四捨五入(指定しない場合、銀行丸めになる))
+        }
+        // 攻撃時(ターゲットの防御力、クリティカルボーナス、属性ボーナスなども処理)
+        else
+        {
+            // 通常(攻撃力*技/補正値)-(敵の防御力/補正値)
+            value = (int)Math.Round(baseValue * (rate / 100) / ConstData.ATTACK_MODIFIER - (targetDefencePower / ConstData.DEFENCE_MODIFIRE), 0, MidpointRounding.AwayFromZero);
 
-        // TODO クリティカルボーナス、属性ボーナス
+            // TODO クリティカルボーナス、属性ボーナス
+        }
 
-        return damage;
+        return value;
     }
 }
