@@ -1,6 +1,7 @@
 using UnityEngine;
 using UniRx;
 using System;
+using System.Linq;
 
 /// <summary>
 /// バトル時、キャラクター制御クラス
@@ -12,11 +13,6 @@ public class CharaController
 
     private CalculateManager.VariableStatus status = new();
     public CalculateManager.VariableStatus Status => status;
-
-    private int maxHp;
-    public int MaxHp => maxHp;
-
-    // TODO バフなど
 
     private int active1RemainingCoolTime;  // アクティブスキル1の残りのクールタイム
     private int active2RemainingCoolTime = 1;  // スキル1を最初に優先して発動するため、初期値は1に設定
@@ -35,7 +31,6 @@ public class CharaController
     public CharaController(CalculateManager.VariableStatus statusData, CharaName charaName)
     {
         status = statusData;
-        maxHp = status.Hp.Value;
 
         // キャラクターとスキルを紐付け
         CreateSkillEffect(charaName);
@@ -75,20 +70,36 @@ public class CharaController
     /// </summary>
     public void ExecuteActiveSkill()
     {
-         // スキル使用(スキル1、スキル2...の順番、全てのスキルがクールタイム中の場合、通常攻撃。)
-        if (active1RemainingCoolTime <= 0)
+        // 「気絶」または「睡眠」状態の場合、行動不能
+        if (status.Debuffs.Any(debuff => debuff.type == DebuffType.気絶 || debuff.type == DebuffType.睡眠))
         {
-            chara.ActiveSkill1(this);
+            return;
+        }
 
-            // クールタイムを追加
-            active1RemainingCoolTime += chara.Active1CoolTime;
-        }
-        else if (active2RemainingCoolTime <= 0)
+        // 「沈黙」状態の場合、スキルを使用できない
+        if (!status.Debuffs.Any(debuff => debuff.type == DebuffType.沈黙))
         {
-            chara.ActiveSkill2(this);
-            active2RemainingCoolTime += chara.Active2CoolTime;
+            // スキル使用(スキル1、スキル2...の順番、全てのスキルがクールタイム中の場合、通常攻撃。)
+            if (active1RemainingCoolTime <= 0)
+            {
+                chara.ActiveSkill1(this);
+
+                // クールタイムを追加
+                active1RemainingCoolTime += chara.Active1CoolTime;
+            }
+            else if (active2RemainingCoolTime <= 0)
+            {
+                chara.ActiveSkill2(this);
+                active2RemainingCoolTime += chara.Active2CoolTime;
+            }
         }
-        //else  // TODO 通常攻撃
+        else
+        {
+            // 通常攻撃
+            var targets = SkillManager.PickTarget(this, TargetType.Opponent, 1);
+
+            targets.ForEach(target => CalculateManager.CalculateSkillEffectValue(status.attackPower, 100, target.Status.defencePower));
+        }
     }
 
     /// <summary>

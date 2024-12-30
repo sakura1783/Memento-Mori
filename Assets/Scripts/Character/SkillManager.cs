@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UniRx;
 using UnityEngine;
 
 /// <summary>
@@ -111,6 +112,12 @@ public static class SkillManager
     {
         // baseValueのrate分の値を計算し、攻撃対象のHPを削る
         target.UpdateHp(-CalculateManager.CalculateSkillEffectValue(baseValue, rate, target.Status.defencePower));
+
+        // 「睡眠」状態を解除
+        if (target.Status.Debuffs.Any(debuff => debuff.type == DebuffType.睡眠))
+        {
+            RemoveDebuff(target, DebuffType.睡眠);
+        }
     }
 
     /// <summary>
@@ -121,6 +128,12 @@ public static class SkillManager
     /// <param name="rate"></param>
     public static void Heal(CharaController target, int baseValue, int rate)
     {
+        // 「不治」状態の場合、HPを回復できない
+        if (target.Status.Debuffs.Any(debuff => debuff.type == DebuffType.不治))  // Any()で、List内に条件に一致する要素があるかどうか判定
+        {
+            return;
+        }
+
         target.UpdateHp(CalculateManager.CalculateSkillEffectValue(baseValue, rate));
     }
 
@@ -166,6 +179,33 @@ public static class SkillManager
     {
         // クリティカル率のみ、CalculateManagerを利用せずに処理可能
         target.Status.criticalRate += rate;
+    }
+
+    /// <summary>
+    /// デバフを追加
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="debuffType"></param>
+    /// <param name="duration"></param>
+    /// <param name="damageRate">基準値の?%分のダメージを与えるか。「毒」「侵食」などで使用する</param>
+    public static void AddDebuff(CharaController target, DebuffType debuffType, int duration, int damageRate = 0)
+    {
+        // すでに該当のデバフを持っている場合、継続時間だけ更新して処理を終了
+
+        // デバフを作成
+        var debuff = new Debuff(debuffType, duration, damageRate);
+
+        target.Status.Debuffs.Add(debuff);
+    }
+
+    /// <summary>
+    /// デバフを削除
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="debuffType"></param>
+    public static void RemoveDebuff(CharaController target, DebuffType debuffType)
+    {
+        target.Status.Debuffs.Remove(target.Status.Debuffs.FirstOrDefault(debuff => debuff.type == debuffType));
     }
 
 

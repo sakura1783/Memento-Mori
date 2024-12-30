@@ -81,6 +81,17 @@ public class BattleManager : PopupBase
     /// <returns>バトルを終わるかどうか。trueでバトル続行(ターンを繰り返す)、falseでバトル終了(このメソッドだけでなく、Battle()からも抜ける)</returns>
     private bool ExecuteTurn()
     {
+        //「毒」状態の場合、現在HP*?%のダメージを受ける
+        foreach (var chara in playerTeam.Concat(opponentTeam))  // Concat()でリスト2つを結合し、処理を簡素化
+        {
+            var poisonDebuff = chara.Status.Debuffs.FirstOrDefault(x => x.type == DebuffType.毒);
+
+            if (poisonDebuff != null)
+            {
+                chara.UpdateHp(-CalculateManager.CalculateSkillEffectValue(chara.Status.Hp.Value, poisonDebuff.damageRate));
+            }
+        }
+        
         int count = 0;  // do-while文が何回回ったか
 
         // 味方1番手→敵1番手→味方2番手...の順に行動  // TODO 素早さの順に攻撃

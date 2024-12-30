@@ -5,7 +5,7 @@ using UniRx;
 public static class CalculateManager
 {
     /// <summary>
-    /// レベルやバフに応じて変動するステータスを管理するクラス
+    /// レベルやスキルに応じて変動するステータスを管理するクラス
     /// </summary>
     public class VariableStatus
     {
@@ -15,6 +15,8 @@ public static class CalculateManager
         public ReactiveProperty<int> Hp;
         public ReactiveProperty<int> MaxHp;
         public float criticalRate;
+
+        public ReactiveCollection<Debuff> Debuffs;  // 持っているデバフ
 
         // TODO 複数の場所で使うのであれば、コンストラクタを作成しても良い
     }
