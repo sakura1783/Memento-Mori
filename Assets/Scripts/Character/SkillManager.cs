@@ -102,17 +102,70 @@ public static class SkillManager
     }
 
     /// <summary>
-    /// 基本攻撃
+    /// 通常攻撃
     /// </summary>
-    /// <param name="targetType"></param>
-    /// <param name="charaStatus">使用者のステータス</param>
-    public static void Attack()
+    /// <param name="target"></param>
+    /// <param name="baseValue">基準となる値</param>
+    /// <param name="rate"></param>
+    public static void Attack(CharaController target, int baseValue, int rate)
     {
-        //var targets = PickTarget(targetType)
+        // baseValueのrate分の値を計算し、攻撃対象のHPを削る
+        target.UpdateHp(-CalculateManager.CalculateSkillEffectValue(baseValue, rate, target.Status.defencePower));
+    }
 
-        // ターゲットの抽出は各キャラのメソッド内で行う。
+    /// <summary>
+    /// 回復
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="baseValue"></param>
+    /// <param name="rate"></param>
+    public static void Heal(CharaController target, int baseValue, int rate)
+    {
+        target.UpdateHp(CalculateManager.CalculateSkillEffectValue(baseValue, rate));
+    }
 
+    /// <summary>
+    /// 最大HPを増加
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="rate"></param>
+    public static void IncreaseMaxHp(CharaController target, int rate)
+    {
+        target.Status.MaxHp.Value += CalculateManager.CalculateSkillEffectValue(target.Status.MaxHp.Value, rate);
+    }
 
+    /// <summary>
+    /// 攻撃力の増加・減少
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="baseValue"></param>
+    /// <param name="rate"></param>
+    /// <param name="isIncrease">trueで増加、falseで減少</param>
+    public static void ModifyAttackPower(CharaController target, int baseValue, int rate, bool isIncrease)
+    {
+        target.Status.attackPower += isIncrease ? +CalculateManager.CalculateSkillEffectValue(baseValue, rate) : -CalculateManager.CalculateSkillEffectValue(baseValue, rate);
+    }
+
+    /// <summary>
+    /// 防御力の増加・減少
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="rate"></param>
+    /// <param name="isIncrease"></param>
+    public static void ModifyDefencePower(CharaController target, int rate, bool isIncrease)
+    {
+        target.Status.defencePower += isIncrease ? +CalculateManager.CalculateSkillEffectValue(target.Status.defencePower, rate) : -CalculateManager.CalculateSkillEffectValue(target.Status.defencePower, rate);
+    }
+
+    /// <summary>
+    /// クリティカル率増加
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="rate"></param>
+    public static void IncreaseCriticalRate(CharaController target, int rate)
+    {
+        // クリティカル率のみ、CalculateManagerを利用せずに処理可能
+        target.Status.criticalRate += rate;
     }
 
 
@@ -120,7 +173,7 @@ public static class SkillManager
     // 単純な攻撃
     // 回復
     // 最大HP増加
-    // 攻撃力増加・減少
+    // 攻撃力増加・減少  // baseValue
     // 防御力増加・減少
     // クリティカル率増加・減少
 

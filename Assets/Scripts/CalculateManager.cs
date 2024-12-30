@@ -13,7 +13,7 @@ public static class CalculateManager
         public int attackPower;
         public int defencePower;
         public ReactiveProperty<int> Hp;
-        // TODO MaxHp;
+        public ReactiveProperty<int> MaxHp;
         public float criticalRate;
 
         // TODO 複数の場所で使うのであれば、コンストラクタを作成しても良い
