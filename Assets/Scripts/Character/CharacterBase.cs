@@ -16,20 +16,20 @@ public abstract class CharacterBase
     /// <summary>
     /// アクティブスキル1
     /// </summary>
-    public abstract void ActiveSkill1(CalculateManager.VariableStatus status);
+    public abstract void ActiveSkill1(CharaController user);
 
     /// <summary>
     /// アクティブスキル2
     /// </summary>
-    public abstract void ActiveSkill2(CalculateManager.VariableStatus status);
+    public abstract void ActiveSkill2(CharaController user);
 
     /// <summary>
     /// パッシブスキル1
     /// </summary>
-    public abstract void PassiveSkill1(CalculateManager.VariableStatus status);
+    public abstract void PassiveSkill1(CharaController user);
 
     /// <summary>
     /// パッシブスキル2
     /// </summary>
-    public virtual void PassiveSkill2(CalculateManager.VariableStatus status){}  // パッシブスキルは2個あるキャラと1個だけのキャラがいるのでabstractではなくvirtualにして、派生クラスでの実装は自由にする
+    public virtual void PassiveSkill2(CharaController user){}  // パッシブスキルは2個あるキャラと1個だけのキャラがいるのでabstractではなくvirtualにして、派生クラスでの実装は自由にする
 }

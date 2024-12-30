@@ -1,5 +1,6 @@
 /// <summary>
 /// ローゼヴィリアのスキル
+/// 各スキルメソッドには、SkillManagerのメソッドを組み合わせて処理を作る
 /// </summary>
 public class Rosevillea : CharacterBase
 {
@@ -9,18 +10,33 @@ public class Rosevillea : CharacterBase
     // 必要であればパッシブのクールタイムも追加
 
 
-    public override void ActiveSkill1(CalculateManager.VariableStatus status)
+    /// <summary>
+    /// ランダムな敵1体に攻撃力*190%の攻撃  // TODO 2ターンの間「気絶」を付与
+    /// </summary>
+    /// <param name="user"></param>
+    public override void ActiveSkill1(CharaController user)
     {
-        // ローゼヴィリアのアクティブスキル1の処理。
-        // SKillManagerのメソッドを組み合わせてスキル処理を作る
+        // ターゲットを取得(戻り値はList<CharaController>型)    
+        var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
+
+        // 攻撃
+        targets.ForEach(target => SkillManager.Attack(target, user.Status.attackPower, 390));
     }
 
-    public override void ActiveSkill2(CalculateManager.VariableStatus status)
+    /// <summary>
+    /// ローゼヴィリアのアクティブスキル2
+    /// </summary>
+    /// <param name="user"></param>
+    public override void ActiveSkill2(CharaController user)
     {
 
     }
 
-    public override void PassiveSkill1(CalculateManager.VariableStatus status)
+    /// <summary>
+    /// ローゼヴィリアのパッシブスキル1
+    /// </summary>
+    /// <param name="user"></param>
+    public override void PassiveSkill1(CharaController user)
     {
 
     }
