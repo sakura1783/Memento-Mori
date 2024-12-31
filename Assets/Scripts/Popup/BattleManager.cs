@@ -67,8 +67,12 @@ public class BattleManager : PopupBase
             }
 
             // クールタイムを減らす
-            playerTeam.ForEach(chara => chara.ReduceCoolTimeByTurn());
-            opponentTeam.ForEach(chara => chara.ReduceCoolTimeByTurn());
+            // playerTeam.ForEach(chara => chara.ReduceCoolTimeByTurn());
+            // opponentTeam.ForEach(chara => chara.ReduceCoolTimeByTurn());
+            foreach (var chara in playerTeam.Concat(opponentTeam))  // 上記の処理を簡略化
+            {
+                chara.ReduceCoolTimeByTurn();
+            }
 
             // 無限ループになるので1フレーム待機  // TODO 確かめる
             await UniTask.DelayFrame(1);

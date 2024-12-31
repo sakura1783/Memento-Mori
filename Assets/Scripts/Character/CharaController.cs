@@ -135,15 +135,30 @@ public class CharaController
     }
 
     /// <summary>
-    /// ターン毎に全てのスキルのクールタイムを1減らす
+    /// ターン毎に全てのスキルとデバフのクールタイムを1減少
     /// </summary>
     public void ReduceCoolTimeByTurn()
     {
-        active1RemainingCoolTime = Mathf.Clamp(active1RemainingCoolTime - 1, 0, int.MaxValue);
-        active2RemainingCoolTime = Mathf.Clamp(active2RemainingCoolTime - 1, 0, int.MaxValue);
+        // 各スキルのクールタイムを減少
+        active1RemainingCoolTime = ReduceCoolTime(active1RemainingCoolTime);
+        active2RemainingCoolTime = ReduceCoolTime(active2RemainingCoolTime);
+        Passive1RemainingCoolTime.Value = ReduceCoolTime(Passive1RemainingCoolTime.Value);
+        Passive2RemainingCoolTime.Value = ReduceCoolTime(Passive2RemainingCoolTime.Value);
+        
+        // 各デバフのクールタイムを減少
+        foreach (var debuff in status.Debuffs.Where(x => x.type != DebuffType.睡眠))  // 「睡眠」はクールタイムの処理を行わない
+        {
+            debuff.duration = ReduceCoolTime(debuff.duration);
+        }
 
-        Passive1RemainingCoolTime.Value = Mathf.Clamp(Passive1RemainingCoolTime.Value - 1, 0, int.MaxValue);
-        Passive2RemainingCoolTime.Value = Mathf.Clamp(Passive2RemainingCoolTime.Value - 1, 0, int.MaxValue);
+
+        // ローカル変数。このメソッド内でしか使えない
+        int ReduceCoolTime(int reduceValue)  // 減らしたいクールタイムを引数で指定
+        {
+            var coolTime = Mathf.Clamp(reduceValue - 1, 0, int.MaxValue);
+
+            return coolTime;
+        }
     }
 
     /// <summary>
