@@ -190,7 +190,15 @@ public static class SkillManager
     /// <param name="damageRate">基準値の?%分のダメージを与えるか。「毒」「侵食」などで使用する</param>
     public static void AddDebuff(CharaController target, DebuffType debuffType, int duration, int damageRate = 0)
     {
-        // すでに該当のデバフを持っている場合、継続時間だけ更新して処理を終了
+        // 重ね掛け不可。継続時間とダメージ割合を置き換えて、処理を終了
+        var duplicateDebuff = target.Status.Debuffs.FirstOrDefault(x => x.type == debuffType);
+        if (duplicateDebuff != null)
+        {
+            duplicateDebuff.duration = duration;
+            duplicateDebuff.damageRate = damageRate;
+
+            return;
+        }
 
         // デバフを作成
         var debuff = new Debuff(debuffType, duration, damageRate);
