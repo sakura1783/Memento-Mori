@@ -11,7 +11,7 @@ public class Rosevillea : CharacterBase
 
 
     /// <summary>
-    /// ランダムな敵1体に攻撃力*190%の攻撃  // TODO 2ターンの間「気絶」を付与
+    /// ランダムな敵1体に攻撃力*390%の攻撃。さらに、2ターンの間「気絶」を付与
     /// </summary>
     /// <param name="user"></param>
     public override void ActiveSkill1(CharaController user)
@@ -19,26 +19,32 @@ public class Rosevillea : CharacterBase
         // ターゲットを取得(戻り値はList<CharaController>型)    
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
 
-        // 攻撃
-        targets.ForEach(target => SkillManager.Attack(target, user.Status.attackPower, 390));
+        // スキル処理
+        targets.ForEach(target =>
+        {
+            SkillManager.Attack(target, user.Status.attackPower, 390);
+            SkillManager.AddDebuff(target, DebuffType.気絶, 2);
+        });
     }
 
     /// <summary>
-    /// ローゼヴィリアのアクティブスキル2
+    /// ランダムな敵1体に攻撃力*420%の攻撃。
     /// </summary>
     /// <param name="user"></param>
     public override void ActiveSkill2(CharaController user)
     {
+        var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
 
+        targets.ForEach(target => SkillManager.Attack(target, user.Status.attackPower, 420));
     }
 
     /// <summary>
-    /// ローゼヴィリアのパッシブスキル1
+    /// 自身の攻撃力が20%増加する(解除不可)。
     /// </summary>
     /// <param name="user"></param>
     public override void PassiveSkill1(CharaController user)
     {
-
+        SkillManager.ModifyAttackPower(user, user.Status.attackPower, 20, true);
     }
 
     // 必要であればPassiveSkill2()も記述
