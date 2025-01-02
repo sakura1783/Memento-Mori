@@ -1,3 +1,6 @@
+using UniRx;
+
+
 /// <summary>
 /// デバフの種類
 /// </summary>
@@ -16,7 +19,7 @@ public enum DebuffType
 public class Debuff
 {
     public DebuffType type;
-    public int duration;
+    public ReactiveProperty<int> Duration = new();
 
     public int damageRate;  // 基準となる値(現在HP、総与ダメージ等)の?%分のダメージを与えるか。「毒」「侵食」などで使用する
 
@@ -30,7 +33,7 @@ public class Debuff
     public Debuff(DebuffType type, int duration, int damageRate = 0)
     {
         this.type = type;
-        this.duration = duration;
+        Duration.Value = duration;
         this.damageRate = damageRate;
     }
 }

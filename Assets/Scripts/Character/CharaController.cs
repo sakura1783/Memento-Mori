@@ -25,11 +25,11 @@ public class CharaController
 
     /// <summary>
     /// コンストラクタ
-    /// 計算後の各ステータスの値を受け取り、キャラに反映させる
     /// </summary>
     /// <param name="statusData"></param>
     public CharaController(CalculateManager.VariableStatus statusData, CharaName charaName)
     {
+        // 計算後の各ステータスの値を受け取り、キャラに反映
         status = statusData;
 
         // キャラクターとスキルを紐付け
@@ -148,7 +148,7 @@ public class CharaController
         // 各デバフのクールタイムを減少
         foreach (var debuff in status.Debuffs.Where(x => x.type != DebuffType.睡眠))  // 「睡眠」はクールタイムの処理を行わない
         {
-            debuff.duration = ReduceCoolTime(debuff.duration);
+            debuff.Duration.Value = ReduceCoolTime(debuff.Duration.Value);
         }
 
 

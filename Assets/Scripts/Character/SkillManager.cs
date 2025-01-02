@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UniRx;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -194,16 +195,20 @@ public static class SkillManager
         var duplicateDebuff = target.Status.Debuffs.FirstOrDefault(x => x.type == debuffType);
         if (duplicateDebuff != null)
         {
-            duplicateDebuff.duration = duration;
+            duplicateDebuff.Duration.Value = duration;
             duplicateDebuff.damageRate = damageRate;
 
             return;
         }
 
-        // デバフを作成
+        // デバフを生成して、追加
         var debuff = new Debuff(debuffType, duration, damageRate);
-
         target.Status.Debuffs.Add(debuff);
+
+        // 監視処理。継続時間が0になったら、デバフを削除
+        debuff.Duration  
+            .Where(x => x == 0)
+            .Subscribe(_ => RemoveDebuff(target, debuff.type));  // TODO Removeされたときにインスタンスの参照が切れるのでAddTo行わなくても大丈夫？必要な場合、どのように記述すれば良いか？
     }
 
     /// <summary>
