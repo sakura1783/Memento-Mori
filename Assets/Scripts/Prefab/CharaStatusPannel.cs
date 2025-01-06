@@ -4,12 +4,10 @@ using UniRx;
 using System.Linq;
 
 /// <summary>
-/// キャラの状態の可視化のみを担う
+/// バトルのキャラの状態の可視化のみを担う
 /// </summary>
 public class CharaStatusPannel : MonoBehaviour
 {
-    private CharaController charaController;
-
     [SerializeField] private Image imgChara;
 
     [SerializeField] private Text txtCharaInfo;  // txtCharaLv,Nameをアサイン
@@ -23,8 +21,6 @@ public class CharaStatusPannel : MonoBehaviour
 
     public void Setup(CharaController charaController, GameData.CharaConstData charaData)
     {
-        this.charaController = charaController;
-
         imgChara.sprite = SpriteManager.instance.GetCharaSprite(charaData.name, CharaSpriteType.Face);
         txtCharaInfo.text = $"Lv{charaData.level} {DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.FirstOrDefault(data => data.englishName == charaData.name).name}";
         txtHpValue.text = $"{charaController.Status.Hp} / {charaController.Status.MaxHp}";
@@ -47,7 +43,7 @@ public class CharaStatusPannel : MonoBehaviour
                 debuff.sprite = SpriteManager.instance.GetDebuffSprite(eventData.Value.type);  // 引数(eventData).Valueでコレクションに追加された要素を取得
             })
             .AddTo(this);
-            
+
         charaController.Status.Debuffs
             .ObserveRemove()
             .Subscribe(eventData => Destroy(gameObject))

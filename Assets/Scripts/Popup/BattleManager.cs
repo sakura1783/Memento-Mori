@@ -3,6 +3,13 @@ using System.Linq;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 
+public enum BattleState
+{
+    Continue,
+    Win,
+    Lose,
+}
+
 public class BattleManager : PopupBase
 {
     public List<CharaController> playerTeam = new();  // CharaStatusPannelクラスからCharaControllerクラスに変更！=> SkillManager等の処理がうまくいく気がする！
@@ -14,6 +21,8 @@ public class BattleManager : PopupBase
     [SerializeField] private Transform opponentTran;
 
     [SerializeField] private TeamAssemblyPop teamAssemblyPop;
+
+    private BattleState battleState;
 
 
     public override void ShowPopup()
@@ -27,6 +36,8 @@ public class BattleManager : PopupBase
     /// </summary>
     private void PrepareBattle()
     {
+        battleState = BattleState.Continue;
+
         // 各チーム各キャラのステータスを計算し、リストに追加
         foreach (var data in teamAssemblyPop.playerTeamInfo)
         {
@@ -48,23 +59,17 @@ public class BattleManager : PopupBase
         }
 
         Battle();
-
-        // TODO バトル後の処理
     }
 
     /// <summary>
-    /// バトルの本処理
+    /// バトル〜終了まで
     /// </summary>
-    private async void Battle()
+    private void Battle()
     {
-        // TODO 無限ループになるので一旦コメントアウト
-        while (true)
+        // 勝敗がつくまでターンをループ
+        do
         {
-            // IsBattleOver()でバトル終了判定が出たら、バトルを終了
-            if (!ExecuteTurn())
-            {
-                return;
-            }
+            ExecuteTurn();
 
             // クールタイムを減らす
             // playerTeam.ForEach(chara => chara.ReduceCoolTimeByTurn());
@@ -74,16 +79,17 @@ public class BattleManager : PopupBase
                 chara.ReduceCoolTimeByTurn();
             }
 
-            // 無限ループになるので1フレーム待機  // TODO 確かめる
-            await UniTask.DelayFrame(1);
-        }
+        }while (battleState == BattleState.Continue);
+
+        // バトル後の処理
+        OnBattleEnd();
     }
 
     /// <summary>
     /// バトルのターン内で行う処理
     /// </summary>
-    /// <returns>バトルを終わるかどうか。trueでバトル続行(ターンを繰り返す)、falseでバトル終了(このメソッドだけでなく、Battle()からも抜ける)</returns>
-    private bool ExecuteTurn()
+    /// <returns>バトルを終わるかどうか。trueでバトル続行(ターンを繰り返す)、trueでバトル終了(このメソッドだけでなく、Battle()からも抜ける)</returns>
+    private void ExecuteTurn()
     {
         //「毒」状態の場合、現在HP*?%のダメージを受ける
         foreach (var chara in playerTeam.Concat(opponentTeam))  // Concat()でリスト2つを結合し、処理を簡素化
@@ -106,8 +112,8 @@ public class BattleManager : PopupBase
             {
                 playerTeam[count].ExecuteActiveSkill();
 
-                // 行動後、バトル終了かどうかを判定。終了の場合falseを返し、Battle()内の処理によって、Battle()内からも抜け出す
-                if (IsBattleOver()) return false;  
+                // 行動後、バトル終了かどうかを判定。終了の場合trueを返し、Battle()内の処理によって、Battle()内からも抜け出す
+                if (IsBattleOver()) return;  // <= return IsBattleOver()では、似ているようで違う処理になってしまうのでダメ。
             }
 
             // 敵の行動
@@ -115,7 +121,7 @@ public class BattleManager : PopupBase
             {
                 opponentTeam[count].ExecuteActiveSkill();
 
-                if (IsBattleOver()) return false;
+                if (IsBattleOver()) return;
             }
 
             count++;
@@ -123,7 +129,7 @@ public class BattleManager : PopupBase
         } while (count < playerTeam.Count && count < opponentTeam.Count);  // 全員が1回行動するまで繰り返す
 
         // 次のターンへ(全てのキャラが一回攻撃し終えたらターンを進める)
-        return true;
+        return;
     }
 
     /// <summary>
@@ -132,24 +138,19 @@ public class BattleManager : PopupBase
     /// <returns></returns>
     private bool IsBattleOver()
     {
-        // どちらのチームが敗北したかを判定
-        bool isPlayerDefeated = playerTeam.All(chara => chara.Status.Hp.Value <= 0);  // All(条件)で、要素全てがその条件を満たしているかを判定する
-        bool isOpponentDefeated = opponentTeam.All(chara => chara.Status.Hp.Value <= 0);
-
-        if (isPlayerDefeated)
+        if (playerTeam.All(chara => chara.Status.Hp.Value <= 0))  // All(条件)で、要素全てがその条件を満たしているかを判定する
         {
-            // プレイヤーが負けた際の処理、または負けたことが分かるようにする
-            // 勝敗(勝ったか、負けたか)を何かしらの形で返す
+            battleState = BattleState.Lose;
             return true;
         }
-        else if (isOpponentDefeated)
+        else if (opponentTeam.All(chara => chara.Status.Hp.Value <= 0))
         {
-            //
-
+            battleState = BattleState.Win;
             return true;
         }
         else
         {
+            battleState = BattleState.Continue;
             return false;
         }
     }
@@ -159,6 +160,8 @@ public class BattleManager : PopupBase
     /// </summary>
     private void OnBattleEnd()
     {
+        // TODO
+
         playerTeam.Clear();
         opponentTeam.Clear();
     }
