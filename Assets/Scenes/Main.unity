@@ -6213,6 +6213,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   charaSpriteDataSO: {fileID: 11400000, guid: 735dfb0dcdf5f4c0ca9e6fae5d1268c6, type: 2}
+  debuffSpriteDataSO: {fileID: 11400000, guid: e16a691b02d944394bbe19aa8040c38a, type: 2}
 --- !u!114 &1692895456
 MonoBehaviour:
   m_ObjectHideFlags: 0

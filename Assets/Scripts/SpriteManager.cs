@@ -7,6 +7,7 @@ using UnityEngine;
 public class SpriteManager : AbstractSingleton<SpriteManager>
 {
     public CharaSpriteDataSO charaSpriteDataSO;
+    public DebuffSpriteDataSO debuffSpriteDataSO;
 
 
     /// <summary>
@@ -45,5 +46,15 @@ public class SpriteManager : AbstractSingleton<SpriteManager>
             // switch式は網羅的ではないらしい
             _ => throw new System.ArgumentException(),
         };
+    }
+
+    /// <summary>
+    /// デバフの画像を取得
+    /// </summary>
+    /// <param name="debuffType"></param>
+    /// <returns></returns>
+    public Sprite GetDebuffSprite(DebuffType debuffType)
+    {
+        return debuffSpriteDataSO.debuffSpriteDataList.FirstOrDefault(data => data.debuffType == debuffType).sprite;
     }
 }

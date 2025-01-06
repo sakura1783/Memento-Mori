@@ -9,7 +9,6 @@ using System.Linq;
 public class CharaStatusPannel : MonoBehaviour
 {
     private CharaController charaController;
-    public CharaController CharaController => charaController;
 
     [SerializeField] private Image imgChara;
 
@@ -19,6 +18,7 @@ public class CharaStatusPannel : MonoBehaviour
     [SerializeField] private Slider hpSlider;
 
     [SerializeField] private Transform buffPlace;
+    [SerializeField] private Image debuffPrefab;
 
 
     public void Setup(CharaController charaController, GameData.CharaConstData charaData)
@@ -31,7 +31,7 @@ public class CharaStatusPannel : MonoBehaviour
         hpSlider.value = 1;
 
         // 購読処理
-        Observable.Merge(charaController.Status.Hp, CharaController.Status.MaxHp)  // Observable.Merge()で、括弧内の値いずれかが変更された場合にSubscribe()の処理が動く
+        Observable.Merge(charaController.Status.Hp, charaController.Status.MaxHp)  // Observable.Merge()で、括弧内の値いずれかが変更された場合にSubscribe()の処理が動く
             .Subscribe(value =>
             {
                 txtHpValue.text = $"{charaController.Status.Hp} / {charaController.Status.MaxHp}";
@@ -39,12 +39,18 @@ public class CharaStatusPannel : MonoBehaviour
             })
             .AddTo(this);
 
-        // TODO
-        // charaController.Status.Debuffs
-        //     .Subscribe(debuff =>
-        //     {
-        //         // 画像を追加
-        //     })
-        //     .AddTo(this);
+        charaController.Status.Debuffs
+            .ObserveAdd()
+            .Subscribe(eventData =>  // <= ObserveAddが提供するイベントデータ
+            {
+                var debuff = Instantiate(debuffPrefab, buffPlace);
+                debuff.sprite = SpriteManager.instance.GetDebuffSprite(eventData.Value.type);  // 引数(eventData).Valueでコレクションに追加された要素を取得
+            })
+            .AddTo(this);
+            
+        charaController.Status.Debuffs
+            .ObserveRemove()
+            .Subscribe(eventData => Destroy(gameObject))
+            .AddTo(this);
     }
 }

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 705d459c1cab94e428ed29289502ecfa, type: 3}
+  m_Name: DebuffSpriteDataSO
+  m_EditorClassIdentifier: 
+  debuffSpriteDataList:
+  - debuffType: 0
+    sprite: {fileID: 21300000, guid: a3b37eeef94584e2c86c10348e246b49, type: 3}
+  - debuffType: 1
+    sprite: {fileID: 21300000, guid: ebe5e8fa836054a428e25b026eb48d0f, type: 3}
+  - debuffType: 2
+    sprite: {fileID: 21300000, guid: 0e715680cdcf54ad5a7ec0a6f6506d54, type: 3}
+  - debuffType: 3
+    sprite: {fileID: 21300000, guid: 44ada9ba28bc24d2eb5c0975285abff7, type: 3}
+  - debuffType: 4
+    sprite: {fileID: 21300000, guid: c771dd53636f042a3a98bedf4274ff9e, type: 3}
