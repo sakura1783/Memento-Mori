@@ -5615,10 +5615,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canvasGroup: {fileID: 1015797304}
   btnClose: {fileID: 0}
+  teamAssemblyPop: {fileID: 2044851257}
   charaStatusPennel: {fileID: 1963139232622000288, guid: 4945b14c001f94b158070661cef881fa, type: 3}
   playerTran: {fileID: 434971776}
   opponentTran: {fileID: 1076289157}
-  teamAssemblyPop: {fileID: 2044851257}
 --- !u!1 &1034880158
 GameObject:
   m_ObjectHideFlags: 0
@@ -8229,6 +8229,7 @@ MonoBehaviour:
   popups:
   - {fileID: 2044851257}
   - {fileID: 1015797305}
+  - {fileID: 2005916539}
   gssReceiver: {fileID: 750197301}
 --- !u!1 &1701532777
 GameObject:
@@ -10034,6 +10035,7 @@ GameObject:
   - component: {fileID: 2005916535}
   - component: {fileID: 2005916538}
   - component: {fileID: 2005916537}
+  - component: {fileID: 2005916539}
   m_Layer: 5
   m_Name: ResultPopup
   m_TagString: Untagged
@@ -10160,6 +10162,22 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &2005916539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005916533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e94182ea0cda41ce8cc72c570ea5903, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canvasGroup: {fileID: 2005916537}
+  btnClose: {fileID: 2005916538}
+  winGroup: {fileID: 998030301}
+  loseGroup: {fileID: 1884641394}
 --- !u!1 &2024162532
 GameObject:
   m_ObjectHideFlags: 0

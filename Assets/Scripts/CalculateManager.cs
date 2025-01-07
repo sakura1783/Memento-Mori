@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using UniRx;
+using Unity.VisualScripting;
 
 public static class CalculateManager
 {
@@ -12,11 +13,11 @@ public static class CalculateManager
         public int combatPower;
         public int attackPower;
         public int defencePower;
-        public ReactiveProperty<int> Hp;
-        public ReactiveProperty<int> MaxHp;
+        public ReactiveProperty<int> Hp = new();  // new()しないとNullになるので注意！
+        public ReactiveProperty<int> MaxHp = new();
         public float criticalRate;
 
-        public ReactiveCollection<Debuff> Debuffs;  // 持っているデバフ
+        public ReactiveCollection<Debuff> Debuffs = new();  // 持っているデバフ
 
         // TODO 複数の場所で使うのであれば、コンストラクタを作成しても良い
     }
@@ -42,6 +43,7 @@ public static class CalculateManager
             defencePower = charaData.initialDefencePower,
             //Hp.Value = charaData.initialHp,
             Hp = { Value = charaData.initialHp },  // ReactivePropertyの場合、初期化はこのように記述する。↑だとエラーになる
+            MaxHp = { Value = charaData.initialHp},
             criticalRate = charaData.initialCriticalRate,
         };
 

@@ -36,6 +36,11 @@ public class PopupBase : MonoBehaviour
         canvasGroup.blocksRaycasts = true;
     }
 
+    public virtual void ShowPopup(BattleState battleState)
+    {
+        ShowPopup();
+    }
+
     /// <summary>
     /// ポップアップの非表示
     /// </summary>

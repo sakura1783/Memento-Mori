@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Cysharp.Threading.Tasks;
 
 public enum BattleState
 {
@@ -15,12 +14,12 @@ public class BattleManager : PopupBase
     public List<CharaController> playerTeam = new();  // CharaStatusPannelクラスからCharaControllerクラスに変更！=> SkillManager等の処理がうまくいく気がする！
     public List<CharaController> opponentTeam = new();
 
+    [SerializeField] private TeamAssemblyPop teamAssemblyPop;
+
     [SerializeField] private CharaStatusPannel charaStatusPennel;
 
     [SerializeField] private Transform playerTran;
     [SerializeField] private Transform opponentTran;
-
-    [SerializeField] private TeamAssemblyPop teamAssemblyPop;
 
     private BattleState battleState;
 
@@ -160,9 +159,14 @@ public class BattleManager : PopupBase
     /// </summary>
     private void OnBattleEnd()
     {
-        // TODO
+        PopupManager.instance.Show<ResultPop>();
 
-        playerTeam.Clear();
-        opponentTeam.Clear();
+        // TODO
+        
+        // TODO 生成したゲームオブジェクト等を全て破棄して、最初の状態に戻す
+
+        // 一旦コメントアウト
+        // playerTeam.Clear();
+        // opponentTeam.Clear();
     }
 }
