@@ -98,7 +98,7 @@ public class CharaController
             // 通常攻撃
             var targets = SkillManager.PickTarget(this, TargetType.Opponent, 1);
 
-            targets.ForEach(target => CalculateManager.CalculateSkillEffectValue(status.attackPower, 100, target.Status.defencePower));
+            targets.ForEach(target => SkillManager.Attack(target, Status.attackPower, 100));
         }
     }
 

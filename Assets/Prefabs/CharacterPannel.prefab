@@ -287,7 +287,7 @@ MonoBehaviour:
   txtHpValue: {fileID: 1963139233061827163}
   hpSlider: {fileID: 1963139233129353613}
   buffPlace: {fileID: 1963139233649768847}
-  debuffPrefab: {fileID: 7495721250113956046, guid: 0ce492617120e452c9d90de5a77f2060, type: 3}
+  buffPrefab: {fileID: 7495721250113956046, guid: 0ce492617120e452c9d90de5a77f2060, type: 3}
 --- !u!1 &1963139232839983611
 GameObject:
   m_ObjectHideFlags: 0

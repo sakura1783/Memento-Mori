@@ -86,10 +86,12 @@ public static class CalculateManager
     /// <param name="baseValue">基準となる値</param>
     /// <param name="rate">baseValueの何%分か</param>
     /// <param name="targetDefencePower">攻撃時のみ使用</param>
+    /// <param name="criticalRate">攻撃時のみ使用。攻撃者のクリティカル確率</param>
     /// <returns></returns>
-    public static int CalculateSkillEffectValue(int baseValue, int rate, int targetDefencePower = 0)
+    public static int CalculateSkillEffectValue(int baseValue, int rate, int targetDefencePower = 0, int criticalRate = 0)
     {
         int value;
+        //bool isCritical = false;
 
         if (targetDefencePower == 0)
         {
@@ -98,10 +100,18 @@ public static class CalculateManager
         // 攻撃時(ターゲットの防御力、クリティカルボーナス、属性ボーナスなども処理)
         else
         {
-            // 通常(攻撃力*技/補正値)-(敵の防御力/補正値)
+            // (攻撃力*技/補正値)-(敵の防御力/補正値)
             value = (int)Math.Round(baseValue * (rate / 100) / ConstData.ATTACK_MODIFIER - (targetDefencePower / ConstData.DEFENCE_MODIFIRE), 0, MidpointRounding.AwayFromZero);
 
-            // TODO クリティカルボーナス、属性ボーナス
+            // TODO 属性ボーナス
+
+            // クリティカルボーナス
+            if (UnityEngine.Random.Range(1, 101) <= criticalRate)
+            {
+                value += (int)Math.Round(value * ConstData.CRITICAL_BONUS, 0, MidpointRounding.AwayFromZero);
+
+                // TODO クリティカルなことをCharaControllerかキャラクラスに渡したい、わからせたい
+            }
         }
 
         return value;
