@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public class Nina : CharacterBase
 {
     public override int Active1CoolTime => 4;

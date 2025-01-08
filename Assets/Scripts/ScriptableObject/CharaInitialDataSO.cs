@@ -51,7 +51,7 @@ public class CharaInitialDataSO : ScriptableObject
         public int initialAttackPower;
         public int initialDefencePower;
         public int initialHp;
-        public float initialCriticalRate;
+        public int initialCriticalRate;
 
         // TODO 各ステータスの増加率、他のステータス追加
 
@@ -70,7 +70,7 @@ public class CharaInitialDataSO : ScriptableObject
             initialAttackPower = int.Parse(datas[5]);
             initialDefencePower = int.Parse(datas[6]);
             initialHp = int.Parse(datas[7]);
-            initialCriticalRate = float.Parse(datas[8]);
+            initialCriticalRate = int.Parse(datas[8]);
         }
     }
 }

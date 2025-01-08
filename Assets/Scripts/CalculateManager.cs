@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using UniRx;
-using Unity.VisualScripting;
 
 public static class CalculateManager
 {
@@ -15,7 +14,7 @@ public static class CalculateManager
         public int defencePower;
         public ReactiveProperty<int> Hp = new();  // new()しないとNullになるので注意！
         public ReactiveProperty<int> MaxHp = new();
-        public float criticalRate;
+        public int criticalRate;
 
         public ReactiveCollection<Buff> Buffs = new();  // 持っているデバフ
 
@@ -60,7 +59,7 @@ public static class CalculateManager
                 status.Hp.Value += (int)Math.Round(status.Hp.Value * ConstData.POWER_INC_RATE_BREAK_LIMIT, 0, MidpointRounding.AwayFromZero);
 
                 // クリティカル率は限界突破の際に1%ずつ上昇
-                status.criticalRate += 0.01f;
+                status.criticalRate += 1;
             }
             // 通常
             else
@@ -73,7 +72,7 @@ public static class CalculateManager
 
             // 上で求めた各ステータスから、戦闘力を計算。
             // 戦闘力 = 攻撃力+防御力+補正後HP+補正後クリティカル率
-            status.combatPower = (int)Math.Round(status.attackPower + status.defencePower + (status.Hp.Value * ConstData.HP_MODIFIRE) + (status.attackPower + status.attackPower * 0.5) / ConstData.ATTACK_MODIFIER * status.criticalRate, 0, MidpointRounding.AwayFromZero);
+            status.combatPower = (int)Math.Round(status.attackPower + status.defencePower + (status.Hp.Value * ConstData.HP_MODIFIRE) + (status.attackPower + status.attackPower * ConstData.CRITICAL_BONUS) / ConstData.ATTACK_MODIFIER * (status.criticalRate / 100), 0, MidpointRounding.AwayFromZero);
         }
 
         // 呼び出し元に計算後のステータスの情報を返す
