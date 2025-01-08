@@ -85,35 +85,40 @@ public static class CalculateManager
     /// </summary>
     /// <param name="baseValue">基準となる値</param>
     /// <param name="rate">baseValueの何%分か</param>
-    /// <param name="targetDefencePower">攻撃時のみ使用</param>
-    /// <param name="criticalRate">攻撃時のみ使用。攻撃者のクリティカル確率</param>
     /// <returns></returns>
-    public static int CalculateSkillEffectValue(int baseValue, int rate, int targetDefencePower = 0, int criticalRate = 0)
+    public static int CalculateSkillEffectValue(int baseValue, int rate)
     {
-        int value;
-        //bool isCritical = false;
-
-        if (targetDefencePower == 0)
-        {
-            value = (int)Math.Round((float)baseValue * (rate / 100), 0, MidpointRounding.AwayFromZero);  // 少数第一位を四捨五入。Math.Round(四捨五入したい値, 少数第何位で(0で少数第一位), MidpointRounding.AwayFromZeroで通常の四捨五入(指定しない場合、銀行丸めになる))
-        }
-        // 攻撃時(ターゲットの防御力、クリティカルボーナス、属性ボーナスなども処理)
-        else
-        {
-            // (攻撃力*技/補正値)-(敵の防御力/補正値)
-            value = (int)Math.Round(baseValue * (rate / 100) / ConstData.ATTACK_MODIFIER - (targetDefencePower / ConstData.DEFENCE_MODIFIRE), 0, MidpointRounding.AwayFromZero);
-
-            // TODO 属性ボーナス
-
-            // クリティカルボーナス
-            if (UnityEngine.Random.Range(1, 101) <= criticalRate)
-            {
-                value += (int)Math.Round(value * ConstData.CRITICAL_BONUS, 0, MidpointRounding.AwayFromZero);
-
-                // TODO クリティカルなことをCharaControllerかキャラクラスに渡したい、わからせたい
-            }
-        }
+        int value = (int)Math.Round((float)baseValue * (rate / 100), 0, MidpointRounding.AwayFromZero);  // 少数第一位を四捨五入。Math.Round(四捨五入したい値, 少数第何位で(0で少数第一位), MidpointRounding.AwayFromZeroで通常の四捨五入(指定しない場合、銀行丸めになる))
 
         return value;
+    }
+
+    /// <summary>
+    /// 攻撃のダメージを計算
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="baseValue"></param>
+    /// <param name="rate"></param>
+    /// <param name="targetDefencePower"></param>
+    /// <returns>int 与えるダメージ、bool クリティカルかどうか</returns>
+    public static (int, bool) CalculateAttackDamage(CharaController user, int baseValue, int rate, int targetDefencePower)
+    {
+        int damageValue;
+        bool isCritical = false;
+
+        // (攻撃力*技/補正値)-(敵の防御力/補正値)
+        damageValue = (int)Math.Round(baseValue * (rate / 100) / ConstData.ATTACK_MODIFIER - (targetDefencePower / ConstData.DEFENCE_MODIFIRE), 0, MidpointRounding.AwayFromZero);
+
+        // TODO 属性ボーナス
+
+        // クリティカルボーナス
+        if (UnityEngine.Random.Range(1, 101) <= user.Status.criticalRate)
+        {
+            damageValue += (int)Math.Round(damageValue * ConstData.CRITICAL_BONUS, 0, MidpointRounding.AwayFromZero);
+
+            isCritical = true;
+        }
+
+        return (damageValue, isCritical);
     }
 }

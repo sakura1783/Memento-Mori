@@ -109,12 +109,13 @@ public static class SkillManager
     /// <param name="target"></param>
     /// <param name="baseValue">基準となる値</param>
     /// <param name="rate"></param>
-    /// <returns>ダメージ値を返す(総与ダメージを実装する際に使う)</returns>
-    public static int Attack(CharaController target, int baseValue, int rate)
+    /// <returns>int ダメージ値を返す(総与ダメージを実装する際に使う)</returns>
+    public static int Attack(CharaController user, CharaController target, int baseValue, int rate)
     {
         // baseValueのrate分の値を計算し、攻撃対象のHPを削る
-        int damageValue = CalculateManager.CalculateSkillEffectValue(baseValue, rate, target.Status.defencePower);
+        (int damageValue, bool isCritical) = CalculateManager.CalculateAttackDamage(user, baseValue, rate, target.Status.defencePower);
         target.UpdateHp(-damageValue);
+        target.ReceivedCriticalDamage = isCritical;
 
         // 「睡眠」状態を解除
         if (target.Status.Buffs.Any(debuff => debuff.type == BuffType.睡眠))

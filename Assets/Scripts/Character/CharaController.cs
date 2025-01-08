@@ -11,6 +11,9 @@ public class CharaController
 {
     private CharacterBase chara;
 
+    private readonly Attribute attribute;  // 属性はずっと変わらない情報なのでreadonly
+    public Attribute Attribute => attribute;
+
     private CalculateManager.VariableStatus status = new();
     public CalculateManager.VariableStatus Status => status;
 
@@ -19,6 +22,13 @@ public class CharaController
 
     public ReactiveProperty<int> Passive1RemainingCoolTime = new(1);  // ExecutePassiveSkill()内、コメントの処理を実現するために、ReactivePropertyで監視処理・初期値を1に設定
     public ReactiveProperty<int> Passive2RemainingCoolTime = new(1);
+
+    private bool receivedCriticalDamage;  // TODO スキル発動の条件が増えると、こういった変数が多くなる。他にいい方法はないか
+    public bool ReceivedCriticalDamage
+    {
+        get => receivedCriticalDamage;
+        set => receivedCriticalDamage = value;
+    }
 
     private CompositeDisposable disposables = new();
 
@@ -31,6 +41,9 @@ public class CharaController
     {
         // 計算後の各ステータスの値を受け取り、キャラに反映
         status = statusData;
+
+        // 属性をスクリプタブルオブジェクトから取得
+        attribute = DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.FirstOrDefault(data => data.englishName == charaName).attribute;
 
         // キャラクターとスキルを紐付け
         CreateSkillEffect(charaName);
@@ -98,7 +111,7 @@ public class CharaController
             // 通常攻撃
             var targets = SkillManager.PickTarget(this, TargetType.Opponent, 1);
 
-            targets.ForEach(target => SkillManager.Attack(target, Status.attackPower, 100));
+            targets.ForEach(target => SkillManager.Attack(this, target, Status.attackPower, 100));
         }
     }
 

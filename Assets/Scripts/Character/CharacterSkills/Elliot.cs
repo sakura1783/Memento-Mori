@@ -12,6 +12,8 @@ public class Elliot : CharacterBase
     {
         var targets = SkillManager.PickTarget(user, TargetType.Ally);
         targets.ForEach(target => SkillManager.ModifyAttackPower(target, user.Status.attackPower, 15, true));
+
+        // TODO 2ターンの間。UniTaskでターン経過するまで待機する？ →元の値を保持、ターン経過後、元の値に戻す
     }
 
     /// <summary>
@@ -21,7 +23,7 @@ public class Elliot : CharacterBase
     public override void ActiveSkill2(CharaController user)
     {
         var attackTargets = SkillManager.PickTarget(user, TargetType.Opponent, 3);
-        attackTargets.ForEach(target => SkillManager.Attack(target, user.Status.attackPower, 200));
+        attackTargets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 200));
 
         var healTargets = SkillManager.PickTarget(user, TargetType.Ally, 2);  // TODO HP割合が低い味方をターゲットにする
         healTargets.ForEach(target =>
@@ -46,6 +48,9 @@ public class Elliot : CharacterBase
     /// <param name="user"></param>
     public override void PassiveSkill2(CharaController user)
     {
-        // TODO 
+        if (user.ReceivedCriticalDamage)
+        {
+            // TODO 直前に行動した相手をPickTargetで取得できないか。BattleManager内に、CharaController型で直前に行動したキャラを保持
+        }
     }
 }

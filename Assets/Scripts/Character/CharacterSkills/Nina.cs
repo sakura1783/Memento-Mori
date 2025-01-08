@@ -13,7 +13,7 @@ public class Nina : CharacterBase
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 4);
         int totalDamage = 0;
 
-        targets.ForEach(target => totalDamage += SkillManager.Attack(target, user.Status.attackPower, 290));
+        targets.ForEach(target => totalDamage += SkillManager.Attack(user, target, user.Status.attackPower, 290));
 
         SkillManager.Heal(user, totalDamage, 10);
     }
@@ -25,7 +25,7 @@ public class Nina : CharacterBase
     public override void ActiveSkill2(CharaController user)
     {
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 2);
-        targets.ForEach(target => SkillManager.Attack(target, user.Status.attackPower, 420));
+        targets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 420));
     
         SkillManager.AddBuff(user, BuffType.ダメージ無効, 1);
     }
