@@ -17,7 +17,7 @@ public static class CalculateManager
         public ReactiveProperty<int> MaxHp = new();
         public float criticalRate;
 
-        public ReactiveCollection<Debuff> Debuffs = new();  // 持っているデバフ
+        public ReactiveCollection<Buff> Buffs = new();  // 持っているデバフ
 
         // TODO 複数の場所で使うのであれば、コンストラクタを作成しても良い
     }

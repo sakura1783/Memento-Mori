@@ -71,13 +71,13 @@ public class CharaController
     public void ExecuteActiveSkill()
     {
         // 「気絶」または「睡眠」状態の場合、行動不能
-        if (status.Debuffs.Any(debuff => debuff.type == DebuffType.気絶 || debuff.type == DebuffType.睡眠))
+        if (status.Buffs.Any(debuff => debuff.type == BuffType.気絶 || debuff.type == BuffType.睡眠))
         {
             return;
         }
 
         // 「沈黙」状態の場合、スキルを使用できない
-        if (!status.Debuffs.Any(debuff => debuff.type == DebuffType.沈黙))
+        if (!status.Buffs.Any(debuff => debuff.type == BuffType.沈黙))
         {
             // スキル使用(スキル1、スキル2...の順番、全てのスキルがクールタイム中の場合、通常攻撃。)
             if (active1RemainingCoolTime <= 0)
@@ -146,7 +146,7 @@ public class CharaController
         Passive2RemainingCoolTime.Value = ReduceCoolTime(Passive2RemainingCoolTime.Value);
         
         // 各デバフのクールタイムを減少
-        foreach (var debuff in status.Debuffs.Where(x => x.type != DebuffType.睡眠))  // 「睡眠」はクールタイムの処理を行わない
+        foreach (var debuff in status.Buffs.Where(x => x.type != BuffType.睡眠))  // 「睡眠」はクールタイムの処理を行わない
         {
             debuff.Duration.Value = ReduceCoolTime(debuff.Duration.Value);
         }

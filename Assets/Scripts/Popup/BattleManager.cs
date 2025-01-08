@@ -93,11 +93,11 @@ public class BattleManager : PopupBase
         //「毒」状態の場合、現在HP*?%のダメージを受ける
         foreach (var chara in playerTeam.Concat(opponentTeam))  // Concat()でリスト2つを結合し、処理を簡素化
         {
-            var poisonDebuff = chara.Status.Debuffs.FirstOrDefault(x => x.type == DebuffType.毒);
+            var poisonDebuff = chara.Status.Buffs.FirstOrDefault(x => x.type == BuffType.毒);
 
             if (poisonDebuff != null)
             {
-                chara.UpdateHp(-CalculateManager.CalculateSkillEffectValue(chara.Status.Hp.Value, poisonDebuff.damageRate));
+                chara.UpdateHp(-CalculateManager.CalculateSkillEffectValue(chara.Status.Hp.Value, poisonDebuff.effectRate));
             }
         }
         

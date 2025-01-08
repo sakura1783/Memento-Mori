@@ -109,16 +109,20 @@ public static class SkillManager
     /// <param name="target"></param>
     /// <param name="baseValue">基準となる値</param>
     /// <param name="rate"></param>
-    public static void Attack(CharaController target, int baseValue, int rate)
+    /// <returns>ダメージ値を返す(総与ダメージを実装する際に使う)</returns>
+    public static int Attack(CharaController target, int baseValue, int rate)
     {
         // baseValueのrate分の値を計算し、攻撃対象のHPを削る
-        target.UpdateHp(-CalculateManager.CalculateSkillEffectValue(baseValue, rate, target.Status.defencePower));
+        int damageValue = CalculateManager.CalculateSkillEffectValue(baseValue, rate, target.Status.defencePower);
+        target.UpdateHp(-damageValue);
 
         // 「睡眠」状態を解除
-        if (target.Status.Debuffs.Any(debuff => debuff.type == DebuffType.睡眠))
+        if (target.Status.Buffs.Any(debuff => debuff.type == BuffType.睡眠))
         {
-            RemoveDebuff(target, DebuffType.睡眠);
+            RemoveBuff(target, BuffType.睡眠);
         }
+
+        return damageValue;
     }
 
     /// <summary>
@@ -130,7 +134,7 @@ public static class SkillManager
     public static void Heal(CharaController target, int baseValue, int rate)
     {
         // 「不治」状態の場合、HPを回復できない
-        if (target.Status.Debuffs.Any(debuff => debuff.type == DebuffType.不治))  // Any()で、List内に条件に一致する要素があるかどうか判定
+        if (target.Status.Buffs.Any(debuff => debuff.type == BuffType.不治))  // Any()で、List内に条件に一致する要素があるかどうか判定
         {
             return;
         }
@@ -183,42 +187,42 @@ public static class SkillManager
     }
 
     /// <summary>
-    /// デバフを追加
+    /// 状態効果(バフ・デバフ)を追加
     /// </summary>
     /// <param name="target"></param>
-    /// <param name="debuffType"></param>
-    /// <param name="duration"></param>
-    /// <param name="damageRate">基準値の?%分のダメージを与えるか。「毒」「侵食」などで使用する</param>
-    public static void AddDebuff(CharaController target, DebuffType debuffType, int duration, int damageRate = 0)
+    /// <param name="buffType"></param>
+    /// <param name="duration">解除不可バフは、デフォルト値で大きな値を設定</param>
+    /// <param name="effectRate">基準値の?%分の影響を与えるか。「再生」「毒」「侵食」などで使用する</param>
+    public static void AddBuff(CharaController target, BuffType buffType, int duration = 100, int effectRate = 0)
     {
         // 重ね掛け不可。継続時間とダメージ割合を置き換えて、処理を終了
-        var duplicateDebuff = target.Status.Debuffs.FirstOrDefault(x => x.type == debuffType);
-        if (duplicateDebuff != null)
+        var duplicateBuff = target.Status.Buffs.FirstOrDefault(x => x.type == buffType);
+        if (duplicateBuff != null)
         {
-            duplicateDebuff.Duration.Value = duration;
-            duplicateDebuff.damageRate = damageRate;
+            duplicateBuff.Duration.Value = duration;
+            duplicateBuff.effectRate = effectRate;
 
             return;
         }
 
         // デバフを生成して、追加
-        var debuff = new Debuff(debuffType, duration, damageRate);
-        target.Status.Debuffs.Add(debuff);
+        var buff = new Buff(buffType, duration, effectRate);
+        target.Status.Buffs.Add(buff);
 
         // 監視処理。継続時間が0になったら、デバフを削除
-        debuff.Duration  
+        buff.Duration  
             .Where(x => x == 0)
-            .Subscribe(_ => RemoveDebuff(target, debuff.type));  // TODO Removeされたときにインスタンスの参照が切れるのでAddTo行わなくても大丈夫？必要な場合、どのように記述すれば良いか？
+            .Subscribe(_ => RemoveBuff(target, buff.type));  // TODO Removeされたときにインスタンスの参照が切れるのでAddTo行わなくても大丈夫？必要な場合、どのように記述すれば良いか？
     }
 
     /// <summary>
     /// デバフを削除
     /// </summary>
     /// <param name="target"></param>
-    /// <param name="debuffType"></param>
-    public static void RemoveDebuff(CharaController target, DebuffType debuffType)
+    /// <param name="buffType"></param>
+    public static void RemoveBuff(CharaController target, BuffType buffType)
     {
-        target.Status.Debuffs.Remove(target.Status.Debuffs.FirstOrDefault(debuff => debuff.type == debuffType));
+        target.Status.Buffs.Remove(target.Status.Buffs.FirstOrDefault(debuff => debuff.type == buffType));
     }
 
 

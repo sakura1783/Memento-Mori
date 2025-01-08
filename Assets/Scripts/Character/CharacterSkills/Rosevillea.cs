@@ -7,7 +7,7 @@ public class Rosevillea : CharacterBase
     public override int Active1CoolTime => 2;  // 各キャラ各スキルで個別の値を設定
     public override int Active2CoolTime => 3;
 
-    // 必要であればパッシブのクールタイムも追加
+    // TODO 必要であればパッシブのクールタイムも追加
 
 
     /// <summary>
@@ -23,7 +23,7 @@ public class Rosevillea : CharacterBase
         targets.ForEach(target =>
         {
             SkillManager.Attack(target, user.Status.attackPower, 390);
-            SkillManager.AddDebuff(target, DebuffType.気絶, 2);
+            SkillManager.AddBuff(target, BuffType.気絶, 2);
         });
     }
 
@@ -47,5 +47,5 @@ public class Rosevillea : CharacterBase
         SkillManager.ModifyAttackPower(user, user.Status.attackPower, 20, true);
     }
 
-    // 必要であればPassiveSkill2()も記述
+    // TODO 必要であればPassiveSkill2()も記述
 }

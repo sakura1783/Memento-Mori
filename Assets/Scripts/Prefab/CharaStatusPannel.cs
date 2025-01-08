@@ -16,7 +16,7 @@ public class CharaStatusPannel : MonoBehaviour
     [SerializeField] private Slider hpSlider;
 
     [SerializeField] private Transform buffPlace;
-    [SerializeField] private Image debuffPrefab;
+    [SerializeField] private Image buffPrefab;
 
 
     public void Setup(CharaController charaController, GameData.CharaConstData charaData)
@@ -35,16 +35,16 @@ public class CharaStatusPannel : MonoBehaviour
             })
             .AddTo(this);
 
-        charaController.Status.Debuffs
+        charaController.Status.Buffs
             .ObserveAdd()
             .Subscribe(eventData =>  // <= ObserveAddが提供するイベントデータ
             {
-                var debuff = Instantiate(debuffPrefab, buffPlace);
+                var debuff = Instantiate(buffPrefab, buffPlace);
                 debuff.sprite = SpriteManager.instance.GetDebuffSprite(eventData.Value.type);  // 引数(eventData).Valueでコレクションに追加された要素を取得
             })
             .AddTo(this);
 
-        charaController.Status.Debuffs
+        charaController.Status.Buffs
             .ObserveRemove()
             .Subscribe(eventData => Destroy(gameObject))
             .AddTo(this);

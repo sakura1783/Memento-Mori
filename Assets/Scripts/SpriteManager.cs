@@ -7,7 +7,7 @@ using UnityEngine;
 public class SpriteManager : AbstractSingleton<SpriteManager>
 {
     public CharaSpriteDataSO charaSpriteDataSO;
-    public DebuffSpriteDataSO debuffSpriteDataSO;
+    public BuffSpriteDataSO buffSpriteDataSO;
 
 
     /// <summary>
@@ -51,10 +51,10 @@ public class SpriteManager : AbstractSingleton<SpriteManager>
     /// <summary>
     /// デバフの画像を取得
     /// </summary>
-    /// <param name="debuffType"></param>
+    /// <param name="buffType"></param>
     /// <returns></returns>
-    public Sprite GetDebuffSprite(DebuffType debuffType)
+    public Sprite GetDebuffSprite(BuffType buffType)
     {
-        return debuffSpriteDataSO.debuffSpriteDataList.FirstOrDefault(data => data.debuffType == debuffType).sprite;
+        return buffSpriteDataSO.buffSpriteDataList.FirstOrDefault(data => data.buffType == buffType).sprite;
     }
 }
