@@ -246,28 +246,6 @@ public static class SkillManager
         await UniTask.WaitUntil(() => battleManager.TurnCount == turnCount + waitTurn);
     }
 
-    // ターゲットと増加した値の情報を使用して、増加ぶんをステータスから引く
-    // public static void RevertStateIncrease(List<CharaController> target, )
-    // {
-    //     // 攻撃力か、防御力か、指定できないからダメだ
-    // }
-
-    /// <summary>
-    /// ステータスの増加分を元に戻す(ステータスから増加分を引く)
-    /// </summary>
-    /// <param name="statuses">増加後のステータス群</param>
-    /// <param name="increaseValues">増加量</param>
-    public static void RevertStateIncrease(List<int> statuses, List<int> increaseValues)
-    {
-        // 増加した値だけ、攻撃力から引く  // TODO 正しいターゲットのステータスが、正しい値ぶん減少しているか確かめる
-        // for (int i = 0; i < statuses.Count; i++)
-        // {
-        //     statuses[i] -= increaseValues[i];
-        // }
-        // 上記を簡略化
-        statuses.Zip(increaseValues, (status, value) => status -= value).ToList();  // Linqは遅延評価されるため、ToList()で強制的に即時実行(ToList()を行わない場合、attackPowerの変更が適用されないので注意)。
-    }
-
 
     /* */
     // 単純な攻撃

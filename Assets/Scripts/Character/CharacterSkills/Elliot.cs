@@ -18,20 +18,20 @@ public class Elliot : CharacterBase
         // 変更前の攻撃力をリストで保持
         //List<int> unmodifiedValues = new();  // 変更前の値を保持してターン経過後に元の値に戻す場合、効果が重複していない場合はそれで問題ないが、効果が重複している場合は意図しない挙動になってしまうため、下の方法でアプローチ
         
-        List<int> targetStatuses = new();
+        // 増加した値をリストで保持
         List<int> increaseValues = new();
 
         var targets = SkillManager.PickTarget(user, TargetType.Ally);
-        targets.ForEach(target =>
-        {
-            targetStatuses.Add(target.Status.attackPower);
-            increaseValues.Add(SkillManager.ModifyAttackPower(target, user.Status.attackPower, 15, true));
-        });
+        targets.ForEach(target => increaseValues.Add(SkillManager.ModifyAttackPower(target, user.Status.attackPower, 15, true)));
 
         await SkillManager.WaitTurnsAsync(2);
         
-        // 増加した値だけ、攻撃力から引く
-        //SkillManager.RevertStateIncrease()
+        // 増加した攻撃力を元に戻す(増加させた分だけ、攻撃力から引く)  // TODO 正しいターゲットのステータスが、正しい値ぶん減少しているか確かめる
+        // for (int i = 0; i < increaseValues.Count; i++)
+        // {
+        //     targets[i].Status.attackPower -= increaseValues[i];
+        // }
+        targets.Zip(increaseValues, (target, value) => target.Status.attackPower -= value).ToList();  // 上記を簡略化。Linqは遅延評価されるため、ToList()で強制的に即時実行(ToList()を行わない場合、attackPowerの変更が適用されないので注意)。
     }
 
     /// <summary>
@@ -66,18 +66,19 @@ public class Elliot : CharacterBase
     /// <param name="user"></param>
     public override async void PassiveSkill2(CharaController user)
     {
-        //int increaseValue;
-
         if (user.ReceivedCriticalDamage)
         {
-            var targets = SkillManager.PickTarget(user, TargetType.Aggressor);
-            targets.ForEach(target => SkillManager.ModifyAttackPower(target, target.Status.attackPower, 15, false));
+            List<int> decreaseValues = new();
 
             user.ReceivedCriticalDamage = false;  // これを忘れるとこのメソッドが実行されるたび毎回発動してしまうので注意
+
+            var targets = SkillManager.PickTarget(user, TargetType.Aggressor);
+            targets.ForEach(target => decreaseValues.Add(SkillManager.ModifyAttackPower(target, target.Status.attackPower, 15, false)));
+
+            await SkillManager.WaitTurnsAsync(1);
+
+            // 減少させた攻撃力を元に戻す
+            targets.Zip(decreaseValues, (target, value) => target.Status.attackPower += value).ToList();
         }
-
-        await SkillManager.WaitTurnsAsync(1);
-
-        
     }
 }

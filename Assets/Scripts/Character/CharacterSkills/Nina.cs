@@ -31,7 +31,7 @@ public class Nina : CharacterBase
     }
 
     /// <summary>
-    /// 自身に「再生」を付与。毎ターン行動開始時にHPを最大HP*5%回復(解除不可)。
+    /// 自身に「再生」を付与。毎ターン行動開始時にHPを最大HP*5%回復(解除不可)。  // TODO バフ系で解除不可のもの、どうするか。Buffクラスに解除不可かどうかのbool型の変数を定義？
     /// </summary>
     /// <param name="user"></param>
     public override void PassiveSkill1(CharaController user)
