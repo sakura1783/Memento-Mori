@@ -21,7 +21,13 @@ public class BattleManager : PopupBase
     [SerializeField] private Transform playerTran;
     [SerializeField] private Transform opponentTran;
 
+    private int turnCount;
+    public int TurnCount => turnCount;
+
     private BattleState battleState;
+
+    private CharaController previousActChara;  // 直前に(前回)行動したキャラ
+    public CharaController PreviousActChara => previousActChara;
 
 
     public override void ShowPopup()
@@ -35,6 +41,8 @@ public class BattleManager : PopupBase
     /// </summary>
     private void PrepareBattle()
     {
+        // 前回のバトルで変更された情報を初期化  // TODO Initializeメソッド作るか、OnBattleEndメソッドにまとめる？
+        turnCount = 0;
         battleState = BattleState.Continue;
 
         // 各チーム各キャラのステータスを計算し、リストに追加
@@ -78,6 +86,8 @@ public class BattleManager : PopupBase
                 chara.ReduceCoolTimeByTurn();
             }
 
+            turnCount++;
+
         }while (battleState == BattleState.Continue);
 
         // バトル後の処理
@@ -110,6 +120,7 @@ public class BattleManager : PopupBase
             if (playerTeam[count] != null)
             {
                 playerTeam[count].ExecuteActiveSkill();
+                previousActChara = playerTeam[count];
 
                 // 行動後、バトル終了かどうかを判定。終了の場合trueを返し、Battle()内の処理によって、Battle()内からも抜け出す
                 if (IsBattleOver()) return;  // <= return IsBattleOver()では、似ているようで違う処理になってしまうのでダメ。
@@ -119,6 +130,7 @@ public class BattleManager : PopupBase
             if (opponentTeam[count] != null)
             {
                 opponentTeam[count].ExecuteActiveSkill();
+                previousActChara = opponentTeam[count];
 
                 if (IsBattleOver()) return;
             }

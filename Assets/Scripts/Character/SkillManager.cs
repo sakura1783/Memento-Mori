@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using UniRx;
-using Unity.VisualScripting;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 /// <summary>
 /// スキルのターゲットの種類
@@ -13,6 +13,7 @@ public enum TargetType
     Ally,  // 自分を含めた味方全員
     Opponent,
     Neighbor,
+    Aggressor,  // 攻撃してきた敵
 }
 
 /// <summary>
@@ -59,6 +60,10 @@ public static class SkillManager
 
             case TargetType.Neighbor:
                 targetList.AddRange(PickNeighbor(user));
+                break;
+
+            case TargetType.Aggressor:
+                targetList.Add(battleManager.PreviousActChara);
                 break;
         }
 
@@ -109,7 +114,7 @@ public static class SkillManager
     /// <param name="target"></param>
     /// <param name="baseValue">基準となる値</param>
     /// <param name="rate"></param>
-    /// <returns>int ダメージ値を返す(総与ダメージを実装する際に使う)</returns>
+    /// <returns>ダメージ値を返す(総与ダメージを実装する際に使う)</returns>
     public static int Attack(CharaController user, CharaController target, int baseValue, int rate)
     {
         // baseValueのrate分の値を計算し、攻撃対象のHPを削る
@@ -160,9 +165,13 @@ public static class SkillManager
     /// <param name="baseValue"></param>
     /// <param name="rate"></param>
     /// <param name="isIncrease">trueで増加、falseで減少</param>
-    public static void ModifyAttackPower(CharaController target, int baseValue, int rate, bool isIncrease)
+    /// <returns>元の値に戻す際に、この値ぶん増加後の値から引く</returns>
+    public static int ModifyAttackPower(CharaController target, int baseValue, int rate, bool isIncrease)
     {
-        target.Status.attackPower += isIncrease ? +CalculateManager.CalculateSkillEffectValue(baseValue, rate) : -CalculateManager.CalculateSkillEffectValue(baseValue, rate);
+        int value = CalculateManager.CalculateSkillEffectValue(baseValue, rate);
+        target.Status.attackPower += isIncrease ? +value : -value;
+
+        return value;
     }
 
     /// <summary>
@@ -224,6 +233,39 @@ public static class SkillManager
     public static void RemoveBuff(CharaController target, BuffType buffType)
     {
         target.Status.Buffs.Remove(target.Status.Buffs.FirstOrDefault(debuff => debuff.type == buffType));
+    }
+
+    /// <summary>
+    /// 指定ターン待機
+    /// </summary>
+    /// <param name="waitTurn"></param>
+    /// <returns></returns>
+    public static async UniTask WaitTurnsAsync(int waitTurn)
+    {
+        int turnCount = battleManager.TurnCount;
+        await UniTask.WaitUntil(() => battleManager.TurnCount == turnCount + waitTurn);
+    }
+
+    // ターゲットと増加した値の情報を使用して、増加ぶんをステータスから引く
+    // public static void RevertStateIncrease(List<CharaController> target, )
+    // {
+    //     // 攻撃力か、防御力か、指定できないからダメだ
+    // }
+
+    /// <summary>
+    /// ステータスの増加分を元に戻す(ステータスから増加分を引く)
+    /// </summary>
+    /// <param name="statuses">増加後のステータス群</param>
+    /// <param name="increaseValues">増加量</param>
+    public static void RevertStateIncrease(List<int> statuses, List<int> increaseValues)
+    {
+        // 増加した値だけ、攻撃力から引く  // TODO 正しいターゲットのステータスが、正しい値ぶん減少しているか確かめる
+        // for (int i = 0; i < statuses.Count; i++)
+        // {
+        //     statuses[i] -= increaseValues[i];
+        // }
+        // 上記を簡略化
+        statuses.Zip(increaseValues, (status, value) => status -= value).ToList();  // Linqは遅延評価されるため、ToList()で強制的に即時実行(ToList()を行わない場合、attackPowerの変更が適用されないので注意)。
     }
 
 
