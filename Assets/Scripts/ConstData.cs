@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 /// <summary>
 /// 定数管理用クラス
-/// 静的クラスのため、非静的メンバは宣言できない。constは
+/// 静的クラスのため、非静的メンバは宣言できない。(constは暗黙的にstaticとなる)
 /// </summary>
 public static class ConstData
 {

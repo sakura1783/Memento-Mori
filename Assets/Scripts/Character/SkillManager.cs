@@ -118,7 +118,7 @@ public static class SkillManager
     public static int Attack(CharaController user, CharaController target, int baseValue, int rate)
     {
         // baseValueのrate分の値を計算し、攻撃対象のHPを削る
-        (int damageValue, bool isCritical) = CalculateManager.CalculateAttackDamage(user, baseValue, rate, target.Status.defencePower);
+        (int damageValue, bool isCritical) = CalculateManager.CalculateAttackDamage(user, baseValue, rate, target);
         target.UpdateHp(-damageValue);
         target.ReceivedCriticalDamage = isCritical;
 

@@ -101,15 +101,19 @@ public static class CalculateManager
     /// <param name="rate"></param>
     /// <param name="targetDefencePower"></param>
     /// <returns>int 与えるダメージ、bool クリティカルかどうか</returns>
-    public static (int, bool) CalculateAttackDamage(CharaController user, int baseValue, int rate, int targetDefencePower)
+    public static (int, bool) CalculateAttackDamage(CharaController user, int baseValue, int rate, CharaController target)
     {
         int damageValue;
         bool isCritical = false;
 
         // (攻撃力*技/補正値)-(敵の防御力/補正値)
-        damageValue = (int)Math.Round(baseValue * (rate / 100) / ConstData.ATTACK_MODIFIER - (targetDefencePower / ConstData.DEFENCE_MODIFIRE), 0, MidpointRounding.AwayFromZero);
+        damageValue = (int)Math.Round(baseValue * (rate / 100) / ConstData.ATTACK_MODIFIER - (target.Status.defencePower / ConstData.DEFENCE_MODIFIRE), 0, MidpointRounding.AwayFromZero);
 
-        // TODO 属性ボーナス
+        // 属性ボーナス
+        if (ConstData.ATTRIBUTE_RELATIONSHIP[user.Attribute] == target.Attribute)
+        {
+            damageValue += (int)Math.Round(damageValue * ConstData.ATTRIBUTE_BONUS, 0, MidpointRounding.AwayFromZero);
+        }
 
         // クリティカルボーナス
         if (UnityEngine.Random.Range(1, 101) <= user.Status.criticalRate)
