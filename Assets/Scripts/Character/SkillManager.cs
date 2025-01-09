@@ -17,6 +17,20 @@ public enum TargetType
 }
 
 /// <summary>
+/// この条件の優劣順にターゲットを取得
+/// </summary>
+public enum ValueType
+{
+    None,  // 指定しない場合
+
+    ByAttackPower,
+    ByDefencePower,
+    ByCurrentHp,
+    ByMaxHp,
+    ByCriticalRate,
+}
+
+/// <summary>
 /// スキルの基本的な処理を記述するクラス
 /// 各キャラのスクリプト内で組み合わせや引数を指定し、スキルの挙動を作る
 /// </summary>
@@ -39,8 +53,10 @@ public static class SkillManager
     /// <param name="user">スキルを使うキャラ</param>
     /// <param name="targetType"></param>
     /// <param name="count">取得するターゲットの数。敵?人、隣接する味方?人、など。count=-1(初期値、値を設定しない場合)で全員、それ以外は指定された数だけターゲットを取得</param>
+    /// <param name="valueType">この条件の優劣順に取得</param>
+    /// <param name="isDescending">valueTypeが高い順(降順)に取得するかどうか</param>
     /// <returns></returns>
-    public static List<CharaController> PickTarget(CharaController user, TargetType targetType, int count = -1)
+    public static List<CharaController> PickTarget(CharaController user, TargetType targetType, int count = -1, ValueType valueType = ValueType.None, bool isDescending = true)
     {
         List<CharaController> targetList = new();
 
@@ -67,17 +83,55 @@ public static class SkillManager
                 break;
         }
 
+        // ValueTypeが高い順・低い順に並び替え
+        switch (valueType)
+        {
+            case ValueType.None:
+                break;
+
+            case ValueType.ByAttackPower:
+                if (isDescending) targetList.OrderByDescending(target => target.Status.attackPower).ToList();
+                else targetList.OrderBy(target => target.Status.attackPower).ToList();
+                break;
+
+            case ValueType.ByDefencePower:
+                if (isDescending) targetList.OrderByDescending(target => target.Status.defencePower).ToList();
+                else targetList.OrderBy(target => target.Status.defencePower).ToList();
+                break;
+
+            case ValueType.ByCurrentHp:
+                if (isDescending) targetList.OrderByDescending(target => target.Status.Hp).ToList();
+                else targetList.OrderBy(target => target.Status.Hp).ToList();
+                break;
+            
+            case ValueType.ByMaxHp:
+                if (isDescending) targetList.OrderByDescending(target => target.Status.MaxHp).ToList();
+                else targetList.OrderBy(target => target.Status.MaxHp).ToList();
+                break;
+
+            case ValueType.ByCriticalRate:
+                if (isDescending) targetList.OrderByDescending(target => target.Status.criticalRate).ToList();
+                else targetList.OrderBy(target => target.Status.criticalRate).ToList();
+                break;
+        }
+
         // 取得するターゲットの数が指定されている場合
         if (count != -1)
         {
             // リストの要素数を超えたターゲットの取得をしないように制御(必ず、count <= targetList.Count となる)
             count = targetList.Count >= count ? count : targetList.Count;
 
-            // countだけランダムに抽出
-            targetList = targetList.OrderBy(_ => Random.value).Take(count).ToList();
+            if (valueType == ValueType.None)
+            {
+                // ValueTypeの指定がない場合、ランダムに抽出
+                targetList = targetList.OrderBy(_ => Random.value).Take(count).ToList();
+            }
+            else
+            {
+                // ValueTypeの指定がある場合、並び替えずにTake()して先頭の要素から順番に取得
+                targetList = targetList.Take(count).ToList();
+            }
         }
-
-        // TODO 追加：攻撃力などの値が上位?人など
 
         return targetList;
     }
