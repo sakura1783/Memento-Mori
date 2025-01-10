@@ -68,17 +68,17 @@ public class Elliot : CharacterBase
     {
         if (user.ReceivedCriticalDamage)
         {
-            Dictionary<CharaName, int> decreaseValues = new();
+            int decreaseValue = 0;
 
             user.ReceivedCriticalDamage = false;  // これを忘れるとこのメソッドが実行されるたび毎回発動してしまうので注意
 
             var targets = SkillManager.PickTarget(user, TargetType.Aggressor);
-            targets.ForEach(target => decreaseValues.Add(target.Name, SkillManager.ModifyAttackPower(target, target.Status.attackPower, 15, false)));
+            targets.ForEach(target => decreaseValue = SkillManager.ModifyAttackPower(target, target.Status.attackPower, 15, false));
 
             await SkillManager.WaitTurnsAsync(1);
 
             // 減少させた攻撃力を元に戻す
-            targets.ForEach(target => target.Status.attackPower += decreaseValues[target.Name]);
+            targets.ForEach(target => target.Status.attackPower += decreaseValue);
         }
     }
 }
