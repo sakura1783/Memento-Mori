@@ -19,7 +19,7 @@ public class Elliot : CharacterBase
         //List<int> unmodifiedValues = new();  // 変更前の値を保持してターン経過後に元の値に戻す場合、効果が重複していない場合はそれで問題ないが、効果が重複している場合は意図しない挙動になってしまうため、下の方法でアプローチ
         
         // 増加した値をリストで保持
-        List<int> increaseValues = new();
+        List<int> increaseValues = new();  // TODO targetsは参照型のため、キャラが死んだ際に要素数が合わなくなる = 正しい値を反映できなくなる
 
         var targets = SkillManager.PickTarget(user, TargetType.Ally);
         targets.ForEach(target => increaseValues.Add(SkillManager.ModifyAttackPower(target, user.Status.attackPower, 15, true)));

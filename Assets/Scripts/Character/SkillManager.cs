@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UniRx;
@@ -84,53 +85,80 @@ public static class SkillManager
         }
 
         // ValueTypeが高い順・低い順に並び替え
-        switch (valueType)
-        {
-            case ValueType.None:
-                break;
+        // switch (valueType)
+        // {
+        //     case ValueType.None:
+        //         break;
 
-            case ValueType.ByAttackPower:
-                if (isDescending) targetList.OrderByDescending(target => target.Status.attackPower).ToList();
-                else targetList.OrderBy(target => target.Status.attackPower).ToList();
-                break;
+        //     case ValueType.ByAttackPower:
+        //         if (isDescending) targetList.OrderByDescending(target => target.Status.attackPower).ToList();
+        //         else targetList.OrderBy(target => target.Status.attackPower).ToList();
+        //         break;
 
-            case ValueType.ByDefencePower:
-                if (isDescending) targetList.OrderByDescending(target => target.Status.defencePower).ToList();
-                else targetList.OrderBy(target => target.Status.defencePower).ToList();
-                break;
+        //     case ValueType.ByDefencePower:
+        //         if (isDescending) targetList.OrderByDescending(target => target.Status.defencePower).ToList();
+        //         else targetList.OrderBy(target => target.Status.defencePower).ToList();
+        //         break;
 
-            case ValueType.ByCurrentHp:
-                if (isDescending) targetList.OrderByDescending(target => target.Status.Hp).ToList();
-                else targetList.OrderBy(target => target.Status.Hp).ToList();
-                break;
+        //     case ValueType.ByCurrentHp:
+        //         if (isDescending) targetList.OrderByDescending(target => target.Status.Hp).ToList();
+        //         else targetList.OrderBy(target => target.Status.Hp).ToList();
+        //         break;
             
-            case ValueType.ByMaxHp:
-                if (isDescending) targetList.OrderByDescending(target => target.Status.MaxHp).ToList();
-                else targetList.OrderBy(target => target.Status.MaxHp).ToList();
-                break;
+        //     case ValueType.ByMaxHp:
+        //         if (isDescending) targetList.OrderByDescending(target => target.Status.MaxHp).ToList();
+        //         else targetList.OrderBy(target => target.Status.MaxHp).ToList();
+        //         break;
 
-            case ValueType.ByCriticalRate:
-                if (isDescending) targetList.OrderByDescending(target => target.Status.criticalRate).ToList();
-                else targetList.OrderBy(target => target.Status.criticalRate).ToList();
-                break;
+        //     case ValueType.ByCriticalRate:
+        //         if (isDescending) targetList.OrderByDescending(target => target.Status.criticalRate).ToList();
+        //         else targetList.OrderBy(target => target.Status.criticalRate).ToList();
+        //         break;
+        // }
+
+        // 上記をリファクタリング。ValueTypeの優劣で並び替え
+        if (valueType != ValueType.None)
+        {
+            // ValueTypeによって、targetListの並び替えで使用する値(ステータス)を変更
+            var valueDic = new Dictionary<ValueType, Func<CharaController, int>>  // Func<引数1, 戻り値>。戻り値の型が1つに決まらない場合、IComparableを利用する(ただし、比較可能な型(大小関係や順序比較が意味を持つ型)のみ)
+            {
+                { ValueType.ByAttackPower, target => target.Status.attackPower },  // valueDic[ValueType.ByAttackPower]した時、target.Status.attackPowerを返す
+                { ValueType.ByDefencePower, target => target.Status.defencePower },
+                { ValueType.ByCurrentHp, target => target.Status.Hp.Value },
+                { ValueType.ByMaxHp, target => target.Status.MaxHp.Value },
+                { ValueType.ByCriticalRate, target => target.Status.criticalRate },
+            };
+
+            if (valueDic.TryGetValue(valueType, out var sortValue))
+            {
+                targetList = isDescending
+                    ? targetList.OrderByDescending(sortValue).ToList()
+                    : targetList.OrderBy(sortValue).ToList();
+            }
         }
 
         // 取得するターゲットの数が指定されている場合
         if (count != -1)
         {
-            // リストの要素数を超えたターゲットの取得をしないように制御(必ず、count <= targetList.Count となる)
-            count = targetList.Count >= count ? count : targetList.Count;
+            // // リストの要素数を超えたターゲットの取得をしないように制御(必ず、count <= targetList.Count となる)
+            // count = targetList.Count >= count ? count : targetList.Count;
 
-            if (valueType == ValueType.None)
-            {
-                // ValueTypeの指定がない場合、ランダムに抽出
-                targetList = targetList.OrderBy(_ => Random.value).Take(count).ToList();
-            }
-            else
-            {
-                // ValueTypeの指定がある場合、並び替えずにTake()して先頭の要素から順番に取得
-                targetList = targetList.Take(count).ToList();
-            }
+            // if (valueType == ValueType.None)
+            // {
+            //     // ValueTypeの指定がない場合、ランダムに抽出
+            //     targetList = targetList.OrderBy(_ => UnityEngine.Random.value).Take(count).ToList();
+            // }
+            // else
+            // {
+            //     // ValueTypeの指定がある場合、並び替えずにTake()して先頭の要素から順番に取得
+            //     targetList = targetList.Take(count).ToList();
+            // }
+
+            // 上記をリファクタリング
+            targetList = targetList
+                .OrderBy(_ => valueType == ValueType.None ? UnityEngine.Random.value : 0)  // OrderBy(_ => 固定値)にすると、全ての要素が同じキーを持つため(OrderBy()は、キーの値を比較して要素を並び替える)、元の順序が保持される(安定ソート)
+                .Take(Math.Min(count, targetList.Count))  // Math.Minで小さい方を返す(上限をリストサイズに制限)
+                .ToList();
         }
 
         return targetList;
