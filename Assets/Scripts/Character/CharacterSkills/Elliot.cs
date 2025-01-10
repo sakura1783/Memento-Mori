@@ -18,20 +18,21 @@ public class Elliot : CharacterBase
         // 変更前の攻撃力をリストで保持
         //List<int> unmodifiedValues = new();  // 変更前の値を保持してターン経過後に元の値に戻す場合、効果が重複していない場合はそれで問題ないが、効果が重複している場合は意図しない挙動になってしまうため、下の方法でアプローチ
         
-        // 増加した値をリストで保持
-        List<int> increaseValues = new();  // TODO targetsは参照型のため、キャラが死んだ際に要素数が合わなくなる = 正しい値を反映できなくなる
-
+        // キャラの名前と増加した値をセットにしてディクショナリで保持 (targets内いずれかのキャラが戦闘不能になった際にListから要素がRemoveされて要素数が合わなくなる→ CharaNameで照合できるようにする)
+        Dictionary<CharaName, int> increaseValues = new();
+        
         var targets = SkillManager.PickTarget(user, TargetType.Ally);
-        targets.ForEach(target => increaseValues.Add(SkillManager.ModifyAttackPower(target, user.Status.attackPower, 15, true)));
+        targets.ForEach(target => increaseValues.Add(target.Name, SkillManager.ModifyAttackPower(target, user.Status.attackPower, 15, true)));
 
         await SkillManager.WaitTurnsAsync(2);
         
-        // 増加した攻撃力を元に戻す(増加させた分だけ、攻撃力から引く)  // TODO 正しいターゲットのステータスが、正しい値ぶん減少しているか確かめる
+        // 増加した攻撃力を元に戻す(増加させた分だけ、攻撃力から引く)
         // for (int i = 0; i < increaseValues.Count; i++)
         // {
         //     targets[i].Status.attackPower -= increaseValues[i];
         // }
-        targets.Zip(increaseValues, (target, value) => target.Status.attackPower -= value).ToList();  // 上記を簡略化。Linqは遅延評価されるため、ToList()で強制的に即時実行(ToList()を行わない場合、attackPowerの変更が適用されないので注意)。
+        // targets.Zip(increaseValues, (target, value) => target.Status.attackPower -= value).ToList();  // 上記を簡略化。Linqは遅延評価されるため、ToList()で強制的に即時実行(ToList()を行わない場合、attackPowerの変更が適用されないので注意)。
+        targets.ForEach(target => target.Status.attackPower -= increaseValues[target.Name]);
     }
 
     /// <summary>
@@ -43,7 +44,7 @@ public class Elliot : CharacterBase
         var attackTargets = SkillManager.PickTarget(user, TargetType.Opponent, 3);
         attackTargets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 200));
 
-        var healTargets = SkillManager.PickTarget(user, TargetType.Ally, 2);  // TODO HP割合が低い味方をターゲットにする
+        var healTargets = SkillManager.PickTarget(user, TargetType.Ally, 2, ValueType.ByCurrentHp, false);
         healTargets.ForEach(target =>
         {
             SkillManager.Heal(target, user.Status.attackPower, 50);
@@ -68,17 +69,17 @@ public class Elliot : CharacterBase
     {
         if (user.ReceivedCriticalDamage)
         {
-            List<int> decreaseValues = new();
+            Dictionary<CharaName, int> decreaseValues = new();
 
             user.ReceivedCriticalDamage = false;  // これを忘れるとこのメソッドが実行されるたび毎回発動してしまうので注意
 
             var targets = SkillManager.PickTarget(user, TargetType.Aggressor);
-            targets.ForEach(target => decreaseValues.Add(SkillManager.ModifyAttackPower(target, target.Status.attackPower, 15, false)));
+            targets.ForEach(target => decreaseValues.Add(target.Name, SkillManager.ModifyAttackPower(target, target.Status.attackPower, 15, false)));
 
             await SkillManager.WaitTurnsAsync(1);
 
             // 減少させた攻撃力を元に戻す
-            targets.Zip(decreaseValues, (target, value) => target.Status.attackPower += value).ToList();
+            targets.ForEach(target => target.Status.attackPower += decreaseValues[target.Name]);
         }
     }
 }

@@ -9,7 +9,10 @@ using System.Linq;
 /// </summary>
 public class CharaController
 {
-    private CharacterBase chara;
+    private CharacterBase chara;  // キャラの(クラス)インスタンスを生成して代入
+
+    private readonly CharaName name;
+    public CharaName Name => name;
 
     private readonly Attribute attribute;  // 属性はずっと変わらない情報なのでreadonly
     public Attribute Attribute => attribute;
