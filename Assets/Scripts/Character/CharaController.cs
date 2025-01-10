@@ -112,9 +112,7 @@ public class CharaController
         else
         {
             // 通常攻撃
-            var targets = SkillManager.PickTarget(this, TargetType.Opponent, 1);
-
-            targets.ForEach(target => SkillManager.Attack(this, target, Status.attackPower, 100));
+            chara.BasicAttack(this);
         }
     }
 

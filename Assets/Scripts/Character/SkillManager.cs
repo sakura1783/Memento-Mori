@@ -191,7 +191,7 @@ public static class SkillManager
     }
 
     /// <summary>
-    /// 通常攻撃
+    /// 攻撃
     /// </summary>
     /// <param name="target"></param>
     /// <param name="baseValue">基準となる値</param>

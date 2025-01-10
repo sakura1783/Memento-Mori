@@ -14,6 +14,16 @@ public abstract class CharacterBase
 
 
     /// <summary>
+    /// 通常攻撃
+    /// </summary>
+    /// <param name="user"></param>
+    public virtual void BasicAttack(CharaController user)
+    {
+        var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
+        targets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 100));
+    }
+
+    /// <summary>
     /// アクティブスキル1
     /// </summary>
     public abstract void ActiveSkill1(CharaController user);
@@ -26,7 +36,7 @@ public abstract class CharacterBase
     /// <summary>
     /// パッシブスキル1
     /// </summary>
-    public abstract void PassiveSkill1(CharaController user);
+    public virtual void PassiveSkill1(CharaController user){}  // ※ virtualのわけ= アリロシャの処理
 
     /// <summary>
     /// パッシブスキル2

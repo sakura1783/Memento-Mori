@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using System.Linq;
 
 public class Elliot : CharacterBase
 {
-    public override int Active1CoolTime => 0;
-    public override int Active2CoolTime => 0;
+    public override int Active1CoolTime => 4;
+    public override int Active2CoolTime => 4;
 
     public override int Passive2CoolTime => 1;
 
