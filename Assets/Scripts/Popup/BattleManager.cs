@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UniRx;
 using UnityEngine;
 
 public enum BattleState
@@ -45,16 +46,22 @@ public class BattleManager : PopupBase
         turnCount = 0;
         battleState = BattleState.Continue;
 
-        // 各チーム各キャラのステータスを計算し、リストに追加
+        // 各チーム各キャラのステータスを計算し、リストに追加  // TODO リファクタリング
         foreach (var data in teamAssemblyPop.playerTeamInfo)
         {
             // CharaControllerの作成(キャラの制御)
-            var chara = new CharaController(CalculateManager.CalculateCharaStatus(data.name, data.level), data.name);
+            CharaController chara = new CharaController(CalculateManager.CalculateCharaStatus(data.name, data.level), data.name);
             playerTeam.Add(chara);  // チームのリストにキャラを追加
 
             // CharaPannelの生成(キャラの状態の可視化)
             var charaPannel = Instantiate(charaStatusPennel, playerTran);
             charaPannel.Setup(chara, data);
+
+            // キャラが戦闘不能になったら、リストから削除  // TODO if(戦闘不能なら)を各処理に追加するしかない？
+            chara.Status.Hp
+                .Where(value => value <= 0)
+                .Subscribe(_ => playerTeam.Remove(chara))
+                .AddTo(this);
         }
         foreach (var data in teamAssemblyPop.opponentTeamInfo)
         {
@@ -63,6 +70,11 @@ public class BattleManager : PopupBase
 
             var charaPannel = Instantiate(charaStatusPennel, opponentTran);
             charaPannel.Setup(chara, data);
+
+            chara.Status.Hp
+                .Where(value => value <= 0)
+                .Subscribe(_ => opponentTeam.Remove(chara))
+                .AddTo(this);
         }
 
         Battle();
@@ -122,6 +134,8 @@ public class BattleManager : PopupBase
                 playerTeam[count].ExecuteActiveSkill();
                 previousActChara = playerTeam[count];
 
+                foreach (var chara in playerTeam.Concat(opponentTeam)) chara.ReceivedCriticalDamage = false;
+
                 // 行動後、バトル終了かどうかを判定。終了の場合trueを返し、Battle()内の処理によって、Battle()内からも抜け出す
                 if (IsBattleOver()) return;  // <= return IsBattleOver()では、似ているようで違う処理になってしまうのでダメ。
             }
@@ -131,6 +145,8 @@ public class BattleManager : PopupBase
             {
                 opponentTeam[count].ExecuteActiveSkill();
                 previousActChara = opponentTeam[count];
+
+                foreach (var chara in playerTeam.Concat(opponentTeam)) chara.ReceivedCriticalDamage = false;
 
                 if (IsBattleOver()) return;
             }

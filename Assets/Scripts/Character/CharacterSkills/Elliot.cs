@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 public class Elliot : CharacterBase
 {
@@ -15,13 +16,12 @@ public class Elliot : CharacterBase
     public override async void ActiveSkill1(CharaController user)  // <= asyncはシグネチャでないため(メソッドのシグネチャは、戻り値の型・名前・引数)、派生クラスでasyncを追加してオーバーライドしても問題ない(矛盾が生じない、エラーにならない)
     {
         // 変更前の攻撃力をリストで保持
-        //List<int> unmodifiedValues = new();  // 変更前の値を保持してターン経過後に元の値に戻す場合、効果が重複していない場合はそれで問題ないが、効果が重複している場合は意図しない挙動になってしまうため、下の方法でアプローチ
+        // List<int> unmodifiedValues = new();  // 変更前の値を保持してターン経過後に元の値に戻す場合、効果が重複していない場合はそれで問題ないが、効果が重複している場合は意図しない挙動になってしまうため、下の方法でアプローチ
         
-        // キャラの名前と増加した値をセットにしてディクショナリで保持 (targets内いずれかのキャラが戦闘不能になった際にListから要素がRemoveされて要素数が合わなくなる→ CharaNameで照合できるようにする)
-        Dictionary<CharaName, int> increaseValues = new();
+        List<int> increaseValues = new();
         
         var targets = SkillManager.PickTarget(user, TargetType.Ally);
-        targets.ForEach(target => increaseValues.Add(target.Name, SkillManager.ModifyAttackPower(target, user.Status.attackPower, 15, true)));
+        targets.ForEach(target => increaseValues.Add(SkillManager.ModifyAttackPower(target, user.Status.attackPower, 15, true)));
 
         await SkillManager.WaitTurnsAsync(2);
         
@@ -30,8 +30,7 @@ public class Elliot : CharacterBase
         // {
         //     targets[i].Status.attackPower -= increaseValues[i];
         // }
-        // targets.Zip(increaseValues, (target, value) => target.Status.attackPower -= value).ToList();  // 上記を簡略化。Linqは遅延評価されるため、ToList()で強制的に即時実行(ToList()を行わない場合、attackPowerの変更が適用されないので注意)。
-        targets.ForEach(target => target.Status.attackPower -= increaseValues[target.Name]);
+        targets.Zip(increaseValues, (target, value) => target.Status.attackPower -= value).ToList();  // 上記を簡略化。Linqは遅延評価されるため、ToList()で強制的に即時実行(ToList()を行わない場合、attackPowerの変更が適用されないので注意)。
     }
 
     /// <summary>
