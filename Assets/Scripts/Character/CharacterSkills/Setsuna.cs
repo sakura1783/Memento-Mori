@@ -15,7 +15,7 @@ public class Setsuna : CharacterBase
     {
         int criticalCount = 0;
 
-        var targets = SkillManager.PickTarget(user, TargetType.Opponent, 3);  // TODO ターゲットは重複あり
+        var targets = SkillManager.PickTarget(user, TargetType.Opponent, 3, allowDuplicates: true);  // TODO ターゲットは重複あり
         targets.ForEach(target =>
         {
             SkillManager.Attack(user, target, user.Status.attackPower, 400);

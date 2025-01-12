@@ -57,7 +57,7 @@ public static class SkillManager
     /// <param name="valueType">この条件の優劣順に取得</param>
     /// <param name="isDescending">valueTypeが高い順(降順)に取得するかどうか</param>
     /// <returns></returns>
-    public static List<CharaController> PickTarget(CharaController user, TargetType targetType, int count = -1, ValueType valueType = ValueType.None, bool isDescending = true)
+    public static List<CharaController> PickTarget(CharaController user, TargetType targetType, int count = -1, ValueType valueType = ValueType.None, bool isDescending = true, bool allowDuplicates = false)
     {
         List<CharaController> targetList = new();
 
@@ -153,12 +153,32 @@ public static class SkillManager
             //     // ValueTypeの指定がある場合、並び替えずにTake()して先頭の要素から順番に取得
             //     targetList = targetList.Take(count).ToList();
             // }
+            
+            if (allowDuplicates)
+            {   
+                // List<CharaController> targets = new();
 
-            // 上記をリファクタリング
-            targetList = targetList
+                // for (int i = 0; i < count; i++)
+                // {
+                //     int randomValue = UnityEngine.Random.Range(0, targetList.Count);
+                //     targets.Add(targetList[randomValue]);
+                // }
+
+                // targetList = targets;
+                
+                // 上記をリファクタリング
+                targetList = Enumerable.Range(0, count)  // for文の代わり。count-1だけループ
+                    .Select(_ => targetList[UnityEngine.Random.Range(0, targetList.Count)])
+                    .ToList();
+            }
+            else
+            {
+                // 上記をリファクタリング
+                targetList = targetList
                 .OrderBy(_ => valueType == ValueType.None ? UnityEngine.Random.value : 0)  // OrderBy(_ => 固定値)にすると、全ての要素が同じキーを持つため(OrderBy()は、キーの値を比較して要素を並び替える)、元の順序が保持される(安定ソート)
                 .Take(Math.Min(count, targetList.Count))  // Math.Minで小さい方を返す(上限をリストサイズに制限)
                 .ToList();
+            }
         }
 
         return targetList;
