@@ -61,4 +61,13 @@ public class Setsuna : CharacterBase
             });
         }
     }
+
+    /// <summary>
+    /// 1ターン目のターン開始時、自身に3ターンの間攻撃力*250%の「シールド」を付与
+    /// </summary>
+    /// <param name="user"></param>
+    public override void PassiveSkill1(CharaController user)
+    {
+        SkillManager.AddBuff(user, BuffType.シールド, true, false, 3, effectValue: CalculateManager.CalculateSkillEffectValue(user.Status.attackPower, 250));
+    }
 }

@@ -57,7 +57,7 @@ public class BattleManager : PopupBase
             var charaPannel = Instantiate(charaStatusPennel, playerTran);
             charaPannel.Setup(chara, data);
 
-            // キャラが戦闘不能になったら、リストから削除  // TODO if(戦闘不能なら)を各処理に追加するしかない？
+            // キャラが戦闘不能になったら、リストから削除  // TODO if(戦闘不能なら)を各処理に追加するか、無視してそのまま処理を実行するか？(CharaControllerは破棄されないため)
             chara.Status.Hp
                 .Where(value => value <= 0)
                 .Subscribe(_ => playerTeam.Remove(chara))

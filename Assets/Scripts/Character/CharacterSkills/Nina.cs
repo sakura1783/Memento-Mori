@@ -27,7 +27,7 @@ public class Nina : CharacterBase
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 2);
         targets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 420));
     
-        SkillManager.AddBuff(user, BuffType.ダメージ無効, 1);
+        SkillManager.AddBuff(user, BuffType.ダメージ無効, true, false, 1);
     }
 
     /// <summary>
@@ -36,6 +36,6 @@ public class Nina : CharacterBase
     /// <param name="user"></param>
     public override void PassiveSkill1(CharaController user)
     {   
-        SkillManager.AddBuff(user, BuffType.再生, effectRate: 5);  // 引数:値とすることで、必要な引数のみ指定することができる
+        SkillManager.AddBuff(user, BuffType.再生, true, true, effectRate: 5);  // 引数:値とすることで、必要な引数のみ指定することができる
     }
 }

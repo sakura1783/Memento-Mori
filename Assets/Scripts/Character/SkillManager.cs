@@ -283,9 +283,12 @@ public static class SkillManager
     /// </summary>
     /// <param name="target"></param>
     /// <param name="buffType"></param>
-    /// <param name="duration">解除不可バフは、デフォルト値で大きな値を設定</param>
+    /// <param name="isPositiveEffect"></param>
+    /// <param name="isIrremovable">解除不可かどうか</param>
+    /// <param name="duration">解除不可バフは、デフォルト値で大きな値を設定(値減らさないけど、一応ね)</param>
     /// <param name="effectRate">基準値の?%分の影響を与えるか。「再生」「毒」「侵食」などで使用する</param>
-    public static void AddBuff(CharaController target, BuffType buffType, int duration = 100, int effectRate = 0)
+    /// <param name="effectValue">効果の量。「シールド」などで利用</param>
+    public static void AddBuff(CharaController target, BuffType buffType, bool isPositiveEffect, bool isIrremovable, int duration = 100, int effectRate = 0, int effectValue = 0)
     {
         // 重ね掛け不可。継続時間とダメージ割合を置き換えて、処理を終了
         var duplicateBuff = target.Status.Buffs.FirstOrDefault(x => x.type == buffType);
@@ -298,11 +301,11 @@ public static class SkillManager
         }
 
         // デバフを生成して、追加
-        var buff = new Buff(buffType, duration, effectRate);
+        var buff = new Buff(buffType, isPositiveEffect, isIrremovable, duration, effectRate, effectValue);
         target.Status.Buffs.Add(buff);
 
-        // 監視処理。継続時間が0になったら、デバフを削除
-        buff.Duration  
+        // 監視処理。継続時間かEffectValueのいずれかが0になったら、バフを削除
+        Observable.Merge(buff.Duration, buff.EffectValue)
             .Where(x => x == 0)
             .Subscribe(_ => RemoveBuff(target, buff.type));  // TODO Removeされたときにインスタンスの参照が切れるのでAddTo行わなくても大丈夫？必要な場合、どのように記述すれば良いか？
     }

@@ -160,7 +160,7 @@ public class CharaController
         Passive2RemainingCoolTime.Value = ReduceCoolTime(Passive2RemainingCoolTime.Value);
         
         // 各デバフのクールタイムを減少
-        foreach (var debuff in status.Buffs.Where(x => x.type != BuffType.睡眠))  // 「睡眠」はクールタイムの処理を行わない
+        foreach (var debuff in status.Buffs.Where(x => !x.isIrremovable))  // 解除不可でないバフのみ、クールタイムを減少
         {
             debuff.Duration.Value = ReduceCoolTime(debuff.Duration.Value);
         }

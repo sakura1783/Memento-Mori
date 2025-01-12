@@ -46,7 +46,7 @@ public class Elliot : CharacterBase
         healTargets.ForEach(target =>
         {
             SkillManager.Heal(target, user.Status.attackPower, 50);
-            SkillManager.AddBuff(target, BuffType.再生, 1, 3);
+            SkillManager.AddBuff(target, BuffType.再生, true, false, 1, 3);
         });
     }
 
