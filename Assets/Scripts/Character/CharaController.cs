@@ -50,6 +50,11 @@ public class CharaController
 
         // キャラクターとスキルを紐付け
         CreateSkillEffect(charaName);
+
+        // 監視処理。戦闘不能になった時、バフを全て削除
+        status.Hp
+            .Where(value => value <= 0)
+            .Subscribe(_ => status.Buffs.Clear());
     }
 
     /// <summary>

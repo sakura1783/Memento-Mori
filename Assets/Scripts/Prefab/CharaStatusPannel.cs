@@ -28,6 +28,7 @@ public class CharaStatusPannel : MonoBehaviour
 
         // 購読処理
         Observable.Merge(charaController.Status.Hp, charaController.Status.MaxHp)  // Observable.Merge()で、括弧内の値いずれかが変更された場合にSubscribe()の処理が動く
+            .Where(_ => charaController.Status.Hp.Value > 0)  // 戦闘不能の場合は処理しない
             .Subscribe(value =>
             {
                 txtHpValue.text = $"{charaController.Status.Hp} / {charaController.Status.MaxHp}";
@@ -47,6 +48,14 @@ public class CharaStatusPannel : MonoBehaviour
         charaController.Status.Buffs
             .ObserveRemove()
             .Subscribe(eventData => Destroy(gameObject))
+            .AddTo(this);
+
+        charaController.Status.Buffs
+            .ObserveReset()  // Clear()された時(= キャラが戦闘不能になった時)
+            .Subscribe(_ =>
+            {
+                foreach (Transform child in buffPlace) Destroy(child.gameObject);
+            })
             .AddTo(this);
     }
 }
