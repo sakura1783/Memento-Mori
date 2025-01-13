@@ -34,4 +34,15 @@ public class PopupManager : AbstractSingleton<PopupManager>
 
         return targetPop;
     }
+
+    /// <summary>
+    /// 指定した型のポップアップを取得
+    /// (該当のポップアップ固有の処理を実行する際などに利用する)
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public T GetPopup<T>() where T : PopupBase
+    {
+        return popups.OfType<T>().FirstOrDefault();
+    }
 }

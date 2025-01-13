@@ -10176,6 +10176,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canvasGroup: {fileID: 2005916537}
   btnClose: {fileID: 2005916538}
+  txtResult: {fileID: 675904941}
   winGroup: {fileID: 998030301}
   loseGroup: {fileID: 1884641394}
 --- !u!1 &2024162532

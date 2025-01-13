@@ -128,7 +128,8 @@ public class BattleManager : PopupBase
         do
         {
             // 味方の行動
-            if (playerTeam[count] != null)
+            //if (playerTeam[count] != null)
+            if (playerTeam.Count > count)
             {
                 playerTeam[count].ExecuteActiveSkill();
                 previousActChara = playerTeam[count];
@@ -140,7 +141,8 @@ public class BattleManager : PopupBase
             }
 
             // 敵の行動
-            if (opponentTeam[count] != null)
+            //if (opponentTeam[count] != null)
+            if (opponentTeam.Count > count)
             {
                 opponentTeam[count].ExecuteActiveSkill();
                 previousActChara = opponentTeam[count];
@@ -186,9 +188,9 @@ public class BattleManager : PopupBase
     /// </summary>
     private void OnBattleEnd()
     {
-        PopupManager.instance.Show<ResultPop>();
+        Debug.Log($"{battleState}");
 
-        // TODO
+        PopupManager.instance.GetPopup<ResultPop>().ShowPopup(battleState);
         
         // TODO 生成したゲームオブジェクト等を全て破棄して、最初の状態に戻す
 
