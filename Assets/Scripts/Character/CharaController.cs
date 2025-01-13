@@ -83,12 +83,6 @@ public class CharaController
     /// <param name="amount"></param>
     public void UpdateHp(int amount)
     {
-        // 「ダメージ無効」状態の場合、ダメージを受けない
-        if (amount < 0 && status.Buffs.Any(buff => buff.type == BuffType.ダメージ無効))
-        {
-            return;
-        }
-
         status.Hp.Value += amount;
     }
 

@@ -221,18 +221,6 @@ public static class SkillManager
     {
         // baseValueのrate分の値を計算し、攻撃対象のHPを削る
         (int damageValue, bool isCritical) = CalculateManager.CalculateAttackDamage(user, baseValue, rate, target);
-        
-        // 「シールド」を持っている場合、ダメージを軽減
-        var shieldBuff = target.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.シールド);
-        if (shieldBuff != null)
-        {
-            var shieldValue = shieldBuff.EffectValue;
-
-            // シールド値を減少、残りのダメージを計算
-            shieldValue.Value -= damageValue;
-            damageValue = Math.Max(-shieldValue.Value, 0);
-        }
-
         target.UpdateHp(-damageValue);
         target.ReceivedCriticalDamage = isCritical;
 
@@ -336,9 +324,9 @@ public static class SkillManager
         var buff = new Buff(buffType, isPositiveEffect, isIrremovable, duration, effectRate, effectValue);
         target.Status.Buffs.Add(buff);
 
-        // 監視処理。継続時間かEffectValueのいずれかが0以下になったら、バフを削除
+        // 監視処理。継続時間かEffectValueのいずれかが0になったら、バフを削除
         Observable.Merge(buff.Duration, buff.EffectValue)
-            .Where(x => x <= 0)
+            .Where(x => x == 0)
             .Subscribe(_ => RemoveBuff(target, buff.type));  // TODO Removeされたときにインスタンスの参照が切れるのでAddTo行わなくても大丈夫？必要な場合、どのように記述すれば良いか？
     }
 
