@@ -32,7 +32,7 @@ public class Buff
     public bool isIrremovable;  // 解除不可かどうか
     public ReactiveProperty<int> Duration = new();
     public int effectRate;  // 基準となる値(現在HP、総与ダメージ等)の?%分の影響を与えるか。「毒」「侵食」「再生」などで使用する
-    public ReactiveProperty<int> EffectValue; // 効果の量(シールドなどで利用)
+    public ReactiveProperty<int> EffectValue = new(); // 効果の量(シールドなどで利用)
 
 
     /// <summary>

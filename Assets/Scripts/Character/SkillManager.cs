@@ -250,6 +250,8 @@ public static class SkillManager
             RemoveBuff(target, BuffType.睡眠);
         }
 
+        Debug.Log($"{user.Name}が{damageValue}の攻撃");
+
         return damageValue;
     }
 

@@ -40,20 +40,20 @@ public class CharaStatusPannel : MonoBehaviour
             .ObserveAdd()
             .Subscribe(eventData =>  // <= ObserveAddが提供するイベントデータ
             {
-                var debuff = Instantiate(buffPrefab, buffPlace);
-                debuff.sprite = SpriteManager.instance.GetDebuffSprite(eventData.Value.type);  // 引数(eventData).Valueでコレクションに追加された要素を取得
-            })
-            .AddTo(this);
+                var buff = Instantiate(buffPrefab, buffPlace);
+                buff.sprite = SpriteManager.instance.GetDebuffSprite(eventData.Value.type);  // 引数(eventData).Valueでコレクションに追加された要素を取得
 
-        charaController.Status.Buffs
-            .ObserveRemove()
-            .Subscribe(eventData => Destroy(gameObject))
+                charaController.Status.Buffs
+                    .ObserveRemove()
+                    .Subscribe(eventData => Destroy(buff.gameObject));
+            })
             .AddTo(this);
 
         charaController.Status.Buffs
             .ObserveReset()  // Clear()された時(= キャラが戦闘不能になった時)
             .Subscribe(_ =>
             {
+                // バフのオブジェクトを全て削除
                 foreach (Transform child in buffPlace) Destroy(child.gameObject);
             })
             .AddTo(this);

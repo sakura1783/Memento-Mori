@@ -11,7 +11,7 @@ public class CharaController
 {
     private CharacterBase chara;  // キャラの(クラス)インスタンスを生成して代入
 
-    private readonly CharaName name;
+    private readonly CharaName name;  // TODO デバッグが終わったら削除
     public CharaName Name => name;
 
     private readonly Attribute attribute;  // 属性はずっと変わらない情報なのでreadonly
@@ -44,6 +44,7 @@ public class CharaController
     {
         // 計算後の各ステータスの値を受け取り、キャラに反映
         status = statusData;
+        name = charaName;  // TODO 削除
 
         // 属性をスクリプタブルオブジェクトから取得
         attribute = DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.FirstOrDefault(data => data.englishName == charaName).attribute;
