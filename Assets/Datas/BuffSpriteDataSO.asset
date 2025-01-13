@@ -12,14 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 705d459c1cab94e428ed29289502ecfa, type: 3}
   m_Name: BuffSpriteDataSO
   m_EditorClassIdentifier: 
-  debuffSpriteDataList:
-  - debuffType: 0
+  buffSpriteDataList:
+  - buffType: 0
+    sprite: {fileID: 21300000, guid: 800b98e2813da40fba9c68855db44876, type: 3}
+  - buffType: 1
+    sprite: {fileID: 21300000, guid: 5a5b70367c88b4f658dcd5486e17b405, type: 3}
+  - buffType: 2
+    sprite: {fileID: 21300000, guid: 6a754e05e3734490bb62bfd47e0b4921, type: 3}
+  - buffType: 3
+    sprite: {fileID: 21300000, guid: 91c658dd33bab4d769d195d050728bcf, type: 3}
+  - buffType: 4
     sprite: {fileID: 21300000, guid: a3b37eeef94584e2c86c10348e246b49, type: 3}
-  - debuffType: 1
+  - buffType: 5
     sprite: {fileID: 21300000, guid: ebe5e8fa836054a428e25b026eb48d0f, type: 3}
-  - debuffType: 2
+  - buffType: 6
     sprite: {fileID: 21300000, guid: 0e715680cdcf54ad5a7ec0a6f6506d54, type: 3}
-  - debuffType: 3
+  - buffType: 7
     sprite: {fileID: 21300000, guid: 44ada9ba28bc24d2eb5c0975285abff7, type: 3}
-  - debuffType: 4
+  - buffType: 8
     sprite: {fileID: 21300000, guid: c771dd53636f042a3a98bedf4274ff9e, type: 3}
