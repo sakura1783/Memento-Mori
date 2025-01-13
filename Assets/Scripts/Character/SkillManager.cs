@@ -219,6 +219,14 @@ public static class SkillManager
     /// <returns>ダメージ値を返す(総与ダメージを実装する際に使う)</returns>
     public static int Attack(CharaController user, CharaController target, int baseValue, int rate)
     {
+        // 「バリア」を持っている場合、一層消費してダメージを無効化
+        var barrierBuff = target.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.バリア);
+        if (barrierBuff != null)
+        {
+            barrierBuff.EffectValue.Value--;
+            return 0;
+        }
+
         // baseValueのrate分の値を計算し、攻撃対象のHPを削る
         (int damageValue, bool isCritical) = CalculateManager.CalculateAttackDamage(user, baseValue, rate, target);
 
