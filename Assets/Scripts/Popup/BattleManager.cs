@@ -112,15 +112,15 @@ public class BattleManager : PopupBase
     /// <returns>バトルを終わるかどうか。trueでバトル続行(ターンを繰り返す)、trueでバトル終了(このメソッドだけでなく、Battle()からも抜ける)</returns>
     private void ExecuteTurn()
     {
-        //「毒」状態の場合、現在HP*?%のダメージを受ける
         foreach (var chara in playerTeam.Concat(opponentTeam))  // Concat()でリスト2つを結合し、処理を簡素化
         {
-            var poisonDebuff = chara.Status.Buffs.FirstOrDefault(x => x.type == BuffType.毒);
+            // 「毒」状態の場合、現在HP*?%のダメージを受ける
+            var poisonDebuff = chara.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.毒);
+            if (poisonDebuff != null) chara.UpdateHp(-CalculateManager.CalculateSkillEffectValue(chara.Status.Hp.Value, poisonDebuff.effectRate));
 
-            if (poisonDebuff != null)
-            {
-                chara.UpdateHp(-CalculateManager.CalculateSkillEffectValue(chara.Status.Hp.Value, poisonDebuff.effectRate));
-            }
+            // 「再生」状態の場合、HPを最大HP*?%回復
+            var regenerationBuff = chara.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.再生);
+            if (regenerationBuff != null) chara.UpdateHp(-CalculateManager.CalculateSkillEffectValue(chara.Status.MaxHp.Value, regenerationBuff.effectRate));
         }
         
         int count = 0;  // do-while文が何回回ったか
