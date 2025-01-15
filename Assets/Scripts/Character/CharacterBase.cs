@@ -20,7 +20,7 @@ public abstract class CharacterBase
     public virtual void BasicAttack(CharaController user)
     {
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
-        targets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 100));
+        targets.ForEach(async target => await SkillManager.Attack(user, target, user.Status.attackPower, 100));
     }
 
     /// <summary>

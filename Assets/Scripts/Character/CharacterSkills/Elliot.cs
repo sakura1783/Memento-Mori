@@ -40,7 +40,7 @@ public class Elliot : CharacterBase
     public override void ActiveSkill2(CharaController user)
     {
         var attackTargets = SkillManager.PickTarget(user, TargetType.Opponent, 3);
-        attackTargets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 200));
+        attackTargets.ForEach(async target => await SkillManager.Attack(user, target, user.Status.attackPower, 200));
 
         var healTargets = SkillManager.PickTarget(user, TargetType.Ally, 2, ValueType.ByCurrentHp, false);
         healTargets.ForEach(target =>

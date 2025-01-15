@@ -4,6 +4,7 @@ using System.Linq;
 using UniRx;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 
 /// <summary>
 /// スキルのターゲットの種類
@@ -217,8 +218,14 @@ public static class SkillManager
     /// <param name="baseValue">基準となる値</param>
     /// <param name="rate"></param>
     /// <returns>ダメージ値を返す(総与ダメージを実装する際に使う)</returns>
-    public static int Attack(CharaController user, CharaController target, int baseValue, int rate)
+    public static async UniTask<int> Attack(CharaController user, CharaController target, int baseValue, int rate)
     {
+        // DOTweenでアニメーション  // TODO ループか何かでUnityが落ちる
+        Vector2 punchPos = new(battleManager.playerTeam.Any(chara => chara == target) ? 20f : -20f, -10f);
+        Debug.Log($"punchPos = {punchPos}");
+        // await target.CharaStatusPannel
+        //     .DOPunchPosition(punchPos, 1f, 2).AsyncWaitForCompletion();  // AsyncWaitForCompletion()でトゥイーンのTaskを返す
+
         // 「バリア」を持っている場合、一層消費してダメージを無効化
         var barrierBuff = target.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.バリア);
         if (barrierBuff != null)
@@ -250,7 +257,11 @@ public static class SkillManager
             RemoveBuff(target, BuffType.睡眠);
         }
 
-        Debug.Log($"{user.Name}が{target.Name}に、{damageValue}の攻撃");
+        // TODO クラッシュしないが、待ちもしない？もう一度確認してみる
+        // target.CharaStatusPannel.DOPunchPosition(punchPos, 1f, 2).OnComplete(() =>
+        // {
+        //     Debug.Log($"{user.Name}が{target.Name}に、{damageValue}の攻撃");
+        // });
 
         return damageValue;
     }

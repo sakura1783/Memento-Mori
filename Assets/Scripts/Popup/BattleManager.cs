@@ -124,7 +124,7 @@ public class BattleManager : PopupBase
         }
         
         int count = 0;  // do-while文が何回回ったか
-        // 味方1番手→敵1番手→味方2番手...の順に行動  // TODO 素早さの順に攻撃
+        // 味方1番手→敵1番手→味方2番手...の順に行動  // TODO 素早さの順に攻撃、リファクタリング
         do
         {
             // 味方の行動

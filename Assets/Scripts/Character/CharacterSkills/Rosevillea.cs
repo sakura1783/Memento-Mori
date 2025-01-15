@@ -20,9 +20,9 @@ public class Rosevillea : CharacterBase
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
 
         // スキル処理
-        targets.ForEach(target =>
+        targets.ForEach(async target =>
         {
-            SkillManager.Attack(user, target, user.Status.attackPower, 390);
+            await SkillManager.Attack(user, target, user.Status.attackPower, 390);
             SkillManager.AddBuff(target, BuffType.気絶, false, false);
         });
     }
@@ -35,7 +35,7 @@ public class Rosevillea : CharacterBase
     {
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
 
-        targets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 420));
+        targets.ForEach(async target => await SkillManager.Attack(user, target, user.Status.attackPower, 420));
     }
 
     /// <summary>
