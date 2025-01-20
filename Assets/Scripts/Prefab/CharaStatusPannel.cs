@@ -21,7 +21,7 @@ public class CharaStatusPannel : MonoBehaviour
 
     public void Setup(CharaController charaController, GameData.CharaConstData charaData)
     {
-        charaController.CharaStatusPannel = this.transform;
+        charaController.CharaStatusPannel = transform;
 
         imgChara.sprite = SpriteManager.instance.GetCharaSprite(charaData.name, CharaSpriteType.Face);
         txtCharaInfo.text = $"Lv{charaData.level} {DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.FirstOrDefault(data => data.englishName == charaData.name).name}";

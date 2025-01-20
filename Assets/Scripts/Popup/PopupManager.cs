@@ -17,8 +17,8 @@ public class PopupManager : AbstractSingleton<PopupManager>
         // ポップアップの初期設定
         popups.ForEach(pop => pop.Setup());
 
-        // テスト
-        Show<TeamAssemblyPop>();
+        // TODO テスト
+        //Show<TeamAssemblyPop>();
     }
 
     /// <summary>

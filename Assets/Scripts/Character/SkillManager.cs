@@ -222,9 +222,10 @@ public static class SkillManager
     {
         // DOTweenでアニメーション  // TODO ループか何かでUnityが落ちる
         Vector2 punchPos = new(battleManager.playerTeam.Any(chara => chara == target) ? 20f : -20f, -10f);
-        Debug.Log($"punchPos = {punchPos}");
-        // await target.CharaStatusPannel
-        //     .DOPunchPosition(punchPos, 1f, 2).AsyncWaitForCompletion();  // AsyncWaitForCompletion()でトゥイーンのTaskを返す
+        //Debug.Log($"punchPos = {punchPos}");
+        //Debug.Log($"CharaStatusPannelの有無：{target.CharaStatusPannel}");
+        // await target.CharaStatusPannel  // TODO すでに破棄(解放)されたCancellationTokenSourceに対してDisposeを呼び出している(二重に処理されている)？
+        //     .DOPunchPosition(punchPos, 1f, 2).AsyncWaitForPosition(1f);  // AsyncWaitForCompletion()でトゥイーンのTaskを返す
 
         // 「バリア」を持っている場合、一層消費してダメージを無効化
         var barrierBuff = target.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.バリア);
