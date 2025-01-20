@@ -416,7 +416,7 @@ GameObject:
   - component: {fileID: 6401546835044482704}
   - component: {fileID: 6401546835044482705}
   m_Layer: 5
-  m_Name: btnGacha
+  m_Name: btnGachaKind
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

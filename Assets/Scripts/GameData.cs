@@ -19,7 +19,7 @@ public class GameData : AbstractSingleton<GameData>
     //     public int hp;
     //     public float criticalRate;
 
-    //     // TODO ランクなど
+    //     // ランクなど
     // }
 
     // public List<OwnedCharaData> ownedCharaDataList = new();
@@ -46,10 +46,33 @@ public class GameData : AbstractSingleton<GameData>
         }
     }
 
+    /// <summary>
+    /// 開催中のガチャ詳細
+    /// </summary>
+    public class CurrentGachaDetail  // TODO このクラス、ここに書くのが適切か？
+    {
+        public GachaType gachaType;
+        public CharaName pickupChara;
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="gachaType"></param>
+        /// <param name="pickupChara"></param>
+        public CurrentGachaDetail(GachaType gachaType, CharaName pickupChara = CharaName.Rosevillea)
+        {
+            this.gachaType = gachaType;
+            this.pickupChara = pickupChara;
+        }
+    }
+
     public List<CharaConstData> ownedCharaDataList = new();
 
     public int clearMapNo = 0;  // クリアしたマップの番号。この値+1が次のマップ番号
     public int clearStageNo = 0;
+
+    public List<CurrentGachaDetail> currentGachaList = new();  // 開催中のガチャの情報。これを使ってゲーム実行時にGachaPop内にオブジェクトを生成
+
 
     // TODO ownedCharaDataListへの追加処理(ガチャで新しいキャラを手に入れた際)
 }

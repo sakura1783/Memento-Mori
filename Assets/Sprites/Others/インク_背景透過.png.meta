@@ -1779,11 +1779,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: pin
+      name: pink_light
       rect:
         serializedVersion: 2
         x: 246
-        y: 20
+        y: 18
         width: 131
         height: 86
       alignment: 0
@@ -2884,9 +2884,9 @@ TextureImporter:
       blue: -386404239
       green: -1760431660
       orenge: 1587139077
-      pin: -1868062486
       pink: -384700486
       pink_dark: -615621739
+      pink_light: -1868062486
       purple: -2145549817
       purple_dark: -615481699
       "\u30A4\u30F3\u30AF_\u80CC\u666F\u900F\u904E_0": -819377054

@@ -8,6 +8,7 @@ public class SpriteManager : AbstractSingleton<SpriteManager>
 {
     public CharaSpriteDataSO charaSpriteDataSO;
     public BuffSpriteDataSO buffSpriteDataSO;
+    public WatercolorPaintDataSO watercolorPaintDataSO;
 
 
     /// <summary>
@@ -56,5 +57,15 @@ public class SpriteManager : AbstractSingleton<SpriteManager>
     public Sprite GetDebuffSprite(BuffType buffType)
     {
         return buffSpriteDataSO.buffSpriteDataList.FirstOrDefault(data => data.buffType == buffType).sprite;
+    }
+
+    /// <summary>
+    /// 水彩ぼかし画像を取得
+    /// </summary>
+    /// <param name="watercolorPaintType"></param>
+    /// <returns></returns>
+    public Sprite GetWatercolorPaintSprite(WatercolorPaintType watercolorPaintType)
+    {
+        return watercolorPaintDataSO.watercolorPaintDataList.FirstOrDefault(data => data.watercolorPaintType == watercolorPaintType).sprite;
     }
 }
