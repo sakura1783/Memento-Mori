@@ -263,6 +263,7 @@ public static class SkillManager
         // {
         //     Debug.Log($"{user.Name}が{target.Name}に、{damageValue}の攻撃");
         // });
+        Debug.Log($"{user.Name}が{target.Name}に、{damageValue}の攻撃");
 
         return damageValue;
     }

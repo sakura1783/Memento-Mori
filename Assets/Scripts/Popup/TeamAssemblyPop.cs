@@ -45,9 +45,9 @@ public class TeamAssemblyPop : PopupBase
     /// <summary>
     /// ポップアップが開かれる時毎回行う処理
     /// </summary>
-    public override void ShowPopup()
+    public void ShowPopup(int mapNo, int stageNo)
     {
-        AssembleOpponentTeam();
+        AssembleOpponentTeam(mapNo, stageNo);
 
         // TODO 保存しておいた前回のチーム編成でキャラのボタンを画面うえに生成
     
@@ -74,15 +74,17 @@ public class TeamAssemblyPop : PopupBase
     /// <summary>
     /// 敵チームのキャラを編成
     /// </summary>
-    private void AssembleOpponentTeam()
+    /// <param name="selectedMapNo">プレイヤーが選択したマップ</param>
+    /// <param name="selectedStageNo">プレイヤーが選択したステージ</param>
+    private void AssembleOpponentTeam(int selectedMapNo, int selectedStageNo)
     {
-        // 現在のマップを取得
+        // 選択されたマップを取得
         //var stageData = DataBaseManager.instance.mapDataSO.mapDataList[GameData.instance.clearMapNo + 1].stageDataSO;  // <= 間違い。Listの要素番号は0から始まる
-        var stageData = DataBaseManager.instance.mapDataSO.mapDataList.FirstOrDefault(data => data.mapNo == GameData.instance.clearMapNo + 1).stageDataSO;
+        var stageData = DataBaseManager.instance.mapDataSO.mapDataList.FirstOrDefault(data => data.mapNo == selectedMapNo).stageDataSO;
 
-        // 現在のステージの敵のリストを取得
+        // 選択されたステージの敵のリストを取得
         //foreach (var enemyData in stageData.stageDataList[GameData.instance.clearStageNo + 1].enemyDataList)  // <= 上記と同じ間違い
-        foreach (var enemyData in stageData.stageDataList.FirstOrDefault(data => data.stageNo == GameData.instance.clearStageNo + 1).enemyDataList)
+        foreach (var enemyData in stageData.stageDataList.FirstOrDefault(data => data.stageNo == selectedStageNo).enemyDataList)
         {
             // 敵チームを編成
             var enemy = new GameData.CharaConstData(enemyData.name, enemyData.level);
@@ -111,7 +113,7 @@ public class TeamAssemblyPop : PopupBase
             var generateTran = playerTeamCharaTran.FirstOrDefault(x => x.transform.childCount <= 0);
             charaButton.CopyButton = Instantiate(copyButtonPrefab, generateTran);
             charaButton.CopyButton.Setup(charaButton, this);
-            //charaButton.CopyButton.IsCopied = true;
+            // charaButton.CopyButton.IsCopied = true;
             // charaButton.CopyButton.IsSelected = true;
             // charaButton.CopyButton.CopyButton = charaButton.CopyButton;
         }
