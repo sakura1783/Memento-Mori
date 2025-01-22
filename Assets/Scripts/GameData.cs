@@ -52,17 +52,19 @@ public class GameData : AbstractSingleton<GameData>
     public class CurrentGachaDetail  // TODO このクラス、ここに書くのが適切か？
     {
         public GachaType gachaType;
-        public CharaName pickupChara;
+        public CharaName pickupChara;  // ピックアップガチャの場合のみ指定
+        public Attribute attribute;  // 属性ガチャの場合のみ指定
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="gachaType"></param>
         /// <param name="pickupChara"></param>
-        public CurrentGachaDetail(GachaType gachaType, CharaName pickupChara = CharaName.Rosevillea)
+        public CurrentGachaDetail(GachaType gachaType, CharaName pickupChara = CharaName.Rosevillea, Attribute attribute = Attribute.藍)
         {
             this.gachaType = gachaType;
             this.pickupChara = pickupChara;
+            this.attribute = attribute;
         }
     }
 

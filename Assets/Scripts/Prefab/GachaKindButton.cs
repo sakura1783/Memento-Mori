@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,18 +16,25 @@ public class GachaKindButton : MonoBehaviour
 
     [SerializeField] private CanvasGroup selectGroup;
 
-
-    public void Setup()
+    private Dictionary<Attribute, (Sprite, Sprite)> attributeSprites = new()  // Item1で水彩画像を、Item2でキャラ画像を取得
     {
-        GameData.instance.currentGachaList.ForEach(gacha =>
+        {Attribute.藍, (SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Blue), SpriteManager.instance.GetCharaSprite(CharaName.Rosevillea, CharaSpriteType.Shoulder))},
+        {Attribute.紅, (SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Orange), SpriteManager.instance.GetCharaSprite(CharaName.Arilosha, CharaSpriteType.Shoulder))},
+        {Attribute.翠, (SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Green), SpriteManager.instance.GetCharaSprite(CharaName.Nina, CharaSpriteType.Shoulder))},
+        {Attribute.黄, (SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Yellow), SpriteManager.instance.GetCharaSprite(CharaName.Elliot, CharaSpriteType.Shoulder))},
+    };
+
+
+    public void Setup(GameData.CurrentGachaDetail gachaData)
+    {
+        txtKind.text = gachaData.gachaType.ToString();
+        if (gachaData.gachaType == GachaType.属性ガチャ)
         {
-            txtKind.text = gacha.gachaType.ToString();
+            txtKind.text = gachaData.attribute.ToString();
+            txtKindDetail.text = "属性ガチャ";
+        }
 
-            // 属性ガチャの場合
-            if (gacha.gachaType == GachaType.藍 || gacha.gachaType == GachaType.紅 || gacha.gachaType == GachaType.翠 || gacha.gachaType == GachaType.黄) txtKindDetail.text = "属性ガチャ";
-
-            SetAppearanceByGachaType(gacha.gachaType, gacha.pickupChara);
-        });
+        SetAppearanceByGachaType(gachaData.gachaType, gachaData.pickupChara, gachaData.attribute);
 
         button.OnClickAsObservable()
             .Subscribe(_ =>OnClick())
@@ -41,8 +50,9 @@ public class GachaKindButton : MonoBehaviour
     /// ガチャの種類を元に見た目を設定
     /// </summary>
     /// <param name="gachaType"></param>
-    /// <param name="pickupChara">ピックアップガチャでのみ使用する</param>
-    private void SetAppearanceByGachaType(GachaType gachaType, CharaName pickupChara = CharaName.Rosevillea)
+    /// <param name="pickupChara">ピックアップガチャでのみ使用</param>
+    /// <param name="attribute">属性ガチャでのみ使用</param>
+    private void SetAppearanceByGachaType(GachaType gachaType, CharaName pickupChara = CharaName.Rosevillea, Attribute attribute = Attribute.藍)
     {
         switch (gachaType)
         {
@@ -53,34 +63,19 @@ public class GachaKindButton : MonoBehaviour
 
             case GachaType.プラチナガチャ:
                 imgColor.sprite = SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Sumire);
-                imgChara.sprite = SpriteManager.instance.GetCharaSprite(CharaName.Rosevillea, CharaSpriteType.Shoulder);
+                //imgChara.sprite = SpriteManager.instance.GetCharaSprite(, CharaSpriteType.Shoulder);  // TODO 
+                break;
+
+            case GachaType.属性ガチャ:
+                imgColor.sprite = attributeSprites[attribute].Item1;
+                imgChara.sprite = attributeSprites[attribute].Item2;
                 break;
 
             case GachaType.運命ガチャ:
                 imgColor.sprite = SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.DarkPurple);
                 //imgChara.sprite = SpriteManager.instance.GetCharaSprite()  // TODO ふさわしいキャラの画像を設定
                 break;
-
-            case GachaType.藍:
-                imgColor.sprite = SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Blue);
-                imgChara.sprite = SpriteManager.instance.GetCharaSprite(CharaName.Setsuna, CharaSpriteType.Shoulder);
-                break;
-
-            case GachaType.紅:
-                imgColor.sprite = SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Orange);
-                imgChara.sprite = SpriteManager.instance.GetCharaSprite(CharaName.Arilosha, CharaSpriteType.Shoulder);
-                break;
-
-            case GachaType.翠:
-                imgColor.sprite = SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Green);
-                imgChara.sprite = SpriteManager.instance.GetCharaSprite(CharaName.Nina, CharaSpriteType.Shoulder);
-                break;
-
-            case GachaType.黄:
-                imgColor.sprite = SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Yellow);
-                imgChara.sprite = SpriteManager.instance.GetCharaSprite(CharaName.Elliot, CharaSpriteType.Shoulder);
-                break;
-        }
+        }   
     }
 
 
