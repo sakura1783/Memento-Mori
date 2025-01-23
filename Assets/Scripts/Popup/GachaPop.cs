@@ -8,7 +8,7 @@ using UnityEngine.UI;
 /// </summary>
 public enum GachaType
 {
-    ピックアップガチャ,  // 名前で管理？
+    ピックアップガチャ,
     プラチナガチャ,
     属性ガチャ,
     運命ガチャ,
@@ -48,7 +48,7 @@ public class GachaPop : PopupBase
             var gachaKindObj = Instantiate(btnGachaKindPrefab, gachaKindTran);
             gachaKindObj.Setup(gachaData);
 
-            // TODO 必要な値の設定
+            // TODO 他の値の設定
         });
     }
 }

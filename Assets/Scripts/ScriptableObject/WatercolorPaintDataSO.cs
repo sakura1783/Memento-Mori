@@ -19,7 +19,7 @@ public enum WatercolorPaintType
 }
 
 [CreateAssetMenu(fileName = "WatercolorPaintDataSO", menuName = "Create WatercolorPaintDataSO")]
-public class WatercolorPaintDataSO : MonoBehaviour
+public class WatercolorPaintDataSO : ScriptableObject
 {
     public List<WatercolorPaintData> watercolorPaintDataList = new();
 

@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08449dfddd79b4aeb81c03d35f67e9fd, type: 3}
+  m_Name: WatercolorPaintDataSO
+  m_EditorClassIdentifier: 
+  watercolorPaintDataList:
+  - watercolorPaintType: 0
+    sprite: {fileID: -888709456, guid: f47cd989f280f42d88f5441584adab27, type: 3}
+  - watercolorPaintType: 1
+    sprite: {fileID: -386404239, guid: e53c8e651b4d641a18ced4651ce65159, type: 3}
+  - watercolorPaintType: 2
+    sprite: {fileID: -1760431660, guid: e53c8e651b4d641a18ced4651ce65159, type: 3}
+  - watercolorPaintType: 3
+    sprite: {fileID: 1587139077, guid: e53c8e651b4d641a18ced4651ce65159, type: 3}
+  - watercolorPaintType: 4
+    sprite: {fileID: -384700486, guid: e53c8e651b4d641a18ced4651ce65159, type: 3}
+  - watercolorPaintType: 5
+    sprite: {fileID: -615621739, guid: e53c8e651b4d641a18ced4651ce65159, type: 3}
+  - watercolorPaintType: 6
+    sprite: {fileID: -1868062486, guid: e53c8e651b4d641a18ced4651ce65159, type: 3}
+  - watercolorPaintType: 7
+    sprite: {fileID: -2145549817, guid: e53c8e651b4d641a18ced4651ce65159, type: 3}
+  - watercolorPaintType: 8
+    sprite: {fileID: -615481699, guid: e53c8e651b4d641a18ced4651ce65159, type: 3}
+  - watercolorPaintType: 9
+    sprite: {fileID: -375308038, guid: 8608210b79a884a6b885e833c24b4482, type: 3}
