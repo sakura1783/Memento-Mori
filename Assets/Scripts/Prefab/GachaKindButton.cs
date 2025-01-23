@@ -16,7 +16,6 @@ public class GachaKindButton : MonoBehaviour
     [SerializeField] private Image imgColor;
 
     [SerializeField] private CanvasGroup selectGroup;
-    public CanvasGroup SelectGroup => selectGroup;
 
     private Dictionary<Attribute, (Sprite, Sprite)> attributeSprites;
 
@@ -40,7 +39,7 @@ public class GachaKindButton : MonoBehaviour
 
         // このオブジェクト以外のselectGroupを非表示にする
         List<GachaKindButton> others = gachaKindPrefabs.Where(prefab => prefab != this).ToList();
-        others.ForEach(obj => obj.SelectGroup.alpha = 0);
+        others.ForEach(obj => obj.selectGroup.alpha = 0);
     }
 
     /// <summary>
