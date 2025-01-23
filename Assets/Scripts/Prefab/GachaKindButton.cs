@@ -38,9 +38,9 @@ public class GachaKindButton : MonoBehaviour
     {
         selectGroup.alpha = 1;
 
-        // TODO このオブジェクト以外のselectGroupを非表示にする
-        List<GachaKindButton> others = new(gachaKindPrefabs.Where(prefab => prefab != this).ToList());
-        others.Select(obj => obj.SelectGroup.alpha = 0);
+        // このオブジェクト以外のselectGroupを非表示にする
+        List<GachaKindButton> others = gachaKindPrefabs.Where(prefab => prefab != this).ToList();
+        others.ForEach(obj => obj.SelectGroup.alpha = 0);
     }
 
     /// <summary>
