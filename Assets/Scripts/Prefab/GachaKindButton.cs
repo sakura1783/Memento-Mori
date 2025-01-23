@@ -16,23 +16,21 @@ public class GachaKindButton : MonoBehaviour
 
     [SerializeField] private CanvasGroup selectGroup;
 
-    private Dictionary<Attribute, (Sprite, Sprite)> attributeSprites = new()  // Item1で水彩画像を、Item2でキャラ画像を取得
-    {
-        {Attribute.藍, (SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Blue), SpriteManager.instance.GetCharaSprite(CharaName.Rosevillea, CharaSpriteType.Shoulder))},
-        {Attribute.紅, (SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Orange), SpriteManager.instance.GetCharaSprite(CharaName.Arilosha, CharaSpriteType.Shoulder))},
-        {Attribute.翠, (SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Green), SpriteManager.instance.GetCharaSprite(CharaName.Nina, CharaSpriteType.Shoulder))},
-        {Attribute.黄, (SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Yellow), SpriteManager.instance.GetCharaSprite(CharaName.Elliot, CharaSpriteType.Shoulder))},
-    };
+    private Dictionary<Attribute, (Sprite, Sprite)> attributeSprites;
 
 
-    public void Setup(GameData.CurrentGachaDetail gachaData)
+    public void Setup(GameData.CurrentGachaDetail gachaData, Dictionary<Attribute, (Sprite, Sprite)> attributeSprites)
     {
+        this.attributeSprites = attributeSprites;
+
         txtKind.text = gachaData.gachaType.ToString();
         if (gachaData.gachaType == GachaType.属性ガチャ)
         {
             txtKind.text = gachaData.attribute.ToString();
             txtKindDetail.text = "属性ガチャ";
         }
+
+        selectGroup.alpha = 0;
 
         SetAppearanceByGachaType(gachaData.gachaType, gachaData.pickupChara, gachaData.attribute);
 

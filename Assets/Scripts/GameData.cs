@@ -73,7 +73,7 @@ public class GameData : AbstractSingleton<GameData>
     public int clearMapNo = 0;  // クリアしたマップの番号。この値+1が次のマップ番号
     public int clearStageNo = 0;
 
-    public List<CurrentGachaDetail> currentGachaList = new();  // 開催中のガチャの情報。これを使ってゲーム実行時にGachaPop内にオブジェクトを生成
+    public List<CurrentGachaDetail> currentGachaList = new();  // 開催中のガチャの情報
 
 
     // TODO ownedCharaDataListへの追加処理(ガチャで新しいキャラを手に入れた際)

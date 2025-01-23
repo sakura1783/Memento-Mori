@@ -19,6 +19,7 @@ public class PopupManager : AbstractSingleton<PopupManager>
 
         // TODO テスト
         //Show<TeamAssemblyPop>();
+        Show<GachaPop>();
     }
 
     /// <summary>
