@@ -7447,12 +7447,19 @@ MonoBehaviour:
   gachaKindTran: {fileID: 679274858}
   btnGachaKindPrefab: {fileID: 3770384807889826281, guid: fe978aeb76bea433c8693c2709c20224, type: 3}
   imgGacha: {fileID: 581298164}
-  btnGachaSpecifics: {fileID: 0}
-  btn1pull: {fileID: 0}
-  btn10pull: {fileID: 0}
-  txtGachaName: {fileID: 0}
-  txtGachaDetail: {fileID: 0}
+  btnGachaSpecifics: {fileID: 1228989410}
+  btn1pull: {fileID: 1666289076}
+  btn10pull: {fileID: 928983750}
+  txtGemCost1x: {fileID: 668664407}
+  txtGemCost10x: {fileID: 378805864}
+  txtGachaName: {fileID: 1722482727}
+  txtGachaDetail: {fileID: 301497617}
   txtGemCount: {fileID: 1807502331}
+  platinumGachaImage: {fileID: 21300000, guid: 33b9d202604394dabae38bd57c5fb996, type: 3}
+  blueAttributeGachaImage: {fileID: 21300000, guid: c9cfb828890004fa999fe8dbef5d667a, type: 3}
+  redAttributeGachaImage: {fileID: 21300000, guid: c9cfb828890004fa999fe8dbef5d667a, type: 3}
+  greenAttributeGachaImage: {fileID: 21300000, guid: c9cfb828890004fa999fe8dbef5d667a, type: 3}
+  yellowAttributeGachaImage: {fileID: 21300000, guid: c9cfb828890004fa999fe8dbef5d667a, type: 3}
 --- !u!1 &1405919948
 GameObject:
   m_ObjectHideFlags: 0

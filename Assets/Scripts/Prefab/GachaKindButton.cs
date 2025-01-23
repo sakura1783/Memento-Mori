@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UniRx;
@@ -17,11 +16,14 @@ public class GachaKindButton : MonoBehaviour
 
     [SerializeField] private CanvasGroup selectGroup;
 
-    private Dictionary<Attribute, (Sprite, Sprite)> attributeSprites;
+    private GachaPop gachaPop;
+
+    private Dictionary<Attribute, (Sprite, Sprite, Sprite)> attributeSprites;
 
 
     public void Setup(GameData.CurrentGachaDetail gachaData, GachaPop gachaPop)
     {
+        this.gachaPop = gachaPop;
         attributeSprites = gachaPop.AttributeSprites;
 
         selectGroup.alpha = 0;
@@ -29,14 +31,22 @@ public class GachaKindButton : MonoBehaviour
         SetAppearanceByGachaType(gachaData.gachaType, gachaData.pickupChara, gachaData.attribute);
 
         button.OnClickAsObservable()
-            .Subscribe(_ =>OnClick(gachaPop.GeneratedGachaKindPrefabs))
+            .Subscribe(_ =>OnClick(gachaData, gachaPop.GeneratedGachaKindPrefabs))
             .AddTo(this);
     }
 
-    public void OnClick(List<GachaKindButton> gachaKindPrefabs)
+    /// <summary>
+    /// タップした際の処理
+    /// </summary>
+    /// <param name="gachaData"></param>
+    /// <param name="gachaKindPrefabs">GachaPopで生成したGachaKindButtonプレハブ群</param>
+    public void OnClick(GameData.CurrentGachaDetail gachaData, List<GachaKindButton> gachaKindPrefabs)
     {
-        selectGroup.alpha = 1;
+        // GachaPopの画面設定
+        gachaPop.SetGachaDetails(gachaData.gachaType, gachaData.pickupChara, gachaData.attribute);
 
+        selectGroup.alpha = 1;
+        
         // このオブジェクト以外のselectGroupを非表示にする
         List<GachaKindButton> others = gachaKindPrefabs.Where(prefab => prefab != this).ToList();
         others.ForEach(obj => obj.selectGroup.alpha = 0);
@@ -93,10 +103,8 @@ public class GachaKindButton : MonoBehaviour
     /* 実装すること */
     // AM5:00に切り替え
     // プラチナガチャ、運命ガチャは常設
-    // 属性ガチャは24時間で切り替え(ただし、天・冥は除く)
+    // 属性ガチャは24時間で切り替え(ただし、天・冥は除く)。属性ガチャのピックアップ順をconstの配列でどこかに宣言する
     // ピックアップガチャは1週間毎で切り替え
 
     // GameDataクラスに、現在開催されているガチャの情報(種類)を保存=> 日経過でガチャの種類を更新、GameDataの情報からゲームを開いた際に一度だけ生成(ポップアップを開いた際に毎回生成、ではない)
-
-    // 属性ガチャのピックアップ順をconstの配列でどこかに宣言する
 }

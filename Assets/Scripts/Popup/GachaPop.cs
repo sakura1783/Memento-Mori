@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,16 +27,27 @@ public class GachaPop : PopupBase
     [SerializeField] private Button btn1pull;
     [SerializeField] private Button btn10pull;
 
+    [SerializeField] private Text txtGemCost1x;  // 1回のガチャで必要な宝石の数
+    [SerializeField] private Text txtGemCost10x;
+
     [SerializeField] private Text txtGachaName;
     [SerializeField] private Text txtGachaDetail;
 
     [SerializeField] private Text txtGemCount;
 
+    [SerializeField] private Sprite platinumGachaImage;
+    [SerializeField] private Sprite blueAttributeGachaImage;
+    [SerializeField] private Sprite redAttributeGachaImage;
+    [SerializeField] private Sprite greenAttributeGachaImage;
+    [SerializeField] private Sprite yellowAttributeGachaImage;
+
+    private static readonly Vector2 imgGachaDefaultSize = new(1400, 800);
+
     private List<GachaKindButton> generatedGachaKindPrefabs = new();
     public List<GachaKindButton> GeneratedGachaKindPrefabs => generatedGachaKindPrefabs;
 
-    private Dictionary<Attribute, (Sprite, Sprite)> attributeSprites;
-    public Dictionary<Attribute, (Sprite, Sprite)> AttributeSprites => attributeSprites;
+    private Dictionary<Attribute, (Sprite, Sprite, Sprite)> attributeSprites;  // Item1で水彩画像を、Item2でキャラ画像を、Item3でガチャのメイン画像を取得
+    public Dictionary<Attribute, (Sprite, Sprite, Sprite)> AttributeSprites => attributeSprites;
 
 
     public override void Setup()
@@ -43,12 +55,12 @@ public class GachaPop : PopupBase
         base.Setup();
 
         // セットする画像の設定  // TODO readonlyにして、宣言時にまとめて定義したいが、SpriteManagerがインスタンスされていない可能性があるため、Nullエラーになる。他の方法を探す
-        attributeSprites = new Dictionary<Attribute, (Sprite, Sprite)>  // Item1で水彩画像を、Item2でキャラ画像を取得
+        attributeSprites = new Dictionary<Attribute, (Sprite, Sprite, Sprite)>
         {
-            {Attribute.藍, (SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Blue), SpriteManager.instance.GetCharaSprite(CharaName.Rosevillea, CharaSpriteType.Shoulder))},
-            {Attribute.紅, (SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Orange), SpriteManager.instance.GetCharaSprite(CharaName.Arilosha, CharaSpriteType.Shoulder))},
-            {Attribute.翠, (SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Green), SpriteManager.instance.GetCharaSprite(CharaName.Nina, CharaSpriteType.Shoulder))},
-            {Attribute.黄, (SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Yellow), SpriteManager.instance.GetCharaSprite(CharaName.Elliot, CharaSpriteType.Shoulder))},
+            {Attribute.藍, (SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Blue), SpriteManager.instance.GetCharaSprite(CharaName.Rosevillea, CharaSpriteType.Shoulder), blueAttributeGachaImage)},
+            {Attribute.紅, (SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Orange), SpriteManager.instance.GetCharaSprite(CharaName.Arilosha, CharaSpriteType.Shoulder), redAttributeGachaImage)},
+            {Attribute.翠, (SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Green), SpriteManager.instance.GetCharaSprite(CharaName.Nina, CharaSpriteType.Shoulder), greenAttributeGachaImage)},
+            {Attribute.黄, (SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Yellow), SpriteManager.instance.GetCharaSprite(CharaName.Elliot, CharaSpriteType.Shoulder), yellowAttributeGachaImage)},
         };
 
         // TODO テスト。終わったら消す
@@ -65,19 +77,62 @@ public class GachaPop : PopupBase
         // GachaSorterクラスのcustomOrderでリストを並び替え
         GameData.instance.currentGachaList.Sort(new GachaSorter());
 
-        // 現在開催されているガチャから、必要なオブジェクトを生成
+        // 現在開催されているガチャから、GachaKindButtonを生成
         GameData.instance.currentGachaList.ForEach(gachaData =>
         {
             var gachaKindObj = Instantiate(btnGachaKindPrefab, gachaKindTran);
             gachaKindObj.Setup(gachaData, this);
 
             generatedGachaKindPrefabs.Add(gachaKindObj);
-
-            // TODO 他の値の設定
-            
         });
 
+        // ガチャの最初の要素で画面をセット
+        var firstGachaData = GameData.instance.currentGachaList[0];
+        SetGachaDetails(firstGachaData.gachaType, firstGachaData.pickupChara, firstGachaData.attribute);
+
         // TODO ボタンの監視処理
+    }
+
+    /// <summary>
+    /// ガチャ詳細を画面に設定
+    /// </summary>
+    /// <param name="gachaType"></param>
+    /// <param name="pickupChara"></param>
+    /// <param name="attribute"></param>
+    public void SetGachaDetails(GachaType gachaType, CharaName pickupChara = CharaName.Rosevillea, Attribute attribute = Attribute.藍)
+    {
+        switch (gachaType)
+        {
+            case GachaType.ピックアップガチャ:
+                SetDetails(SpriteManager.instance.GetCharaSprite(pickupChara, CharaSpriteType.Full), "ピックアップガチャ", $"{DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.FirstOrDefault(data => data.englishName == pickupChara).name}が期間限定で登場", new Vector2(800, 800));
+                break;
+
+            case GachaType.プラチナガチャ:
+                SetDetails(platinumGachaImage, "プラチナガチャ", "SRまでのキャラが出現");
+                break;
+
+            case GachaType.属性ガチャ:
+                SetDetails(attributeSprites[attribute].Item3, $"{attribute}属性ガチャ", $"{attribute}属性のキャラが出現");
+                break;
+
+            case GachaType.運命ガチャ:
+                txtGemCost1x.text = "500";
+                txtGemCost10x.text = "5000";
+                SetDetails(SpriteManager.instance.GetCharaSprite(pickupChara, CharaSpriteType.Full), "運命ガチャ", "設定したキャラやアイテムが出現");
+                break;
+        }
+
+        // 引数に指定した値を各変数に代入
+        void SetDetails(Sprite gachaImage, string gachaName, string gachaDetail, Vector2 imageSize = default)
+        {
+            // 値が指定されない場合は(1400, 800)を、指定されている場合は指定値のサイズに設定
+            imageSize = imageSize == default ? imgGachaDefaultSize : imageSize;
+            imgGacha.rectTransform.sizeDelta = imageSize;
+
+            imgGacha.sprite = gachaImage;
+            txtGachaName.text = gachaName;
+            txtGachaDetail.text = gachaDetail;
+        }
     }
 }
 
