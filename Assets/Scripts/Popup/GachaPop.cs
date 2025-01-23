@@ -22,6 +22,7 @@ public class GachaPop : PopupBase
     [SerializeField] private GachaKindButton btnGachaKindPrefab;
 
     [SerializeField] private Image imgGacha;
+    [SerializeField] private Image imgWatercolorPaint;
 
     [SerializeField] private Button btnGachaSpecifics;
     [SerializeField] private Button btn1pull;
@@ -104,34 +105,35 @@ public class GachaPop : PopupBase
         switch (gachaType)
         {
             case GachaType.ピックアップガチャ:
-                SetDetails(SpriteManager.instance.GetCharaSprite(pickupChara, CharaSpriteType.Full), "ピックアップガチャ", $"{DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.FirstOrDefault(data => data.englishName == pickupChara).name}が期間限定で登場", new Vector2(800, 800));
+                SetDetails(SpriteManager.instance.GetCharaSprite(pickupChara, CharaSpriteType.Full), SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.DarkPink), "ピックアップガチャ", $"{DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.FirstOrDefault(data => data.englishName == pickupChara).name}が期間限定で登場", new Vector2(800, 800));
                 break;
 
             case GachaType.プラチナガチャ:
-                SetDetails(platinumGachaImage, "プラチナガチャ", "SRまでのキャラが出現");
+                SetDetails(platinumGachaImage, SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Sumire), "プラチナガチャ", "SRまでのキャラが出現");
                 break;
 
             case GachaType.属性ガチャ:
-                SetDetails(attributeSprites[attribute].Item3, $"{attribute}属性ガチャ", $"{attribute}属性のキャラが出現");
+                SetDetails(attributeSprites[attribute].Item3, attributeSprites[attribute].Item1, $"{attribute}属性ガチャ", $"{attribute}属性のキャラが出現");
                 break;
 
-            case GachaType.運命ガチャ:
-                txtGemCost1x.text = "500";
-                txtGemCost10x.text = "5000";
-                SetDetails(SpriteManager.instance.GetCharaSprite(pickupChara, CharaSpriteType.Full), "運命ガチャ", "設定したキャラやアイテムが出現");
+            case GachaType.運命ガチャ:  // TODO imgGachaのサイズ設定
+                SetDetails(SpriteManager.instance.GetCharaSprite(pickupChara, CharaSpriteType.Full), SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.DarkPurple), "運命ガチャ", "設定したキャラやアイテムが出現", gachaCost1x:500);
                 break;
         }
 
         // 引数に指定した値を各変数に代入
-        void SetDetails(Sprite gachaImage, string gachaName, string gachaDetail, Vector2 imageSize = default)
+        void SetDetails(Sprite gachaImage, Sprite waterPaintSprite, string gachaName, string gachaDetail, Vector2 imageSize = default, int gachaCost1x = 300)
         {
             // 値が指定されない場合は(1400, 800)を、指定されている場合は指定値のサイズに設定
             imageSize = imageSize == default ? imgGachaDefaultSize : imageSize;
             imgGacha.rectTransform.sizeDelta = imageSize;
 
             imgGacha.sprite = gachaImage;
+            imgWatercolorPaint.sprite = waterPaintSprite;
             txtGachaName.text = gachaName;
             txtGachaDetail.text = gachaDetail;
+            txtGemCost1x.text = gachaCost1x.ToString();
+            txtGemCost10x.text = (gachaCost1x * 10).ToString();
         }
     }
 }
