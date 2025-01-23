@@ -23,13 +23,6 @@ public class GachaKindButton : MonoBehaviour
     {
         this.attributeSprites = attributeSprites;
 
-        txtKind.text = gachaData.gachaType.ToString();
-        if (gachaData.gachaType == GachaType.属性ガチャ)
-        {
-            txtKind.text = gachaData.attribute.ToString();
-            txtKindDetail.text = "属性ガチャ";
-        }
-
         selectGroup.alpha = 0;
 
         SetAppearanceByGachaType(gachaData.gachaType, gachaData.pickupChara, gachaData.attribute);
@@ -55,25 +48,40 @@ public class GachaKindButton : MonoBehaviour
         switch (gachaType)
         {
             case GachaType.ピックアップガチャ:
+                SetTextProperties("ピックアップ\nガチャ", 35);
                 imgColor.sprite = SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.DarkPink);
                 imgChara.sprite = SpriteManager.instance.GetCharaSprite(pickupChara, CharaSpriteType.Shoulder);
                 break;
 
             case GachaType.プラチナガチャ:
+                SetTextProperties("プラチナ\nガチャ", 40);
                 imgColor.sprite = SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.Sumire);
                 //imgChara.sprite = SpriteManager.instance.GetCharaSprite(, CharaSpriteType.Shoulder);  // TODO 
                 break;
 
             case GachaType.属性ガチャ:
+                SetTextProperties(attribute.ToString(), 48, gachaType.ToString(), 27);
                 imgColor.sprite = attributeSprites[attribute].Item1;
                 imgChara.sprite = attributeSprites[attribute].Item2;
                 break;
 
             case GachaType.運命ガチャ:
+                txtKind.text = "運命\nガチャ";
+                SetTextProperties("運命", 48, "ガチャ", 35);
                 imgColor.sprite = SpriteManager.instance.GetWatercolorPaintSprite(WatercolorPaintType.DarkPurple);
                 //imgChara.sprite = SpriteManager.instance.GetCharaSprite()  // TODO ふさわしいキャラの画像を設定
                 break;
-        }   
+        }
+
+        // UIのテキスト設定
+        void SetTextProperties(string text1, int size1, string text2 = "", int size2 = 0)
+        {
+            txtKind.text = text1;
+            txtKindDetail.text = text2;
+
+            txtKind.fontSize = size1;
+            txtKindDetail.fontSize = size2;
+        }
     }
 
 

@@ -189,7 +189,7 @@ public class CharaController
         }
 
 
-        // ローカル変数。このメソッド内でしか使えない
+        // ローカル関数。このメソッド内でしか使えない
         int ReduceCoolTime(int reduceValue)  // 減らしたいクールタイムを引数で指定
         {
             var coolTime = Mathf.Clamp(reduceValue - 1, 0, int.MaxValue);
