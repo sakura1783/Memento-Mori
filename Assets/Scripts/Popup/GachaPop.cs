@@ -22,9 +22,20 @@ public class GachaPop : PopupBase
 
     [SerializeField] private Image imgGacha;
 
+    [SerializeField] private Button btnGachaSpecifics;
+    [SerializeField] private Button btn1pull;
+    [SerializeField] private Button btn10pull;
+
+    [SerializeField] private Text txtGachaName;
+    [SerializeField] private Text txtGachaDetail;
+
     [SerializeField] private Text txtGemCount;
 
+    private List<GachaKindButton> generatedGachaKindPrefabs = new();
+    public List<GachaKindButton> GeneratedGachaKindPrefabs => generatedGachaKindPrefabs;
+
     private Dictionary<Attribute, (Sprite, Sprite)> attributeSprites;
+    public Dictionary<Attribute, (Sprite, Sprite)> AttributeSprites => attributeSprites;
 
 
     public override void Setup()
@@ -58,10 +69,15 @@ public class GachaPop : PopupBase
         GameData.instance.currentGachaList.ForEach(gachaData =>
         {
             var gachaKindObj = Instantiate(btnGachaKindPrefab, gachaKindTran);
-            gachaKindObj.Setup(gachaData, attributeSprites);
+            gachaKindObj.Setup(gachaData, this);
+
+            generatedGachaKindPrefabs.Add(gachaKindObj);
 
             // TODO 他の値の設定
+            
         });
+
+        // TODO ボタンの監視処理
     }
 }
 

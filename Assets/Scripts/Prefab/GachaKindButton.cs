@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,26 +16,31 @@ public class GachaKindButton : MonoBehaviour
     [SerializeField] private Image imgColor;
 
     [SerializeField] private CanvasGroup selectGroup;
+    public CanvasGroup SelectGroup => selectGroup;
 
     private Dictionary<Attribute, (Sprite, Sprite)> attributeSprites;
 
 
-    public void Setup(GameData.CurrentGachaDetail gachaData, Dictionary<Attribute, (Sprite, Sprite)> attributeSprites)
+    public void Setup(GameData.CurrentGachaDetail gachaData, GachaPop gachaPop)
     {
-        this.attributeSprites = attributeSprites;
+        attributeSprites = gachaPop.AttributeSprites;
 
         selectGroup.alpha = 0;
 
         SetAppearanceByGachaType(gachaData.gachaType, gachaData.pickupChara, gachaData.attribute);
 
         button.OnClickAsObservable()
-            .Subscribe(_ =>OnClick())
+            .Subscribe(_ =>OnClick(gachaPop.GeneratedGachaKindPrefabs))
             .AddTo(this);
     }
 
-    public void OnClick()
+    public void OnClick(List<GachaKindButton> gachaKindPrefabs)
     {
-        selectGroup.alpha = 1;   // TODO 外す際の処理、どうするか
+        selectGroup.alpha = 1;
+
+        // TODO このオブジェクト以外のselectGroupを非表示にする
+        List<GachaKindButton> others = new(gachaKindPrefabs.Where(prefab => prefab != this).ToList());
+        others.Select(obj => obj.SelectGroup.alpha = 0);
     }
 
     /// <summary>
