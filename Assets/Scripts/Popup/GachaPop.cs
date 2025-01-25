@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -91,7 +92,16 @@ public class GachaPop : PopupBase
         var firstGachaData = GameData.instance.currentGachaList[0];
         SetGachaDetails(firstGachaData.gachaType, firstGachaData.pickupChara, firstGachaData.attribute);
 
-        // TODO ボタンの監視処理
+        Observable.Merge
+            (
+                btn1pull.OnClickAsObservable().Select(_ => true),  // RxのSelectで、ストリームを流れるデータを他のデータに変換できる
+                btn10pull.OnClickAsObservable().Select(_ => false)
+            )
+            .ThrottleFirst(TimeSpan.FromSeconds(1f))
+            .Subscribe(isSinglePull => PopupManager.instance.GetPopup<GachaExecutionPop>().ShowPopup(isSinglePull))  // Selectで変換したデータをShowPopup()に渡す
+            .AddTo(this);
+
+        // TODO btnGachaSpecifics
     }
 
     /// <summary>

@@ -54,7 +54,7 @@ public class CharaButton : MonoBehaviour
     // }
 
 
-    public void Setup(GameData.CharaConstData charaData, TeamAssemblyPop teamAssemblyPop)
+    public void Setup(GameData.CharaConstData charaData, TeamAssemblyPop teamAssemblyPop = null)
     {
         this.charaData = charaData;
         this.teamAssemblyPop = teamAssemblyPop;
@@ -62,6 +62,11 @@ public class CharaButton : MonoBehaviour
         // TODO 見た目の設定
         imgChara.sprite = SpriteManager.instance.GetCharaSprite(charaData.name, CharaSpriteType.Face);
 
+        if (!teamAssemblyPop)
+        {
+            return;
+        }
+        
         button.OnClickAsObservable()
             .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
             .Subscribe(_ => ModifyPlayerTeam())
