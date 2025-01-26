@@ -1,4 +1,7 @@
 using System.Linq;
+using Cysharp.Threading.Tasks;
+using UniRx;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Setsuna : CharacterBase
@@ -71,5 +74,15 @@ public class Setsuna : CharacterBase
         SkillManager.AddBuff(user, BuffType.シールド, true, false, 3, effectValue: CalculateManager.CalculateSkillEffectValue(user.Status.attackPower, 250));
     }
 
-    // TODO PassiveSkill2
+    /// <summary>
+    /// 毎ターン開始時、または自身が攻撃を受けた時、自身のHP割合が50%未満の場合、自身のクリティカル率が30%増加する(解除不可)。
+    /// </summary>
+    /// <param name="user"></param>
+    public override void PassiveSkill2(CharaController user)
+    {
+        user.Status.Hp
+            .Where(value => value < user.Status.MaxHp.Value / 2)  // TODO これだと、デバフでダメージを受けた際も50%未満になれば発動してしまう
+            .Take(1)  // 最初の一度だけイベントを通す
+            .Subscribe(_ => SkillManager.IncreaseCriticalRate(user, 30));
+    }
 }
