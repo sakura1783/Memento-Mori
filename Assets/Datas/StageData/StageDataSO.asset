@@ -17,17 +17,23 @@ MonoBehaviour:
     enemyDataList:
     - name: 2
       level: 1
+      rarity: 2
     - name: 3
       level: 1
+      rarity: 0
   - stageNo: 2
     enemyDataList:
     - name: 0
       level: 1
+      rarity: 0
     - name: 1
       level: 1
+      rarity: 0
   - stageNo: 3
     enemyDataList:
     - name: 2
-      level: 0
+      level: 1
+      rarity: 2
     - name: 4
-      level: 0
+      level: 1
+      rarity: 2

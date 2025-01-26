@@ -9062,6 +9062,7 @@ GameObject:
   - component: {fileID: 1692895456}
   - component: {fileID: 1692895454}
   - component: {fileID: 1692895455}
+  - component: {fileID: 1692895457}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -9099,10 +9100,13 @@ MonoBehaviour:
   ownedCharaDataList:
   - name: 0
     level: 5
+    rarity: 0
   - name: 1
     level: 5
+    rarity: 0
   - name: 4
     level: 5
+    rarity: 2
   clearMapNo: 0
   clearStageNo: 0
 --- !u!114 &1692895454
@@ -9154,6 +9158,19 @@ MonoBehaviour:
   - {fileID: 1015797305}
   - {fileID: 2005916539}
   gssReceiver: {fileID: 750197301}
+--- !u!114 &1692895457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1692895450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62901904c967d49efac23680aae224f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorDataSO: {fileID: 11400000, guid: 2f321a905365d4a8082a9d048d1450e8, type: 2}
 --- !u!1 &1701532777
 GameObject:
   m_ObjectHideFlags: 0

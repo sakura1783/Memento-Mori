@@ -74,7 +74,7 @@ public class GachaExecutionPop : PopupBase
         {
             // 全キャラからランダムに取得
             var charaData = DataBaseManager.instance.charaInitialDataSO.charaInitialDataList[UnityEngine.Random.Range(0, DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.Count)];
-            resultCharaData.Add(new (charaData.englishName, 1));
+            resultCharaData.Add(new (charaData.englishName, 1, charaData.initialRarity));
 
             var rarityObj = Instantiate(gachaRarityPrefab, resultTran);
             generatedGachaRarities.Add(rarityObj);

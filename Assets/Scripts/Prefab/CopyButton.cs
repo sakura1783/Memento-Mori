@@ -25,8 +25,10 @@ public class CopyButton : MonoBehaviour
         teamAssemblyPop = pop;
         this.baseButton = baseButton;
 
-        // TODO 見た目
         imgChara.sprite = SpriteManager.instance.GetCharaSprite(baseButton.CharaData.name, CharaSpriteType.Face);
+        imgRank.color = ColorManager.instance.GetColorByRarity(baseButton.CharaData.rarity);
+        // TODO imgAttribute
+        txtCharaLevel.text = $"Lv{baseButton.CharaData.level}";
 
         button.OnClickAsObservable()
             .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))

@@ -34,15 +34,18 @@ public class GameData : AbstractSingleton<GameData>
         public CharaName name;
         public int level;
 
+        public Rarity rarity;
+        
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="name"></param>
         /// <param name="level"></param>
-        public CharaConstData(CharaName name, int level)
+        public CharaConstData(CharaName name, int level, Rarity rarity)
         {
             this.name = name;
             this.level = level;
+            this.rarity = rarity;
         }
     }
 

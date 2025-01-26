@@ -87,7 +87,7 @@ public class TeamAssemblyPop : PopupBase
         foreach (var enemyData in stageData.stageDataList.FirstOrDefault(data => data.stageNo == selectedStageNo).enemyDataList)
         {
             // 敵チームを編成
-            var enemy = new GameData.CharaConstData(enemyData.name, enemyData.level);
+            var enemy = new GameData.CharaConstData(enemyData.name, enemyData.level, enemyData.rarity);
             opponentTeamInfo.Add(enemy);
         }
 

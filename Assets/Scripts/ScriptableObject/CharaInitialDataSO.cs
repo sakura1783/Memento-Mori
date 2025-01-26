@@ -34,7 +34,7 @@ public enum Attribute
 }
 
 /// <summary>
-/// レアリティ
+/// レアリティ(ランク)
 /// </summary>
 public enum Rarity
 {
@@ -74,7 +74,7 @@ public class CharaInitialDataSO : ScriptableObject
         public int initialHp;
         public int initialCriticalRate;
 
-        public Rarity initialRarity; 
+        public Rarity initialRarity;
 
         // TODO 各ステータスの増加率、他のステータス追加
 

@@ -18,8 +18,7 @@ public class PopupManager : AbstractSingleton<PopupManager>
         popups.ForEach(pop => pop.Setup());
 
         // TODO テスト
-        //Show<TeamAssemblyPop>();
-        Show<GachaPop>();
+        //Show<GachaPop>();
     }
 
     /// <summary>

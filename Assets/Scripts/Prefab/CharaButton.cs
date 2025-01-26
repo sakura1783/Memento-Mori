@@ -31,12 +31,6 @@ public class CharaButton : MonoBehaviour
 
     private TeamAssemblyPop teamAssemblyPop;
 
-    // private bool isSelected = false;  // コピーと本体で独立した値を持っているので、一方の値を変えてももう一方の値は変わらない
-    // public bool IsSelected
-    // {
-    //     get => isSelected;
-    //     set => isSelected = value;
-    // }
     public ReactiveProperty<bool> IsSelected = new();
 
     private CopyButton copyButton;  // 画面うえに生成した、コピーされたCharaButtonのゲームオブジェクト
@@ -46,27 +40,22 @@ public class CharaButton : MonoBehaviour
         set => copyButton = value;
     }
 
-    // private bool isCopied;  // コピーされた(画面うえに生成された)ものかどうか
-    // public bool IsCopied
-    // {
-    //     get => isCopied;
-    //     set => isCopied = value;
-    // }
-
 
     public void Setup(GameData.CharaConstData charaData, TeamAssemblyPop teamAssemblyPop = null)
     {
         this.charaData = charaData;
         this.teamAssemblyPop = teamAssemblyPop;
 
-        // TODO 見た目の設定
         imgChara.sprite = SpriteManager.instance.GetCharaSprite(charaData.name, CharaSpriteType.Face);
+        imgRank.color = ColorManager.instance.GetColorByRarity(charaData.rarity);
+        // TODO imgAttribute
+        txtCharaLevel.text = $"Lv{charaData.level}";
 
         if (!teamAssemblyPop)
         {
             return;
         }
-        
+
         button.OnClickAsObservable()
             .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
             .Subscribe(_ => ModifyPlayerTeam())
@@ -106,7 +95,7 @@ public class CharaButton : MonoBehaviour
             // }
 
             // キャラをチームに追加
-            var chara = new GameData.CharaConstData(charaData.name, charaData.level);
+            var chara = new GameData.CharaConstData(charaData.name, charaData.level, charaData.rarity);
             teamAssemblyPop.playerTeamInfo.Add(chara);
 
             // 画面うえにCopyButtonを生成
