@@ -51,6 +51,8 @@ public class GachaPop : PopupBase
     private Dictionary<Attribute, (Sprite, Sprite, Sprite)> attributeSprites;  // Item1で水彩画像を、Item2でキャラ画像を、Item3でガチャのメイン画像を取得
     public Dictionary<Attribute, (Sprite, Sprite, Sprite)> AttributeSprites => attributeSprites;
 
+    private GachaType currentGachaType;
+
 
     public override void Setup()
     {
@@ -98,7 +100,7 @@ public class GachaPop : PopupBase
                 btn10pull.OnClickAsObservable().Select(_ => false)
             )
             .ThrottleFirst(TimeSpan.FromSeconds(1f))
-            .Subscribe(isSinglePull => PopupManager.instance.GetPopup<GachaExecutionPop>().ShowPopup(isSinglePull))  // Selectで変換したデータをShowPopup()に渡す
+            .Subscribe(isSinglePull => PopupManager.instance.GetPopup<GachaExecutionPop>().ShowPopup(isSinglePull, currentGachaType == GachaType.運命ガチャ))  // Selectで変換したデータをShowPopup()に渡す
             .AddTo(this);
 
         // TODO btnGachaSpecifics
@@ -112,6 +114,8 @@ public class GachaPop : PopupBase
     /// <param name="attribute"></param>
     public void SetGachaDetails(GachaType gachaType, CharaName pickupChara = CharaName.Rosevillea, Attribute attribute = Attribute.藍)
     {
+        currentGachaType = gachaType;
+
         switch (gachaType)
         {
             case GachaType.ピックアップガチャ:
