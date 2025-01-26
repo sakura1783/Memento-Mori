@@ -70,4 +70,6 @@ public class Setsuna : CharacterBase
     {
         SkillManager.AddBuff(user, BuffType.シールド, true, false, 3, effectValue: CalculateManager.CalculateSkillEffectValue(user.Status.attackPower, 250));
     }
+
+    // TODO PassiveSkill2
 }

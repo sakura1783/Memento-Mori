@@ -33,6 +33,27 @@ public enum Attribute
     冥,
 }
 
+/// <summary>
+/// レアリティ
+/// </summary>
+public enum Rarity
+{
+    R,
+    R_,  // R+
+    SR,
+    SR_,
+    SSR,
+    SSR_,
+    UR,
+    UR_,
+    LR,
+    LR_1,
+    LR_2,
+    LR_3,
+    LR_4,
+    LR_5,
+}
+
 [CreateAssetMenu(fileName = "CharaInitialDataSO", menuName = "Create CharaInitialDataSO")]
 public class CharaInitialDataSO : ScriptableObject
 {
@@ -53,6 +74,8 @@ public class CharaInitialDataSO : ScriptableObject
         public int initialHp;
         public int initialCriticalRate;
 
+        public Rarity initialRarity; 
+
         // TODO 各ステータスの増加率、他のステータス追加
 
 
@@ -71,6 +94,7 @@ public class CharaInitialDataSO : ScriptableObject
             initialDefencePower = int.Parse(datas[6]);
             initialHp = int.Parse(datas[7]);
             initialCriticalRate = int.Parse(datas[8]);
+            initialRarity = (Rarity)System.Enum.Parse(typeof(Rarity), datas[9]);
         }
     }
 }

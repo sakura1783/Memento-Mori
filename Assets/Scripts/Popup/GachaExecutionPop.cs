@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UniRx;
-using UniRx.Triggers;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -114,6 +112,7 @@ public class GachaExecutionPop : PopupBase
         buttonGroup.blocksRaycasts = false;
     }
 
+
     /* TODO 実装 */
     // 各キャラの排出確率(レアリティ、ピックアップ時などを考慮)
     // 各ガチャで排出されるキャラ
@@ -125,4 +124,5 @@ public class GachaExecutionPop : PopupBase
     // レアリティはレベルに依存しない。所持キャラのレアリティをどこで保存するか。やはり上記クラスに追加するか？
 
     // ジェムを必要数持っているか・回した後にジェムを減らす
+    // GameDataクラス、所持キャラリストへの追加
 }
