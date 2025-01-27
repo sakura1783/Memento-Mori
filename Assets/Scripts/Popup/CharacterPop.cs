@@ -2,6 +2,9 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// OwnedCharaPopとEvolutionPopの切り替え用ポップアップクラス
+/// </summary>
 public class CharacterPop : PopupBase
 {
     [SerializeField] private Button btnToOwnedCharaPop;
@@ -15,29 +18,26 @@ public class CharacterPop : PopupBase
     {
         base.Setup();
 
-        // TODO Rx.Selectでストリームデータを変換、toOwnedCharaPopのtrue,falseでalphaと開くポップアップを制御
-        btnToOwnedCharaPop.OnClickAsObservable()
-            .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
-            .Subscribe(_ =>
-            {
-                toOwnedCharaButtonNotSelectGroup.alpha = 1;
-                toEvolutionNotSelectGroup.alpha = 0;
-
-                PopupManager.instance.Show<OwnedCharaPop>();  // TODO Show()に前回のポップアップを閉じる処理を追加、trueで前回のポップアップを閉じる
-            })
-            .AddTo(this);
-
-        btnToEvolutionPop.OnClickAsObservable()
-            .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
-            .Subscribe(_ =>
-            {
-                toOwnedCharaButtonNotSelectGroup.alpha = 0;
-                toEvolutionNotSelectGroup.alpha = 1;
-
-                PopupManager.instance.Show<EvolutionPop>();
-            })
-            .AddTo(this);
+        Observable.Merge
+        (
+            btnToOwnedCharaPop.OnClickAsObservable().Select(_ => true),
+            btnToEvolutionPop.OnClickAsObservable().Select(_ => false)
+        )
+        .Subscribe(toOwnedCharaPop =>
+        {
+            toOwnedCharaButtonNotSelectGroup.alpha = toOwnedCharaPop ? 0 : 1;
+            toEvolutionNotSelectGroup.alpha = toOwnedCharaPop ? 1 : 0;
+            
+            if (toOwnedCharaPop) PopupManager.instance.Show<OwnedCharaPop>(true);
+            else PopupManager.instance.Show<EvolutionPop>(true);
+        })
+        .AddTo(this);
     }
 
-    // TODO ShowPopup()
+    public override void ShowPopup()
+    {
+        PopupManager.instance.Show<OwnedCharaPop>(false);
+
+        base.ShowPopup();
+    }
 }

@@ -33,13 +33,8 @@ public class TeamAssemblyPop : PopupBase
 
         btnFight.OnClickAsObservable()
             .ThrottleFirst(System.TimeSpan.FromSeconds(2f))
-            .Subscribe(_ => 
-            {
-                HidePopup();
-
-                // バトル画面を表示
-                PopupManager.instance.Show<BattleManager>();
-            });
+            .Subscribe(_ => PopupManager.instance.Show<BattleManager>(true))
+            .AddTo(this);
     }
 
     /// <summary>
@@ -67,6 +62,8 @@ public class TeamAssemblyPop : PopupBase
         //         charaButton.Setup(data, this);
         //     }
         // }
+
+        PopupManager.instance.PreviousPop = this;
 
         base.ShowPopup();
     }

@@ -7212,17 +7212,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 40
+    m_Left: 75
     m_Right: 0
-    m_Top: 15
-    m_Bottom: 0
+    m_Top: 30
+    m_Bottom: 30
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
   m_CellSize: {x: 125, y: 125}
-  m_Spacing: {x: 20, y: 20}
+  m_Spacing: {x: 70, y: 60}
   m_Constraint: 1
-  m_ConstraintCount: 11
+  m_ConstraintCount: 5
 --- !u!1 &989642417
 GameObject:
   m_ObjectHideFlags: 0
@@ -8054,6 +8054,7 @@ GameObject:
   - component: {fileID: 1065952123}
   - component: {fileID: 1065952122}
   - component: {fileID: 1065952124}
+  - component: {fileID: 1065952125}
   m_Layer: 5
   m_Name: Character
   m_TagString: Untagged
@@ -8194,6 +8195,24 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &1065952125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1065952117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f35b1da51d894fe68a5c69eb32334ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canvasGroup: {fileID: 1065952124}
+  btnClose: {fileID: 0}
+  btnToOwnedCharaPop: {fileID: 1788672228}
+  btnToEvolutionPop: {fileID: 1549205133}
+  toOwnedCharaButtonNotSelectGroup: {fileID: 1189889903}
+  toEvolutionNotSelectGroup: {fileID: 480812935}
 --- !u!1 &1073206585
 GameObject:
   m_ObjectHideFlags: 0
@@ -8479,6 +8498,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1115029007}
   - component: {fileID: 1115029008}
+  - component: {fileID: 1115029009}
   m_Layer: 5
   m_Name: OwnedCharaPop
   m_TagString: Untagged
@@ -8519,6 +8539,22 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &1115029009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1115029006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f05c4a8155bfe43a688005e58a1164b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canvasGroup: {fileID: 1115029008}
+  btnClose: {fileID: 0}
+  charactersTran: {fileID: 1322006926}
+  charaButtonPrefab: {fileID: 3258061684216097395, guid: becee1d292cac4d2580caac5e938e3f5, type: 3}
 --- !u!1 &1119941894
 GameObject:
   m_ObjectHideFlags: 0
@@ -9773,17 +9809,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 40
+    m_Left: 130
     m_Right: 0
-    m_Top: 15
-    m_Bottom: 0
+    m_Top: 35
+    m_Bottom: 35
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
   m_CellSize: {x: 125, y: 125}
-  m_Spacing: {x: 20, y: 20}
+  m_Spacing: {x: 90, y: 80}
   m_Constraint: 1
-  m_ConstraintCount: 11
+  m_ConstraintCount: 8
 --- !u!1 &1330011860
 GameObject:
   m_ObjectHideFlags: 0
@@ -12148,6 +12184,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   popups:
+  - {fileID: 1065952125}
+  - {fileID: 1115029009}
+  - {fileID: 1964535046}
   - {fileID: 2044851257}
   - {fileID: 1401496741}
   - {fileID: 623055044}
@@ -14346,6 +14385,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1964535044}
   - component: {fileID: 1964535045}
+  - component: {fileID: 1964535046}
   m_Layer: 5
   m_Name: EvolutionPop
   m_TagString: Untagged
@@ -14390,6 +14430,20 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &1964535046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1964535043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cce9c684cdfe452989c6ff6c660743d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canvasGroup: {fileID: 1964535045}
+  btnClose: {fileID: 0}
 --- !u!1 &1973230419
 GameObject:
   m_ObjectHideFlags: 0
