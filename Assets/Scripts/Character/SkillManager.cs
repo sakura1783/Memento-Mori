@@ -40,7 +40,6 @@ public static class SkillManager
 {
     private static BattleManager battleManager;
 
-
     /// <summary>
     /// コンストラクタ
     /// </summary>
@@ -48,6 +47,7 @@ public static class SkillManager
     {
         battleManager = GameObject.Find("Battle").GetComponent<BattleManager>();  // TODO これでもいいけど、何か他にいい方法はないか
     }
+    
 
     /// <summary>
     /// 発動対象を決めるメソッド(敵or味方or自分or隣接する味方etc... ?名)

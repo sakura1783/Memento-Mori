@@ -3,7 +3,8 @@ using UnityEngine.UI;
 using UniRx;
 
 /// <summary>
-/// キャラ選択用ボタン(キャラ一覧、キャラ編成画面)
+/// キャラ選択用ボタン(キャラ一覧、キャラ編成画面、ガチャなどで使用)
+/// (このクラスは、見た目の制御のみを担う)
 /// </summary>
 public class CharaButton : MonoBehaviour
 {   
@@ -37,6 +38,10 @@ public class CharaButton : MonoBehaviour
         get => copyButton;
         set => copyButton = value;
     }
+
+    // CharaButton copyButton;  // 作る場合、上を修正
+    // CharaButton baseButton;  // どちらに値が入っているかで、自身がベースかコピーか判断し、それぞれ適切な処理を行わせる
+    // コピーを削除、自身のIsSelectedをfalseにする処理
 
 
     public void Setup(GameData.CharaConstData charaData)

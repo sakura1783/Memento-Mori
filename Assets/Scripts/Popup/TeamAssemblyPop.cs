@@ -51,6 +51,7 @@ public class TeamAssemblyPop : PopupBase
         {
             var charaButton = Instantiate(charaButtonPrefab, charactersTran);
             charaButton.Setup(data);
+            
             charaButton.Button.OnClickAsObservable()
                 .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
                 .Subscribe(_ => ModifyPlayerTeam(charaButton))
@@ -105,7 +106,7 @@ public class TeamAssemblyPop : PopupBase
     /// キャラをプレイヤーのチームに追加・削除
     /// </summary>
     /// <param name="pushedButton"></param>
-    public void ModifyPlayerTeam(CharaButton pushedButton)
+    private void ModifyPlayerTeam(CharaButton pushedButton)
     {
         // すでに選択されているボタン、またはコピーのボタンを押した場合
         if (pushedButton.IsSelected.Value) //|| isCopied)

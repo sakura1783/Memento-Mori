@@ -12,8 +12,9 @@ public class OwnedCharaPop : PopupBase
         GameData.instance.ownedCharaDataList.ForEach(data =>
         {
             var charaButton = Instantiate(charaButtonPrefab, charactersTran);
-            charaButton.Setup(data);  // TODO CharaButtonクラスにボタンの挙動を追加(TeamAssemblyPopのボタンとは違う挙動を行うため)。=> 反映させる
+            charaButton.Setup(data);
             charaButton.transform.localScale = new Vector2(1.2f, 1.2f);
+            // TODO charaButton押下時の処理を追加、ここでOnClickAsObservableのSubscribe内に記述
         });
 
         base.ShowPopup();

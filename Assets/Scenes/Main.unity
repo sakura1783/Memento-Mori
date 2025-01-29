@@ -8535,7 +8535,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1115029006}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -14426,7 +14426,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1964535043}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -14444,6 +14444,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canvasGroup: {fileID: 1964535045}
   btnClose: {fileID: 0}
+  charactersTran: {fileID: 0}
+  step1Group: {fileID: 0}
+  step2Group: {fileID: 0}
+  btnEvovle: {fileID: 0}
+  btnEvolveAll: {fileID: 0}
+  btnRelease: {fileID: 0}
+  charaButtonPrefab: {fileID: 0}
 --- !u!1 &1973230419
 GameObject:
   m_ObjectHideFlags: 0
