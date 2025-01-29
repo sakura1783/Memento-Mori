@@ -50,7 +50,11 @@ public class TeamAssemblyPop : PopupBase
         foreach (var data in GameData.instance.ownedCharaDataList)
         {
             var charaButton = Instantiate(charaButtonPrefab, charactersTran);
-            charaButton.Setup(data, this);
+            charaButton.Setup(data);
+            charaButton.Button.OnClickAsObservable()
+                .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
+                .Subscribe(_ => ModifyPlayerTeam(charaButton))
+                .AddTo(charaButton);
         }
 
         // テスト。たくさん生成
@@ -92,13 +96,48 @@ public class TeamAssemblyPop : PopupBase
         for (int i = 0; i < opponentTeamInfo.Count; i++)
         {
             var charaButton = Instantiate(charaButtonPrefab, opponentTeamCharaTran[i], false);
-            charaButton.Setup(opponentTeamInfo[i], this);
+            charaButton.Setup(opponentTeamInfo[i]);
             charaButton.Button.interactable = false;
+        }
+    }
+    
+    /// <summary>
+    /// キャラをプレイヤーのチームに追加・削除
+    /// </summary>
+    /// <param name="pushedButton"></param>
+    public void ModifyPlayerTeam(CharaButton pushedButton)
+    {
+        // すでに選択されているボタン、またはコピーのボタンを押した場合
+        if (pushedButton.IsSelected.Value) //|| isCopied)
+        {
+            // キャラをチームから外す
+            playerTeamInfo.RemoveAll(data => data.name == pushedButton.CharaData.name);  // RemoveではなくRemoveAllを使えば、ラムダ式を使ってより簡潔に記述できる
+
+            // 画面うえからCopyButtonを破棄
+            SetCopyButton(false, pushedButton);
+
+            pushedButton.IsSelected.Value = false;
+
+            return;
+        }
+        else
+        {
+            // チームがすでに満員の場合、処理しない
+            if (IsTeamAtMaxCapacity()) return;
+
+            // キャラをチームに追加
+            var chara = new GameData.CharaConstData(pushedButton.CharaData.name, pushedButton.CharaData.level, pushedButton.CharaData.rarity);
+            playerTeamInfo.Add(chara);
+
+            // 画面うえにCopyButtonを生成
+            SetCopyButton(true, pushedButton);
+
+            pushedButton.IsSelected.Value = true;
         }
     }
 
     /// <summary>
-    /// CharaButtonを画面うえに生成・破棄
+    /// CopyButtonを画面うえに生成・破棄
     /// </summary>
     /// <param name="isAssembled"></param>
     /// <param name="charaButton">コピーするCharaButton</param>
@@ -110,20 +149,9 @@ public class TeamAssemblyPop : PopupBase
             var generateTran = playerTeamCharaTran.FirstOrDefault(x => x.transform.childCount <= 0);
             charaButton.CopyButton = Instantiate(copyButtonPrefab, generateTran);
             charaButton.CopyButton.Setup(charaButton, this);
-            // charaButton.CopyButton.IsCopied = true;
-            // charaButton.CopyButton.IsSelected = true;
-            // charaButton.CopyButton.CopyButton = charaButton.CopyButton;
         }
         else
         {
-            // SortCharaButton(System.Array.FindIndex(playerTeamCharaTran, x => x == charaButton.CopyButton.transform.parent));
-
-            // // ボタンを破棄
-            // Destroy(charaButton.CopyButton.gameObject);
-            // charaButton.CopyButton = null;
-            // charaButton.IsSelected = false;
-            // 破壊時、コピーを押した時本体のisSelectedがtrueのまま。次にもう一度編成しようとしてタップした際にMissingエラーになってしまう
-
             charaButton.CopyButton.RemoveCopyButton();
         }
     }
