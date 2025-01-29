@@ -32,29 +32,56 @@ public class CharaButton : MonoBehaviour
 
     public ReactiveProperty<bool> IsSelected = new();
 
-    private CopyButton copyButton;  // 画面うえに生成した、コピーされたCharaButtonのゲームオブジェクト
-    public CopyButton CopyButton
+    private CharaButton copyButton;  // 自身がベースの場合、ここにコピーの情報が入る(自身がコピーの場合はnull)
+    public CharaButton CopyButton
     {
         get => copyButton;
         set => copyButton = value;
     }
 
-    // CharaButton copyButton;  // 作る場合、上を修正
-    // CharaButton baseButton;  // どちらに値が入っているかで、自身がベースかコピーか判断し、それぞれ適切な処理を行わせる
-    // コピーを削除、自身のIsSelectedをfalseにする処理
+    private CharaButton baseButton;  // 自身がコピーの場合、ここにベースの情報が入る(自身がベースの場合はnull)
+    public CharaButton BaseButton
+    {
+        get => baseButton;
+        set => baseButton = value;
+    }
 
 
+    /// <summary>
+    /// CharaButton(本体)の初期設定
+    /// </summary>
+    /// <param name="charaData"></param>
     public void Setup(GameData.CharaConstData charaData)
     {
         this.charaData = charaData;
 
+        IsSelected
+            .Subscribe(value => selectedSet.alpha = value ? 1 : 0)
+            .AddTo(this);
+
+        SetCharaDetails(charaData);
+    }
+
+    /// <summary>
+    /// CopyButton(CharaButtonのコピー)の初期設定
+    /// </summary>
+    /// <param name="baseButton">コピーする本体のボタン</param>
+    public void Setup(CharaButton baseButton)
+    {
+        this.baseButton = baseButton;
+
+        SetCharaDetails(baseButton.CharaData);
+    }
+
+    /// <summary>
+    /// キャラの詳細を各UIに設定
+    /// </summary>
+    /// <param name="charaData"></param>
+    private void SetCharaDetails(GameData.CharaConstData charaData)
+    {
         imgChara.sprite = SpriteManager.instance.GetCharaSprite(charaData.name, CharaSpriteType.Face);
         imgRank.color = ColorManager.instance.GetColorByRarity(charaData.rarity);
         // TODO imgAttribute
         txtCharaLevel.text = $"Lv{charaData.level}";
-
-        IsSelected
-            .Subscribe(value => selectedSet.alpha = value ? 1 : 0)
-            .AddTo(this);
     }
 }

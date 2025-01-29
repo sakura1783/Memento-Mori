@@ -22,9 +22,7 @@ public class TeamAssemblyPop : PopupBase
     [SerializeField] private Text txtPlayerTeamCombat;
     [SerializeField] private Text txtOpponentTeamCombat;
 
-    [SerializeField] private CharaButton charaButtonPrefab;  // Characters下に生成するキャラのボタン
-
-    [SerializeField] private CopyButton copyButtonPrefab;  // 画面うえに生成するキャラのボタン
+    [SerializeField] private CharaButton charaButtonPrefab;
 
 
     public override void Setup()
@@ -51,22 +49,12 @@ public class TeamAssemblyPop : PopupBase
         {
             var charaButton = Instantiate(charaButtonPrefab, charactersTran);
             charaButton.Setup(data);
-            
+
             charaButton.Button.OnClickAsObservable()
                 .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
                 .Subscribe(_ => ModifyPlayerTeam(charaButton))
                 .AddTo(charaButton);
         }
-
-        // テスト。たくさん生成
-        // for (int i = 0; i < 10; i++)
-        // {
-        //     foreach (var data in GameData.instance.ownedCharaDataList)
-        //     {
-        //         var charaButton = Instantiate(charaButtonPrefab, charactersTran);
-        //         charaButton.Setup(data, this);
-        //     }
-        // }
 
         PopupManager.instance.PreviousPop = this;
 
@@ -140,20 +128,30 @@ public class TeamAssemblyPop : PopupBase
     /// <summary>
     /// CopyButtonを画面うえに生成・破棄
     /// </summary>
-    /// <param name="isAssembled"></param>
-    /// <param name="charaButton">コピーするCharaButton</param>
-    public void SetCopyButton(bool isAssembled, CharaButton charaButton)
+    /// <param name="addToTeam">キャラを編成するかどうか</param>
+    /// <param name="baseButton">コピーするCharaButton</param>
+    private void SetCopyButton(bool addToTeam, CharaButton baseButton)
     {
-        if (isAssembled)
+        if (addToTeam)
         {
-            // CopyButtonを生成
+            // CopyButton(CharaButtonのコピー)を生成
             var generateTran = playerTeamCharaTran.FirstOrDefault(x => x.transform.childCount <= 0);
-            charaButton.CopyButton = Instantiate(copyButtonPrefab, generateTran);
-            charaButton.CopyButton.Setup(charaButton, this);
+            baseButton.CopyButton = Instantiate(charaButtonPrefab, generateTran);
+            baseButton.CopyButton.Setup(baseButton);
         }
         else
         {
-            charaButton.CopyButton.RemoveCopyButton();
+            // 画面うえのCharaButton群を並び替え
+            SortCharaButton(System.Array.FindIndex(playerTeamCharaTran, x => x == transform.parent));
+
+            // キャラをチームから外す
+            playerTeamInfo.RemoveAll(chara => chara.name == baseButton.CharaData.name);
+
+            // CopyButtonを破壊
+            Destroy(baseButton.CopyButton.gameObject);
+
+            baseButton.IsSelected.Value = false;
+            baseButton.CopyButton = null;
         }
     }
 
@@ -161,7 +159,7 @@ public class TeamAssemblyPop : PopupBase
     /// 画面うえのCharaButtonを並び替え
     /// </summary>
     /// <param name="removedIndex">破棄されたCharaButtonの要素番号</param>
-    public void SortCharaButton(int removedIndex)
+    private void SortCharaButton(int removedIndex)
     {
         // オブジェクトをそれぞれ左に1個ずつずらす
         for (int i = removedIndex; i < playerTeamCharaTran.Length - 1; i++)  // <= 繰り返しの条件として、6番目の要素を参照するとIndexOutOfRangeエラーになるので配列-1を指定。
@@ -192,7 +190,7 @@ public class TeamAssemblyPop : PopupBase
     /// チームが満員かどうかを調べる。trueで満員
     /// </summary>
     /// <returns></returns>
-    public bool IsTeamAtMaxCapacity()
+    private bool IsTeamAtMaxCapacity()
     {
         return !playerTeamCharaTran.FirstOrDefault(x => x.transform.childCount <= 0);
     }
