@@ -17,6 +17,11 @@ public class CharaButton : MonoBehaviour
 
     [SerializeField] private Image imgChara;
     [SerializeField] private Image imgRank;
+    public Image ImgRank
+    {
+        get => imgRank;
+        set => imgRank = value;
+    }
     [SerializeField] private Image imgAttribute;
 
     [SerializeField] private Text txtCharaLevel;
@@ -69,6 +74,7 @@ public class CharaButton : MonoBehaviour
     public void Setup(CharaButton baseButton)
     {
         this.baseButton = baseButton;
+        charaData = baseButton.CharaData;  // EvolutionPopではコピーのコピーを作成するので、この情報が必要となる
 
         SetCharaDetails(baseButton.CharaData);
     }
