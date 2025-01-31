@@ -63,9 +63,7 @@ public class EvolutionPop : PopupBase
 
         GameData.instance.ownedCharaDataList.ForEach(data =>
         {
-            var charaButton = Instantiate(charaButtonPrefab, charactersTran);  // TODO 必要であれば、メソッドにする(進化するたびに再生成する必要がある)
-            charaButton.Setup(data);
-            charaButton.transform.localScale = new Vector2(1.2f, 1.2f);
+            var charaButton = CreateCharaButton(data, null, charactersTran, 1.2f);
             
             charaButton.Button.OnClickAsObservable()
                 .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
@@ -88,14 +86,10 @@ public class EvolutionPop : PopupBase
             SwitchDisplay(false);
 
             // pushedButtonのコピーを生成
-            var evolveChara = Instantiate(charaButtonPrefab, beforeEvolveTran);
-            evolveChara.Setup(pushedButton);
-            evolveChara.transform.localScale = new Vector2(1.3f, 1.3f);
+            var evolveChara = CreateCharaButton(null, pushedButton, beforeEvolveTran, 1.3f);
 
             // 進化後のCharaButtonを生成
-            var afterEvolveChara = Instantiate(charaButtonPrefab, afterEvolveTran);
-            afterEvolveChara.Setup(evolveChara);
-            afterEvolveChara.transform.localScale = new Vector2(1.3f, 1.3f);
+            var afterEvolveChara = CreateCharaButton(null, evolveChara, afterEvolveTran, 1.3f);
             afterEvolveChara.Button.interactable = false;
             if (evolutionRarityMap.Any(data => data.Key == pushedButton.CharaData.rarity)) afterEvolveChara.ImgRank.color = ColorManager.instance.GetColorByRarity(evolutionRarityMap[pushedButton.CharaData.rarity]);  // 適切なレアリティの色を枠に設定
 
@@ -103,28 +97,24 @@ public class EvolutionPop : PopupBase
             var requirement = evolutionRequirements[pushedButton.CharaData.rarity];
             for (int i = 0; i < requirement.Item3; i++)
             {
-                var requireChara = Instantiate(charaButtonPrefab, requireCharasTran);
-
                 GameData.CharaConstData charaData = new(requirement.Item2 ? pushedButton.CharaData.name : CharaName.None, 0, requirement.Item1);
-                requireChara.Setup(charaData);
-                requireChara.Button.interactable = false;
+
+                var requireChara = CreateCharaButton(charaData, null, requireCharasTran, 0.9f);
                 requireChara.TxtCharaLevel.text = "";
             }
+
+            // TODO 消費可能なキャラ以外は選べない(CharaButtonのinteractableをfalseに、色も変更して選べないことを可視化)
         }
 
         // 進化するキャラが選択されていて、進化するキャラとは異なるキャラ(=消費するキャラ)を選択した場合
-        else if (beforeEvolveTran.childCount > 0 && !pushedButton.BaseButton.IsSelected.Value)
+        else if (beforeEvolveTran.childCount >= 1 && !pushedButton.BaseButton.IsSelected.Value)
         {
             foreach (Transform child in requireCharasTran)
             {
                 // 進化素材がすでに全て選択されている場合は処理しない
                 if (child.childCount > 0) return;
 
-                var consumeChara = Instantiate(charaButtonPrefab, child);
-                consumeChara.Setup(pushedButton);
-                consumeChara.transform.localScale = new Vector2(0.9f, 0.9f);
-
-                //var consumeChara = CreateCharaButton(null, pushedButton, child, 0.9f);
+                CreateCharaButton(null, pushedButton, child, 0.9f);
             }
         }
 
