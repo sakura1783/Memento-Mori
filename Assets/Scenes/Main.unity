@@ -12130,13 +12130,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ownedCharaDataList:
-  - name: 0
-    level: 5
-    rarity: 0
   - name: 1
     level: 5
     rarity: 0
-  - name: 4
+  - name: 2
+    level: 5
+    rarity: 0
+  - name: 5
     level: 5
     rarity: 2
   clearMapNo: 0
@@ -14444,16 +14444,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canvasGroup: {fileID: 1964535045}
   btnClose: {fileID: 0}
-  charactersTran: {fileID: 0}
-  beforeEvolveTran: {fileID: 0}
-  afterEvolveTran: {fileID: 0}
-  requireCharasTran: {fileID: 0}
-  step1Group: {fileID: 0}
-  step2Group: {fileID: 0}
-  btnEvovle: {fileID: 0}
-  btnEvolveAll: {fileID: 0}
-  btnRelease: {fileID: 0}
-  charaButtonPrefab: {fileID: 0}
+  charactersTran: {fileID: 975835573}
+  beforeEvolveTran: {fileID: 936091083}
+  afterEvolveTran: {fileID: 788753526}
+  requireCharasTran: {fileID: 419360899}
+  step1Group: {fileID: 1017471787}
+  step2Group: {fileID: 170979031}
+  btnEvovle: {fileID: 709859206}
+  btnEvolveAll: {fileID: 1560305381}
+  btnRelease: {fileID: 255766093}
+  charaButtonPrefab: {fileID: 3258061684216097395, guid: becee1d292cac4d2580caac5e938e3f5, type: 3}
 --- !u!1 &1973230419
 GameObject:
   m_ObjectHideFlags: 0
