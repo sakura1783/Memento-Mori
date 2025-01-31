@@ -25,6 +25,11 @@ public class CharaButton : MonoBehaviour
     [SerializeField] private Image imgAttribute;
 
     [SerializeField] private Text txtCharaLevel;
+    public Text TxtCharaLevel
+    {
+        get => txtCharaLevel;
+        set => txtCharaLevel = value;
+    }
 
     [SerializeField] private CanvasGroup selectedSet;
 

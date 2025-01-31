@@ -59,9 +59,7 @@ public class EvolutionPop : PopupBase
 
     public override void ShowPopup()
     {
-        step1Group.alpha = 1;
-        step2Group.alpha = 0;
-        step2Group.blocksRaycasts = false;
+        SwitchDisplay(true);
 
         GameData.instance.ownedCharaDataList.ForEach(data =>
         {
@@ -87,6 +85,8 @@ public class EvolutionPop : PopupBase
         // 進化するキャラを選択していない場合
         if (beforeEvolveTran.childCount <= 0)
         {
+            SwitchDisplay(false);
+
             // pushedButtonのコピーを生成
             var evolveChara = Instantiate(charaButtonPrefab, beforeEvolveTran);
             evolveChara.Setup(pushedButton);
@@ -99,14 +99,16 @@ public class EvolutionPop : PopupBase
             afterEvolveChara.Button.interactable = false;
             if (evolutionRarityMap.Any(data => data.Key == pushedButton.CharaData.rarity)) afterEvolveChara.ImgRank.color = ColorManager.instance.GetColorByRarity(evolutionRarityMap[pushedButton.CharaData.rarity]);  // 適切なレアリティの色を枠に設定
 
-            // TODO 消費キャラを表示
+            // 進化に必要なキャラを表示
             var requirement = evolutionRequirements[pushedButton.CharaData.rarity];
             for (int i = 0; i < requirement.Item3; i++)
             {
                 var requireChara = Instantiate(charaButtonPrefab, requireCharasTran);
 
-                // TODO CharaButtonクラスに、新しく進化素材用の初期設定メソッドを作る
-                //GameData.CharaConstData charaData = new(requirement.Item2 ? pushedButton.CharaData.name : CharaName.None, )
+                GameData.CharaConstData charaData = new(requirement.Item2 ? pushedButton.CharaData.name : CharaName.None, 0, requirement.Item1);
+                requireChara.Setup(charaData);
+                requireChara.Button.interactable = false;
+                requireChara.TxtCharaLevel.text = "";
             }
         }
 
@@ -125,7 +127,7 @@ public class EvolutionPop : PopupBase
         }
 
         // いずれかで選択しているキャラと全く同じキャラのCharaButtonを押した場合(= キャラを取り消し)
-        else if (beforeEvolveTran.childCount >= 1 && pushedButton.CharaData == beforeEvolveTran.GetComponentInChildren<CharaButton>().CharaData)
+        else
         {
             pushedButton.BaseButton.IsSelected.Value = false;
 
@@ -142,7 +144,7 @@ public class EvolutionPop : PopupBase
                 Destroy(pushedButton.gameObject);
             }
 
-            // TODO 消費キャラを破棄
+            // TODO 消費キャラを破棄  // 消費するキャラか、進化するキャラかによって挙動が変わる
         }
 
         // TODO ローカル関数の定義。CreateCharaButton()
@@ -151,4 +153,17 @@ public class EvolutionPop : PopupBase
     // TODO 各ボタンを押した際のメソッド
 
     // TODO GameData.ownedCharaListに、進化後のキャラを追加・進化前のキャラと消費したキャラを削除
+    
+    /// <summary>
+    /// 画面表示を切り替え
+    /// </summary>
+    /// <param name="showStep1Group"></param>
+    private void SwitchDisplay(bool showStep1Group)
+    {
+        step1Group.alpha = showStep1Group ? 1 : 0;
+        step1Group.blocksRaycasts = showStep1Group;
+
+        step2Group.alpha = showStep1Group ? 0 : 1;
+        step2Group.blocksRaycasts = !showStep1Group;
+    }
 }
