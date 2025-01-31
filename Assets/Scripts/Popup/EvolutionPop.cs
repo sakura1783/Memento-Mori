@@ -123,36 +123,59 @@ public class EvolutionPop : PopupBase
                 var consumeChara = Instantiate(charaButtonPrefab, child);
                 consumeChara.Setup(pushedButton);
                 consumeChara.transform.localScale = new Vector2(0.9f, 0.9f);
+
+                //var consumeChara = CreateCharaButton(null, pushedButton, child, 0.9f);
             }
         }
 
         // いずれかで選択しているキャラと全く同じキャラのCharaButtonを押した場合(= キャラを取り消し)
         else
         {
-            pushedButton.BaseButton.IsSelected.Value = false;
-
             // 自身が本体のボタンである場合
             if (!pushedButton.IsCopied)
             {
                 Destroy(pushedButton.CopyButton.gameObject);
                 pushedButton.CopyButton = null;
+
+                // 進化予定であったキャラの場合、requireCharasTran下のオブジェクトを全削除
+                if (pushedButton.CopyButton.transform.parent == beforeEvolveTran) foreach (Transform child in requireCharasTran) Destroy(child.gameObject);
             }
             // 自身がコピーのボタンである場合
             else
             {
                 pushedButton.BaseButton.CopyButton = null;
                 Destroy(pushedButton.gameObject);
+                
+                if (pushedButton.transform.parent == beforeEvolveTran) foreach (Transform child in requireCharasTran) Destroy(child.gameObject);
             }
 
-            // TODO 消費キャラを破棄  // 消費するキャラか、進化するキャラかによって挙動が変わる
+            pushedButton.BaseButton.IsSelected.Value = false;
         }
-
-        // TODO ローカル関数の定義。CreateCharaButton()
     }
 
     // TODO 各ボタンを押した際のメソッド
 
     // TODO GameData.ownedCharaListに、進化後のキャラを追加・進化前のキャラと消費したキャラを削除
+
+
+    /// <summary>
+    /// CharaButtonの作成
+    /// </summary>
+    /// <param name="charaData"></param>
+    /// <param name="baseButton"></param>
+    /// <param name="parentTran"></param>
+    /// <param name="scaleValue"></param>
+    /// <returns></returns>
+    private CharaButton CreateCharaButton(GameData.CharaConstData charaData, CharaButton baseButton, Transform parentTran, float scaleValue)
+    {
+        var charaButton = Instantiate(charaButtonPrefab, parentTran);
+
+        if (charaData != null) charaButton.Setup(charaData);
+        else charaButton.Setup(baseButton);
+        charaButton.transform.localScale = new Vector2(scaleValue, scaleValue);
+
+        return charaButton;
+    }
     
     /// <summary>
     /// 画面表示を切り替え
