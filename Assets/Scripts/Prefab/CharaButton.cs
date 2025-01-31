@@ -35,8 +35,6 @@ public class CharaButton : MonoBehaviour
         set => charaData = value;
     }
 
-    public ReactiveProperty<bool> IsSelected = new();
-
     private CharaButton copyButton;  // 自身がベースの場合、ここにコピーの情報が入る(自身がコピーの場合はnull)
     public CharaButton CopyButton
     {
@@ -51,6 +49,11 @@ public class CharaButton : MonoBehaviour
         set => baseButton = value;
     }
 
+    public ReactiveProperty<bool> IsSelected = new();
+
+    private bool isCopied;
+    public bool IsCopied => isCopied;
+
 
     /// <summary>
     /// CharaButton(本体)の初期設定
@@ -58,13 +61,13 @@ public class CharaButton : MonoBehaviour
     /// <param name="charaData"></param>
     public void Setup(GameData.CharaConstData charaData)
     {
-        this.charaData = charaData;
+        baseButton = this;
 
         IsSelected
             .Subscribe(value => selectedSet.alpha = value ? 1 : 0)
             .AddTo(this);
 
-        SetCharaDetails(charaData);
+        SetDetails(charaData);
     }
 
     /// <summary>
@@ -74,17 +77,19 @@ public class CharaButton : MonoBehaviour
     public void Setup(CharaButton baseButton)
     {
         this.baseButton = baseButton;
-        charaData = baseButton.CharaData;  // EvolutionPopではコピーのコピーを作成するので、この情報が必要となる
+        isCopied = true;
 
-        SetCharaDetails(baseButton.CharaData);
+        SetDetails(baseButton.CharaData);
     }
 
     /// <summary>
     /// キャラの詳細を各UIに設定
     /// </summary>
     /// <param name="charaData"></param>
-    private void SetCharaDetails(GameData.CharaConstData charaData)
+    private void SetDetails(GameData.CharaConstData charaData)
     {
+        this.charaData = charaData;
+
         imgChara.sprite = SpriteManager.instance.GetCharaSprite(charaData.name, CharaSpriteType.Face);
         imgRank.color = ColorManager.instance.GetColorByRarity(charaData.rarity);
         // TODO imgAttribute

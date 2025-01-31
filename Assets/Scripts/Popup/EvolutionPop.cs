@@ -31,6 +31,24 @@ public class EvolutionPop : PopupBase
         {Rarity.UR_, Rarity.LR},
     };
 
+    // Dictionary<進化するキャラのレアリティ, (消費キャラのレアリティ, 同名キャラか, 必要数)>
+    private static readonly Dictionary<Rarity, (Rarity, bool, int)> evolutionRequirements = new()
+    {
+        {Rarity.R, (Rarity.R, true, 2)},
+        {Rarity.R_, (Rarity.R_, false, 2)},
+        {Rarity.SR, (Rarity.SR, true, 1)},
+        {Rarity.SR_, (Rarity.SR_, false, 2)},
+        {Rarity.SSR, (Rarity.SR_, true, 1)},
+        {Rarity.SSR_, (Rarity.SSR_, false, 1)},
+        {Rarity.UR, (Rarity.SSR_, false, 1)},
+        {Rarity.UR_, (Rarity.SR_, true, 2)},
+        {Rarity.LR, (Rarity.SR_, true, 1)},
+        {Rarity.LR_1, (Rarity.SR_, true, 1)},
+        {Rarity.LR_2, (Rarity.SR_, true, 1)},
+        {Rarity.LR_3, (Rarity.SR_, true, 1)},
+        {Rarity.LR_4, (Rarity.SR_, true, 2)},
+    };
+
 
     public override void Setup()
     {
@@ -80,16 +98,57 @@ public class EvolutionPop : PopupBase
             afterEvolveChara.transform.localScale = new Vector2(1.3f, 1.3f);
             afterEvolveChara.Button.interactable = false;
             if (evolutionRarityMap.Any(data => data.Key == pushedButton.CharaData.rarity)) afterEvolveChara.ImgRank.color = ColorManager.instance.GetColorByRarity(evolutionRarityMap[pushedButton.CharaData.rarity]);  // 適切なレアリティの色を枠に設定
-        }
 
-        // 進化するキャラが選択されていて、進化するキャラのCharaButtonがすでに選択されている場合
-        if (beforeEvolveTran.childCount >= 1)
-        {
-            
+            // TODO 消費キャラを表示
+            var requirement = evolutionRequirements[pushedButton.CharaData.rarity];
+            for (int i = 0; i < requirement.Item3; i++)
+            {
+                var requireChara = Instantiate(charaButtonPrefab, requireCharasTran);
+
+                // TODO CharaButtonクラスに、新しく進化素材用の初期設定メソッドを作る
+                //GameData.CharaConstData charaData = new(requirement.Item2 ? pushedButton.CharaData.name : CharaName.None, )
+            }
         }
 
         // 進化するキャラが選択されていて、進化するキャラとは異なるキャラ(=消費するキャラ)を選択した場合
+        else if (beforeEvolveTran.childCount > 0 && !pushedButton.BaseButton.IsSelected.Value)
+        {
+            foreach (Transform child in requireCharasTran)
+            {
+                // 進化素材がすでに全て選択されている場合は処理しない
+                if (child.childCount > 0) return;
+
+                var consumeChara = Instantiate(charaButtonPrefab, child);
+                consumeChara.Setup(pushedButton);
+                consumeChara.transform.localScale = new Vector2(0.9f, 0.9f);
+            }
+        }
+
+        // いずれかで選択しているキャラと全く同じキャラのCharaButtonを押した場合(= キャラを取り消し)
+        else if (beforeEvolveTran.childCount >= 1 && pushedButton.CharaData == beforeEvolveTran.GetComponentInChildren<CharaButton>().CharaData)
+        {
+            pushedButton.BaseButton.IsSelected.Value = false;
+
+            // 自身が本体のボタンである場合
+            if (!pushedButton.IsCopied)
+            {
+                Destroy(pushedButton.CopyButton.gameObject);
+                pushedButton.CopyButton = null;
+            }
+            // 自身がコピーのボタンである場合
+            else
+            {
+                pushedButton.BaseButton.CopyButton = null;
+                Destroy(pushedButton.gameObject);
+            }
+
+            // TODO 消費キャラを破棄
+        }
+
+        // TODO ローカル関数の定義。CreateCharaButton()
     }
 
     // TODO 各ボタンを押した際のメソッド
+
+    // TODO GameData.ownedCharaListに、進化後のキャラを追加・進化前のキャラと消費したキャラを削除
 }

@@ -3,6 +3,8 @@ using UnityEngine;
 
 public enum CharaName
 {
+    None,
+    
     Rosevillea,
     Nina,
     Elliot,
