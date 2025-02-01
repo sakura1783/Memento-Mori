@@ -64,11 +64,6 @@ public class EvolutionPop : PopupBase
         GameData.instance.ownedCharaDataList.ForEach(data =>
         {
             var charaButton = CreateCharaButton(data, null, charactersTran, 1.2f);
-            
-            charaButton.Button.OnClickAsObservable()
-                .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
-                .Subscribe(_ => OnClickCharaButton(charaButton))
-                .AddTo(charaButton);
         });
         
         base.ShowPopup();
@@ -101,21 +96,33 @@ public class EvolutionPop : PopupBase
 
                 var requireChara = CreateCharaButton(charaData, null, requireCharasTran, 0.9f);
                 requireChara.TxtCharaLevel.text = "";
+                requireChara.ImgChara.color = new (requireChara.ImgChara.color.r, requireChara.ImgChara.color.g, requireChara.ImgChara.color.b, (float)150 / 255);  // 0〜1の間で指定
+                requireChara.Button.interactable = false;
             }
 
             // TODO 消費可能なキャラ以外は選べない(CharaButtonのinteractableをfalseに、色も変更して選べないことを可視化)
+
+            Debug.Log("①入りました");
         }
 
         // 進化するキャラが選択されていて、進化するキャラとは異なるキャラ(=消費するキャラ)を選択した場合
-        else if (beforeEvolveTran.childCount >= 1 && !pushedButton.BaseButton.IsSelected.Value)
+        else if (beforeEvolveTran.childCount >= 1 && pushedButton != beforeEvolveTran.GetComponentInChildren<CharaButton>() && pushedButton != beforeEvolveTran.GetComponentInChildren<CharaButton>().BaseButton && !pushedButton.IsSelected.Value)
         {
+            Debug.Log("②-1入りました");
+
             foreach (Transform child in requireCharasTran)
             {
-                // 進化素材がすでに全て選択されている場合は処理しない
-                if (child.childCount > 0) return;
+                // 進化素材がすでに選択されている場合
+                if (child.childCount > 3) continue;
 
-                CreateCharaButton(null, pushedButton, child, 0.9f);
+                // TODO Alpha0にする？
+                var consumeChara = CreateCharaButton(null, pushedButton, child, 1f);
+                pushedButton.IsSelected.Value = true;
+
+                return;  // CreateCharaButton()が一度だけ動いたら、処理を終了
             }
+
+            Debug.Log("②-2入りました");
         }
 
         // いずれかで選択しているキャラと全く同じキャラのCharaButtonを押した場合(= キャラを取り消し)
@@ -124,22 +131,37 @@ public class EvolutionPop : PopupBase
             // 自身が本体のボタンである場合
             if (!pushedButton.IsCopied)
             {
+                // 進化予定であったキャラの場合
+                if (pushedButton.CopyButton.transform.parent == beforeEvolveTran)
+                {
+                    // 生成した各オブジェクトを破棄
+                    Destroy(afterEvolveTran.GetChild(0).gameObject);
+                    foreach (Transform child in requireCharasTran) Destroy(child.gameObject);
+                }
+
                 Destroy(pushedButton.CopyButton.gameObject);
                 pushedButton.CopyButton = null;
 
-                // 進化予定であったキャラの場合、requireCharasTran下のオブジェクトを全削除
-                if (pushedButton.CopyButton.transform.parent == beforeEvolveTran) foreach (Transform child in requireCharasTran) Destroy(child.gameObject);
+                // TODO alpha値戻す？
             }
             // 自身がコピーのボタンである場合
             else
             {
+                if (pushedButton.transform.parent == beforeEvolveTran)
+                {
+                    Destroy(afterEvolveTran.GetChild(0).gameObject);
+                    foreach (Transform child in requireCharasTran) Destroy(child.gameObject);
+                }
+
                 pushedButton.BaseButton.CopyButton = null;
                 Destroy(pushedButton.gameObject);
-                
-                if (pushedButton.transform.parent == beforeEvolveTran) foreach (Transform child in requireCharasTran) Destroy(child.gameObject);
             }
 
             pushedButton.BaseButton.IsSelected.Value = false;
+
+            SwitchDisplay(true);
+
+            Debug.Log("③入りました");
         }
     }
 
@@ -163,6 +185,16 @@ public class EvolutionPop : PopupBase
         if (charaData != null) charaButton.Setup(charaData);
         else charaButton.Setup(baseButton);
         charaButton.transform.localScale = new Vector2(scaleValue, scaleValue);
+
+        charaButton.Button.OnClickAsObservable()
+                .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
+                //.Subscribe(_ => OnClickCharaButton(charaButton))
+                .Subscribe(_ =>
+                {
+                    OnClickCharaButton(charaButton);
+                    Debug.Log("押されました");
+                })
+                .AddTo(charaButton.gameObject);
 
         return charaButton;
     }

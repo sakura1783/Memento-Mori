@@ -16,6 +16,11 @@ public class CharaButton : MonoBehaviour
     }
 
     [SerializeField] private Image imgChara;
+    public Image ImgChara
+    {
+        get => imgChara;
+        set => imgChara = value;
+    }
     [SerializeField] private Image imgRank;
     public Image ImgRank
     {
@@ -82,6 +87,7 @@ public class CharaButton : MonoBehaviour
     public void Setup(CharaButton baseButton)
     {
         this.baseButton = baseButton;
+        baseButton.CopyButton = this;
         isCopied = true;
 
         SetDetails(baseButton.CharaData);
