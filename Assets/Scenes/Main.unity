@@ -12136,6 +12136,9 @@ MonoBehaviour:
   - name: 2
     level: 5
     rarity: 0
+  - name: 4
+    level: 5
+    rarity: 0
   - name: 5
     level: 5
     rarity: 2

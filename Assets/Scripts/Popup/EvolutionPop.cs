@@ -82,6 +82,7 @@ public class EvolutionPop : PopupBase
 
             // pushedButtonのコピーを生成
             var evolveChara = CreateCharaButton(null, pushedButton, beforeEvolveTran, 1.3f);
+            evolveChara.BaseButton.IsSelected.Value = true;
 
             // 進化後のCharaButtonを生成
             var afterEvolveChara = CreateCharaButton(null, evolveChara, afterEvolveTran, 1.3f);
@@ -105,7 +106,7 @@ public class EvolutionPop : PopupBase
             Debug.Log("①入りました");
         }
 
-        // 進化するキャラが選択されていて、進化するキャラとは異なるキャラ(=消費するキャラ)を選択した場合
+        // 進化するキャラが選択されていて、進化するキャラとは異なるキャラ(=消費するキャラ)を選択した場合  // TODO 消費キャラのコピーを押した際に、意図した挙動にならない。(下のelse文に入ってほしい)。分の構造を逆にする？
         else if (beforeEvolveTran.childCount >= 1 && pushedButton != beforeEvolveTran.GetComponentInChildren<CharaButton>() && pushedButton != beforeEvolveTran.GetComponentInChildren<CharaButton>().BaseButton && !pushedButton.IsSelected.Value)
         {
             Debug.Log("②-1入りました");
@@ -119,15 +120,21 @@ public class EvolutionPop : PopupBase
                 var consumeChara = CreateCharaButton(null, pushedButton, child, 1f);
                 pushedButton.IsSelected.Value = true;
 
-                return;  // CreateCharaButton()が一度だけ動いたら、処理を終了
-            }
+                Debug.Log("②-2入りました");
 
-            Debug.Log("②-2入りました");
+                break;  // CreateCharaButton()が一度だけ動いたら、処理を終了
+            }
         }
 
         // いずれかで選択しているキャラと全く同じキャラのCharaButtonを押した場合(= キャラを取り消し)
         else
         {
+            // 共通
+            // 本体のボタンのIsSelectedをfalseにして、コピーを破棄
+
+            // 進化するキャラの場合のみ、追加で
+            // 生成したオブジェクト()
+
             // 自身が本体のボタンである場合
             if (!pushedButton.IsCopied)
             {
@@ -136,7 +143,19 @@ public class EvolutionPop : PopupBase
                 {
                     // 生成した各オブジェクトを破棄
                     Destroy(afterEvolveTran.GetChild(0).gameObject);
-                    foreach (Transform child in requireCharasTran) Destroy(child.gameObject);
+                    foreach (Transform child in requireCharasTran)
+                    {
+                        child.TryGetComponent<CharaButton>(out var charaButton);  // TODO 親子関係が複雑。CharaButton下にCharaButtonを生成している。目的のオブジェクトを取得するにはどうすればいいか。
+                        Debug.Log($"名前：{charaButton}");
+                        charaButton.IsSelected.Value = false;
+                        charaButton.CopyButton = null;
+
+                        Destroy(child.gameObject);
+                    }
+
+                    SwitchDisplay(true);
+
+                    Debug.Log(pushedButton.CopyButton.transform.parent, beforeEvolveTran);
                 }
 
                 Destroy(pushedButton.CopyButton.gameObject);
@@ -150,7 +169,19 @@ public class EvolutionPop : PopupBase
                 if (pushedButton.transform.parent == beforeEvolveTran)
                 {
                     Destroy(afterEvolveTran.GetChild(0).gameObject);
-                    foreach (Transform child in requireCharasTran) Destroy(child.gameObject);
+                    foreach (Transform child in requireCharasTran)
+                    {
+                        child.TryGetComponent<CharaButton>(out var charaButton);
+                        Debug.Log($"名前：{charaButton}");
+                        charaButton.BaseButton.IsSelected.Value = false;
+                        charaButton.BaseButton.CopyButton = null;
+
+                        Destroy(child.gameObject);
+                    }
+
+                    SwitchDisplay(true);
+
+                    Debug.Log(pushedButton.transform.parent, beforeEvolveTran);
                 }
 
                 pushedButton.BaseButton.CopyButton = null;
@@ -158,8 +189,6 @@ public class EvolutionPop : PopupBase
             }
 
             pushedButton.BaseButton.IsSelected.Value = false;
-
-            SwitchDisplay(true);
 
             Debug.Log("③入りました");
         }
@@ -188,12 +217,7 @@ public class EvolutionPop : PopupBase
 
         charaButton.Button.OnClickAsObservable()
                 .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
-                //.Subscribe(_ => OnClickCharaButton(charaButton))
-                .Subscribe(_ =>
-                {
-                    OnClickCharaButton(charaButton);
-                    Debug.Log("押されました");
-                })
+                .Subscribe(_ => OnClickCharaButton(charaButton))
                 .AddTo(charaButton.gameObject);
 
         return charaButton;
