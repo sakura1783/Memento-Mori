@@ -45,18 +45,18 @@ public class CharaButton : MonoBehaviour
         set => charaData = value;
     }
 
-    private CharaButton copyButton;  // 自身がベースの場合、ここにコピーの情報が入る(自身がコピーの場合はnull)
-    public CharaButton CopyButton
-    {
-        get => copyButton;
-        set => copyButton = value;
-    }
-
     private CharaButton baseButton;  // 自身が元かコピーかに関係なく、必ず情報が入る
     public CharaButton BaseButton
     {
         get => baseButton;
         set => baseButton = value;
+    }
+
+    private CharaButton copyButton;  // 自身がベースの場合、ここにコピーの情報が入る(自身がコピーの場合はnull)
+    public CharaButton CopyButton
+    {
+        get => copyButton;
+        set => copyButton = value;
     }
 
     public ReactiveProperty<bool> IsSelected = new();

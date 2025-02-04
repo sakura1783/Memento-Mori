@@ -102,94 +102,48 @@ public class EvolutionPop : PopupBase
             }
 
             // TODO 消費可能なキャラ以外は選べない(CharaButtonのinteractableをfalseに、色も変更して選べないことを可視化)
-
-            Debug.Log("①入りました");
         }
 
         // いずれかで選択しているキャラと全く同じキャラのCharaButtonを押した場合(= キャラを取り消し)
         else if (pushedButton.BaseButton.IsSelected.Value)
         {
-            // 共通
-            // 本体のボタンのIsSelectedをfalseにして、コピーを破棄
-
-            // 進化するキャラの場合のみ、追加で
-            // 生成したオブジェクト()
-
-            // 自身が本体のボタンである場合
-            if (!pushedButton.IsCopied)
+            // 進化予定のキャラの場合
+            if (pushedButton.BaseButton.CopyButton.transform.parent == beforeEvolveTran)
             {
-                // 進化予定であったキャラの場合
-                if (pushedButton.CopyButton.transform.parent == beforeEvolveTran)
+                // 生成した各オブジェクトを破棄
+                Destroy(afterEvolveTran.GetChild(0).gameObject);
+                foreach (Transform child in requireCharasTran)
                 {
-                    // 生成した各オブジェクトを破棄
-                    Destroy(afterEvolveTran.GetChild(0).gameObject);
-                    foreach (Transform child in requireCharasTran)
+                    if (child.childCount >= 4)  // ※親子関係が複雑なのでわかりにくい
                     {
-                        if (child.childCount >= 4)  // ※親子関係が複雑なのでわかりにくい
-                        {
-                            Debug.Log("③-1入りました");
-                            child.GetChild(3).TryGetComponent<CharaButton>(out var charaButton);
-                            charaButton.BaseButton.IsSelected.Value = false;
-                            charaButton.BaseButton.CopyButton = null;  // TODO この処理に関しては、自身がコピーか本体か関係ない
-                        }
-
-                        Destroy(child.gameObject);
+                        child.GetChild(3).TryGetComponent<CharaButton>(out var charaButton);
+                        charaButton.BaseButton.IsSelected.Value = false;
+                        charaButton.BaseButton.CopyButton = null;
                     }
 
-                    SwitchDisplay(true);
+                    Destroy(child.gameObject);
                 }
 
-                Destroy(pushedButton.CopyButton.gameObject);
-                pushedButton.CopyButton = null;
-
-                // TODO alpha値戻す？
+                SwitchDisplay(true);
             }
-            // 自身がコピーのボタンである場合
-            else
-            {
-                if (pushedButton.transform.parent == beforeEvolveTran)
-                {
-                    Destroy(afterEvolveTran.GetChild(0).gameObject);
-                    foreach (Transform child in requireCharasTran)
-                    {
-                        if (child.childCount >= 4)
-                        {
-                            Debug.Log("③-2入りました");
-                            child.GetChild(3).TryGetComponent<CharaButton>(out var charaButton);
-                            charaButton.BaseButton.IsSelected.Value = false;
-                            charaButton.BaseButton.CopyButton = null;
-                        }
 
-                        Destroy(child.gameObject);
-                    }
-
-                    SwitchDisplay(true);
-                }
-
-                pushedButton.BaseButton.CopyButton = null;
-                Destroy(pushedButton.gameObject);
-            }
+            // コピーのボタンを削除
+            Destroy(pushedButton.BaseButton.CopyButton.gameObject);
+            pushedButton.BaseButton.CopyButton = null;
 
             pushedButton.BaseButton.IsSelected.Value = false;
-
-            Debug.Log("③入りました");
         }
 
-        // 進化するキャラが選択されていて、進化するキャラとは異なるキャラ(=消費するキャラ)を選択した場合  // TODO 消費キャラのコピーを押した際に、意図した挙動にならない。(下のelse文に入ってほしい)。分の構造を逆にする？
-        else //if (beforeEvolveTran.childCount >= 1 && pushedButton != beforeEvolveTran.GetComponentInChildren<CharaButton>() && pushedButton != beforeEvolveTran.GetComponentInChildren<CharaButton>().BaseButton && !pushedButton.IsSelected.Value)
+        // (進化するキャラが選択されていて、進化するキャラとは異なるキャラ(=消費するキャラ)を選択した場合)
+        else
         {
-            Debug.Log("②-1入りました");
-
             foreach (Transform child in requireCharasTran)
             {
                 // 進化素材がすでに選択されている場合
                 if (child.childCount > 3) continue;
 
-                // TODO Alpha0にする？
                 var consumeChara = CreateCharaButton(null, pushedButton, child, 1f);
                 pushedButton.IsSelected.Value = true;
-
-                Debug.Log("②-2入りました");
 
                 break;  // CreateCharaButton()が一度だけ動いたら、処理を終了
             }
