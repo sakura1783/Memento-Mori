@@ -96,8 +96,8 @@ public class TeamAssemblyPop : PopupBase
     /// <param name="pushedButton"></param>
     private void ModifyPlayerTeam(CharaButton pushedButton)
     {
-        // すでに選択されているボタン、//またはコピーのボタンを押した場合
-        if (pushedButton.BaseButton.IsSelected.Value) //|| isCopied)
+        // すでに選択されているキャラのボタンを押した場合
+        if (pushedButton.BaseButton.IsSelected.Value)
         {
             // キャラをチームから外す
             playerTeamInfo.RemoveAll(data => data.name == pushedButton.CharaData.name);  // RemoveではなくRemoveAllを使えば、ラムダ式を使ってより簡潔に記述できる
@@ -147,7 +147,7 @@ public class TeamAssemblyPop : PopupBase
         else
         {
             // 画面うえのCharaButton群を並び替え
-            SortCharaButton(System.Array.FindIndex(playerTeamCharaTran, tran => tran == baseButton.CopyButton.transform.parent));
+            SortCharaButton(System.Array.FindIndex(playerTeamCharaTran, tran => tran == baseButton.CopyButton.transform.parent));  // 条件「CopyButtonの親がtranである」
 
             // キャラをチームから外す
             playerTeamInfo.RemoveAll(chara => chara.name == baseButton.CharaData.name);
@@ -169,14 +169,9 @@ public class TeamAssemblyPop : PopupBase
         // オブジェクトをそれぞれ左に1個ずつずらす
         for (int i = removedIndex; i < playerTeamCharaTran.Length - 1; i++)  // <= 繰り返しの条件として、6番目の要素を参照するとIndexOutOfRangeエラーになるので配列-1を指定。
         {
-            if (playerTeamCharaTran[i + 1].childCount <= 0)
-            {
-                // CharaTranに子(CharaButton)が存在しない場合、処理しない
-                return;
-            }
-            Debug.Log($"removeIndex = {removedIndex}");
-            Debug.Log(playerTeamCharaTran[i + 1]);
-            Debug.Log(playerTeamCharaTran[i]);
+            // CharaTranに子(CharaButton)が存在しない場合、処理しない
+            if (playerTeamCharaTran[i + 1].childCount <= 0) return;
+
             // 親を再設定
             playerTeamCharaTran[i + 1].GetChild(0).SetParent(playerTeamCharaTran[i]);
 
@@ -186,10 +181,7 @@ public class TeamAssemblyPop : PopupBase
                 // 最初の要素の場合、CharaTran[i]には破壊する予定のCharaButtonがまだいるので、2番目の子を参照する
                 playerTeamCharaTran[i].GetChild(1).localPosition = Vector2.zero;
             }
-            else
-            {
-                playerTeamCharaTran[i].GetChild(0).localPosition = Vector2.zero;
-            }
+            else playerTeamCharaTran[i].GetChild(0).localPosition = Vector2.zero;
         }
     }
 
