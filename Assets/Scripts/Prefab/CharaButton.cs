@@ -45,14 +45,14 @@ public class CharaButton : MonoBehaviour
         set => charaData = value;
     }
 
-    private CharaButton copyButton;  // 自身が元かコピーかに関係なく、必ず情報が入る
+    private CharaButton copyButton;  // 自身がベースの場合、ここにコピーの情報が入る(自身がコピーの場合はnull)
     public CharaButton CopyButton
     {
         get => copyButton;
         set => copyButton = value;
     }
 
-    private CharaButton baseButton;  // 自身がコピーの場合、ここにベースの情報が入る(自身がベースの場合はnull)
+    private CharaButton baseButton;  // 自身が元かコピーかに関係なく、必ず情報が入る
     public CharaButton BaseButton
     {
         get => baseButton;
@@ -87,7 +87,7 @@ public class CharaButton : MonoBehaviour
     public void Setup(CharaButton baseButton)
     {
         this.baseButton = baseButton;
-        baseButton.CopyButton = this;
+        baseButton.copyButton = this;
         isCopied = true;
 
         SetDetails(baseButton.CharaData);

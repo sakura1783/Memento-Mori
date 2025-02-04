@@ -26,7 +26,7 @@ public class PopupManager : AbstractSingleton<PopupManager>
 
         // TODO テスト
         //Show<GachaPop>();
-        Show<CharacterPop>(false);
+        //Show<CharacterPop>(false);
     }
 
     /// <summary>

@@ -96,14 +96,14 @@ public class TeamAssemblyPop : PopupBase
     /// <param name="pushedButton"></param>
     private void ModifyPlayerTeam(CharaButton pushedButton)
     {
-        // すでに選択されているボタン、またはコピーのボタンを押した場合
-        if (pushedButton.IsSelected.Value) //|| isCopied)
+        // すでに選択されているボタン、//またはコピーのボタンを押した場合
+        if (pushedButton.BaseButton.IsSelected.Value) //|| isCopied)
         {
             // キャラをチームから外す
             playerTeamInfo.RemoveAll(data => data.name == pushedButton.CharaData.name);  // RemoveではなくRemoveAllを使えば、ラムダ式を使ってより簡潔に記述できる
 
             // 画面うえからCopyButtonを破棄
-            SetCopyButton(false, pushedButton);
+            SetCopyButton(false, pushedButton.BaseButton);
 
             pushedButton.IsSelected.Value = false;
 
@@ -119,7 +119,7 @@ public class TeamAssemblyPop : PopupBase
             playerTeamInfo.Add(chara);
 
             // 画面うえにCopyButtonを生成
-            SetCopyButton(true, pushedButton);
+            SetCopyButton(true, pushedButton.BaseButton);
 
             pushedButton.IsSelected.Value = true;
         }
@@ -134,15 +134,20 @@ public class TeamAssemblyPop : PopupBase
     {
         if (addToTeam)
         {
-            // CopyButton(CharaButtonのコピー)を生成
+            // CopyButton(CharaButtonのコピー)の生成と初期設定
             var generateTran = playerTeamCharaTran.FirstOrDefault(x => x.transform.childCount <= 0);
-            baseButton.CopyButton = Instantiate(charaButtonPrefab, generateTran);
-            baseButton.CopyButton.Setup(baseButton);
+            var copyButton = Instantiate(charaButtonPrefab, generateTran);
+            copyButton.Setup(baseButton);
+
+            copyButton.Button.OnClickAsObservable()
+                .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
+                .Subscribe(_ => ModifyPlayerTeam(copyButton))
+                .AddTo(copyButton.gameObject);
         }
         else
         {
             // 画面うえのCharaButton群を並び替え
-            SortCharaButton(System.Array.FindIndex(playerTeamCharaTran, x => x == transform.parent));
+            SortCharaButton(System.Array.FindIndex(playerTeamCharaTran, tran => tran == baseButton.CopyButton.transform.parent));
 
             // キャラをチームから外す
             playerTeamInfo.RemoveAll(chara => chara.name == baseButton.CharaData.name);
@@ -169,7 +174,9 @@ public class TeamAssemblyPop : PopupBase
                 // CharaTranに子(CharaButton)が存在しない場合、処理しない
                 return;
             }
-
+            Debug.Log($"removeIndex = {removedIndex}");
+            Debug.Log(playerTeamCharaTran[i + 1]);
+            Debug.Log(playerTeamCharaTran[i]);
             // 親を再設定
             playerTeamCharaTran[i + 1].GetChild(0).SetParent(playerTeamCharaTran[i]);
 
