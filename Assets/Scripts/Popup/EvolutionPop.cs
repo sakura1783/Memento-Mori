@@ -145,17 +145,18 @@ public class EvolutionPop : PopupBase
                     Destroy(afterEvolveTran.GetChild(0).gameObject);
                     foreach (Transform child in requireCharasTran)
                     {
-                        child.TryGetComponent<CharaButton>(out var charaButton);  // TODO 親子関係が複雑。CharaButton下にCharaButtonを生成している。目的のオブジェクトを取得するにはどうすればいいか。
-                        Debug.Log($"名前：{charaButton}");
-                        charaButton.IsSelected.Value = false;
-                        charaButton.CopyButton = null;
+                        if (child.childCount >= 4)  // ※親子関係が複雑なのでわかりにくい
+                        {
+                            Debug.Log("③-1入りました");
+                            child.GetChild(3).TryGetComponent<CharaButton>(out var charaButton);
+                            charaButton.BaseButton.IsSelected.Value = false;
+                            charaButton.BaseButton.CopyButton = null;  // TODO この処理に関しては、自身がコピーか本体か関係ない
+                        }
 
                         Destroy(child.gameObject);
                     }
 
                     SwitchDisplay(true);
-
-                    Debug.Log(pushedButton.CopyButton.transform.parent, beforeEvolveTran);
                 }
 
                 Destroy(pushedButton.CopyButton.gameObject);
@@ -171,17 +172,18 @@ public class EvolutionPop : PopupBase
                     Destroy(afterEvolveTran.GetChild(0).gameObject);
                     foreach (Transform child in requireCharasTran)
                     {
-                        child.TryGetComponent<CharaButton>(out var charaButton);
-                        Debug.Log($"名前：{charaButton}");
-                        charaButton.BaseButton.IsSelected.Value = false;
-                        charaButton.BaseButton.CopyButton = null;
+                        if (child.childCount >= 4)
+                        {
+                            Debug.Log("③-2入りました");
+                            child.GetChild(3).TryGetComponent<CharaButton>(out var charaButton);
+                            charaButton.BaseButton.IsSelected.Value = false;
+                            charaButton.BaseButton.CopyButton = null;
+                        }
 
                         Destroy(child.gameObject);
                     }
 
                     SwitchDisplay(true);
-
-                    Debug.Log(pushedButton.transform.parent, beforeEvolveTran);
                 }
 
                 pushedButton.BaseButton.CopyButton = null;
