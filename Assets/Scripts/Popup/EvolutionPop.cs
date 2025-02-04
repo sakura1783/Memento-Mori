@@ -106,28 +106,8 @@ public class EvolutionPop : PopupBase
             Debug.Log("①入りました");
         }
 
-        // 進化するキャラが選択されていて、進化するキャラとは異なるキャラ(=消費するキャラ)を選択した場合  // TODO 消費キャラのコピーを押した際に、意図した挙動にならない。(下のelse文に入ってほしい)。分の構造を逆にする？
-        else if (beforeEvolveTran.childCount >= 1 && pushedButton != beforeEvolveTran.GetComponentInChildren<CharaButton>() && pushedButton != beforeEvolveTran.GetComponentInChildren<CharaButton>().BaseButton && !pushedButton.IsSelected.Value)
-        {
-            Debug.Log("②-1入りました");
-
-            foreach (Transform child in requireCharasTran)
-            {
-                // 進化素材がすでに選択されている場合
-                if (child.childCount > 3) continue;
-
-                // TODO Alpha0にする？
-                var consumeChara = CreateCharaButton(null, pushedButton, child, 1f);
-                pushedButton.IsSelected.Value = true;
-
-                Debug.Log("②-2入りました");
-
-                break;  // CreateCharaButton()が一度だけ動いたら、処理を終了
-            }
-        }
-
         // いずれかで選択しているキャラと全く同じキャラのCharaButtonを押した場合(= キャラを取り消し)
-        else
+        else if (pushedButton.BaseButton.IsSelected.Value)
         {
             // 共通
             // 本体のボタンのIsSelectedをfalseにして、コピーを破棄
@@ -193,6 +173,26 @@ public class EvolutionPop : PopupBase
             pushedButton.BaseButton.IsSelected.Value = false;
 
             Debug.Log("③入りました");
+        }
+
+        // 進化するキャラが選択されていて、進化するキャラとは異なるキャラ(=消費するキャラ)を選択した場合  // TODO 消費キャラのコピーを押した際に、意図した挙動にならない。(下のelse文に入ってほしい)。分の構造を逆にする？
+        else //if (beforeEvolveTran.childCount >= 1 && pushedButton != beforeEvolveTran.GetComponentInChildren<CharaButton>() && pushedButton != beforeEvolveTran.GetComponentInChildren<CharaButton>().BaseButton && !pushedButton.IsSelected.Value)
+        {
+            Debug.Log("②-1入りました");
+
+            foreach (Transform child in requireCharasTran)
+            {
+                // 進化素材がすでに選択されている場合
+                if (child.childCount > 3) continue;
+
+                // TODO Alpha0にする？
+                var consumeChara = CreateCharaButton(null, pushedButton, child, 1f);
+                pushedButton.IsSelected.Value = true;
+
+                Debug.Log("②-2入りました");
+
+                break;  // CreateCharaButton()が一度だけ動いたら、処理を終了
+            }
         }
     }
 
