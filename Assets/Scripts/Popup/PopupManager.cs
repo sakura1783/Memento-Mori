@@ -25,7 +25,7 @@ public class PopupManager : AbstractSingleton<PopupManager>
         popups.ForEach(pop => pop.Setup());
 
         // TODO テスト
-        //Show<GachaPop>();
+        //Show<GachaPop>(false);
         Show<CharacterPop>(false);
     }
 
