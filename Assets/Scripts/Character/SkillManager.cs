@@ -225,16 +225,13 @@ public static class SkillManager
         Vector2 punchPos = new(battleManager.playerTeam.Any(chara => chara == target) ? 20f : -20f, -10f);
         //Debug.Log($"punchPos = {punchPos}");
         //Debug.Log($"CharaStatusPannelの有無：{target.CharaStatusPannel}");
-        // TODO やってみたけどダメ　target.CharaStatusPannel.DOKill();  // 既存のトゥイーンを停止してから新しいトゥイーンを開始
+        target.CharaStatusPannel.DOKill();  // 既存のトゥイーンを停止してから新しいトゥイーンを開始
         //await target.CharaStatusPannel  // TODO すでに破棄(解放)されたCancellationTokenSourceに対してDisposeを呼び出している(二重に処理されている)？
             //.DOPunchPosition(punchPos, 1f, 2).AsyncWaitForPosition(1f);  // AsyncWaitForCompletion()でトゥイーンのTaskを返す
-            // TODO やってみたけどダメ.DOPunchPosition(punchPos, 1f, 2).AsyncWaitForCompletion();
-        
-        // var cts = new CancellationTokenSource();
-        // var token = cts.Token;
-
-        // await target.CharaStatusPannel.DOPunchPosition(punchPos, 1f, 2)
-        //     .ToUniTask(cancellationToken: token);
+        var cts = new CancellationTokenSource();
+        var token = cts.Token;
+        await target.CharaStatusPannel.DOPunchPosition(punchPos, 1f, 2)
+            .ToUniTask(cancellationToken: token);
 
         // TODO 一回破棄してみる？
 
