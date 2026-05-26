@@ -137,7 +137,7 @@ public class BattleManager : PopupBase
                 foreach (var chara in playerTeam.Concat(opponentTeam)) chara.ReceivedCriticalDamage = false;
 
                 // 行動後、バトル終了かどうかを判定。終了の場合trueを返し、Battle()内の処理によって、Battle()内からも抜け出す
-                if (IsBattleOver()) return;  // <= return IsBattleOver()では、似ているようで違う処理になってしまうのでダメ。
+                if (IsBattleOver()) return;
             }
 
             // 敵の行動

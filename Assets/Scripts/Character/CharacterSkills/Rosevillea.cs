@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+
 /// <summary>
 /// ローゼヴィリアのスキル
 /// 各スキルメソッドには、SkillManagerのメソッドを組み合わせて処理を作る
@@ -20,11 +22,16 @@ public class Rosevillea : CharacterBase
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
 
         // スキル処理
-        targets.ForEach(async target =>
+        targets.ForEach(target =>
         {
-            await SkillManager.Attack(user, target, user.Status.attackPower, 390);
+            SkillManager.Attack(user, target, user.Status.attackPower, 390);
             SkillManager.AddBuff(target, BuffType.気絶, false, false);
         });
+        // foreach (var target in targets)
+        // {
+        //     await SkillManager.Attack(user, target, user.Status.attackPower, 390);
+        //     SkillManager.AddBuff(target, BuffType.気絶, false, false);
+        // }
     }
 
     /// <summary>
@@ -35,7 +42,7 @@ public class Rosevillea : CharacterBase
     {
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
 
-        targets.ForEach(async target => await SkillManager.Attack(user, target, user.Status.attackPower, 420));
+        targets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 420));
     }
 
     /// <summary>

@@ -1,7 +1,6 @@
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using UniRx;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Setsuna : CharacterBase
@@ -18,10 +17,10 @@ public class Setsuna : CharacterBase
     {
         int criticalCount = 0;
 
-        var targets = SkillManager.PickTarget(user, TargetType.Opponent, 3, allowDuplicates: true);  // TODO ターゲットは重複あり
-        targets.ForEach(async target =>
+        var targets = SkillManager.PickTarget(user, TargetType.Opponent, 3, allowDuplicates: true);
+        targets.ForEach(target =>
         {
-            await SkillManager.Attack(user, target, user.Status.attackPower, 400);
+            SkillManager.Attack(user, target, user.Status.attackPower, 400);
             
             if (target.ReceivedCriticalDamage)
             {
@@ -45,7 +44,7 @@ public class Setsuna : CharacterBase
     public override void ActiveSkill2(CharaController user)
     {
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 4);
-        targets.ForEach(async target => await SkillManager.Attack(user, target, user.Status.attackPower, 350));
+        targets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 350));
         
         // 追加攻撃
         int additionalAttackCount = 0;
@@ -54,9 +53,9 @@ public class Setsuna : CharacterBase
         while (additionalAttackCount > 0)
         {
             var additionalTargets = SkillManager.PickTarget(user, TargetType.Opponent, 1, ValueType.ByCurrentHp, false);
-            additionalTargets.ForEach(async target =>
+            additionalTargets.ForEach(target =>
             {
-                await SkillManager.Attack(user, target, user.Status.attackPower, 480);
+                SkillManager.Attack(user, target, user.Status.attackPower, 480);
                 Mathf.Clamp(additionalAttackCount--, 0, 4);  // 追加攻撃の回数を1減少
 
                 // 戦闘不能にするたび、追加で攻撃

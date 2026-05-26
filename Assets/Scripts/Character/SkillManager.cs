@@ -58,6 +58,7 @@ public static class SkillManager
     /// <param name="count">取得するターゲットの数。敵?人、隣接する味方?人、など。count=-1(初期値、値を設定しない場合)で全員、それ以外は指定された数だけターゲットを取得</param>
     /// <param name="valueType">この条件の優劣順に取得</param>
     /// <param name="isDescending">valueTypeが高い順(降順)に取得するかどうか</param>
+    /// <param name="allowDuplicates">同じターゲットを複数回取得することを許可するかどうか</param>
     /// <returns></returns>
     public static List<CharaController> PickTarget(CharaController user, TargetType targetType, int count = -1, ValueType valueType = ValueType.None, bool isDescending = true, bool allowDuplicates = false)
     {
@@ -70,11 +71,11 @@ public static class SkillManager
                 break;
 
             case TargetType.Ally:
-                targetList.AddRange(battleManager.playerTeam.All(chara => chara == user) ? battleManager.playerTeam : battleManager.opponentTeam);
+                targetList.AddRange(battleManager.playerTeam.Contains(user) ? battleManager.playerTeam : battleManager.opponentTeam);
                 break;
 
             case TargetType.Opponent:
-                targetList.AddRange(battleManager.playerTeam.All(chara => chara != user) ? battleManager.playerTeam : battleManager.opponentTeam);
+                targetList.AddRange(battleManager.playerTeam.Contains(user) ? battleManager.opponentTeam : battleManager.playerTeam);
                 break;
 
             case TargetType.Neighbor:
@@ -86,39 +87,7 @@ public static class SkillManager
                 break;
         }
 
-        // ValueTypeが高い順・低い順に並び替え
-        // switch (valueType)
-        // {
-        //     case ValueType.None:
-        //         break;
-
-        //     case ValueType.ByAttackPower:
-        //         if (isDescending) targetList.OrderByDescending(target => target.Status.attackPower).ToList();
-        //         else targetList.OrderBy(target => target.Status.attackPower).ToList();
-        //         break;
-
-        //     case ValueType.ByDefencePower:
-        //         if (isDescending) targetList.OrderByDescending(target => target.Status.defencePower).ToList();
-        //         else targetList.OrderBy(target => target.Status.defencePower).ToList();
-        //         break;
-
-        //     case ValueType.ByCurrentHp:
-        //         if (isDescending) targetList.OrderByDescending(target => target.Status.Hp).ToList();
-        //         else targetList.OrderBy(target => target.Status.Hp).ToList();
-        //         break;
-            
-        //     case ValueType.ByMaxHp:
-        //         if (isDescending) targetList.OrderByDescending(target => target.Status.MaxHp).ToList();
-        //         else targetList.OrderBy(target => target.Status.MaxHp).ToList();
-        //         break;
-
-        //     case ValueType.ByCriticalRate:
-        //         if (isDescending) targetList.OrderByDescending(target => target.Status.criticalRate).ToList();
-        //         else targetList.OrderBy(target => target.Status.criticalRate).ToList();
-        //         break;
-        // }
-
-        // 上記をリファクタリング。ValueTypeの優劣で並び替え
+        // ValueTypeの優劣で並び替え
         if (valueType != ValueType.None)
         {
             // ValueTypeによって、targetListの並び替えで使用する値(ステータス)を変更
@@ -194,13 +163,13 @@ public static class SkillManager
     private static List<CharaController> PickNeighbor(CharaController user)
     {
         // userが所属するチームのリストを取得
-        var team = battleManager.playerTeam.All(chara => chara == user) ? battleManager.playerTeam : battleManager.opponentTeam;
+        var team = battleManager.playerTeam.Contains(user) ? battleManager.playerTeam : battleManager.opponentTeam;
 
         // userのインデックス番号を取得
         var userIndex = team.FindIndex(chara => chara == user);
         
         List<CharaController> neighbors = new();
-        if (userIndex - 1 < 0)  // 左隣にキャラが存在したら
+        if (userIndex - 1 >= 0)  // 左隣にキャラが存在したら
         {
             neighbors.Add(team[userIndex - 1]);
         }
@@ -219,19 +188,20 @@ public static class SkillManager
     /// <param name="baseValue">基準となる値</param>
     /// <param name="rate"></param>
     /// <returns>ダメージ値を返す(総与ダメージを実装する際に使う)</returns>
-    public static async UniTask<int> Attack(CharaController user, CharaController target, int baseValue, int rate)
+    public static int Attack(CharaController user, CharaController target, int baseValue, int rate)
     {
+        // TODO アニメーション 攻撃ごとではなく、行動ごと
         // DOTweenでアニメーション  // TODO ループか何かでUnityが落ちる
-        Vector2 punchPos = new(battleManager.playerTeam.Any(chara => chara == target) ? 20f : -20f, -10f);
+        //Vector2 punchPos = new(battleManager.playerTeam.Any(chara => chara == target) ? 20f : -20f, -10f);
         //Debug.Log($"punchPos = {punchPos}");
         //Debug.Log($"CharaStatusPannelの有無：{target.CharaStatusPannel}");
-        target.CharaStatusPannel.DOKill();  // 既存のトゥイーンを停止してから新しいトゥイーンを開始
-        //await target.CharaStatusPannel  // TODO すでに破棄(解放)されたCancellationTokenSourceに対してDisposeを呼び出している(二重に処理されている)？
-            //.DOPunchPosition(punchPos, 1f, 2).AsyncWaitForPosition(1f);  // AsyncWaitForCompletion()でトゥイーンのTaskを返す
-        var cts = new CancellationTokenSource();
-        var token = cts.Token;
-        await target.CharaStatusPannel.DOPunchPosition(punchPos, 1f, 2)
-            .ToUniTask(cancellationToken: token);
+        //target.CharaStatusPannel.DOKill();  // 既存のトゥイーンを停止してから新しいトゥイーンを開始
+        // await target.CharaStatusPannel  // TODO すでに破棄(解放)されたCancellationTokenSourceに対してDisposeを呼び出している(二重に処理されている)？
+        //     .DOPunchPosition(punchPos, 1f, 2).AsyncWaitForPosition(1f);  // AsyncWaitForCompletion()でトゥイーンのTaskを返す
+        // var cts = new CancellationTokenSource();
+        // var token = cts.Token;
+        // await target.CharaStatusPannel.DOPunchPosition(punchPos, 1f, 2)
+        //     .ToUniTask(cancellationToken: token);
 
         // TODO 一回破棄してみる？
 
@@ -243,7 +213,7 @@ public static class SkillManager
             return 0;
         }
 
-        // baseValueのrate分の値を計算し、攻撃対象のHPを削る
+        // baseValueのrate分の値を計算(攻撃力の200%の攻撃なら、baseValue=攻撃力、rate=200)
         (int damageValue, bool isCritical) = CalculateManager.CalculateAttackDamage(user, baseValue, rate, target);
 
         // 「シールド」を持っている場合、ダメージを軽減

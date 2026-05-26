@@ -40,7 +40,6 @@ public class Buff
     /// </summary>
     /// <param name="type"></param>
     /// <param name="duration">解除不可のバフは、デフォルト値で大きな値を設定</param>
-    /// <param name="damageRate"></param>
     public Buff(BuffType type, bool isPositiveEffect, bool isIrremovable, int duration = 100, int effectRate = 0, int effectValue = 0)
     {
         this.type = type;
