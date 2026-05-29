@@ -88,7 +88,7 @@ public static class CalculateManager
     /// <returns></returns>
     public static int CalculateSkillEffectValue(int baseValue, int rate)
     {
-        int value = (int)Math.Round((float)baseValue * (rate / 100), 0, MidpointRounding.AwayFromZero);  // 少数第一位を四捨五入。Math.Round(四捨五入したい値, 少数第何位で(0で少数第一位), MidpointRounding.AwayFromZeroで通常の四捨五入(指定しない場合、銀行丸めになる))
+        int value = (int)Math.Round(baseValue * (rate / 100f), 0, MidpointRounding.AwayFromZero);  // 少数第一位を四捨五入。Math.Round(四捨五入したい値, 少数第何位で(0で少数第一位), MidpointRounding.AwayFromZeroで通常の四捨五入(指定しない場合、銀行丸めになる))
 
         return value;
     }

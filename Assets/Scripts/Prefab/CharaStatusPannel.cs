@@ -34,7 +34,7 @@ public class CharaStatusPannel : MonoBehaviour
             .Subscribe(value =>
             {
                 txtHpValue.text = $"{charaController.Status.Hp} / {charaController.Status.MaxHp}";
-                hpSlider.value = charaController.Status.Hp.Value / charaController.Status.MaxHp.Value;
+                hpSlider.value = (float)charaController.Status.Hp.Value / charaController.Status.MaxHp.Value;
             })
             .AddTo(this);
 
