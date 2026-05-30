@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 using System.Linq;
+using System.Collections.Generic;
 
 /// <summary>
 /// バトルのキャラの状態の可視化のみを担う
@@ -17,6 +18,8 @@ public class CharaStatusPannel : MonoBehaviour
 
     [SerializeField] private Transform buffPlace;
     [SerializeField] private Image buffPrefab;
+
+    private readonly Dictionary<Buff, Image> buffs = new();
 
 
     public void Setup(CharaController charaController, GameData.CharaConstData charaData)
@@ -43,11 +46,22 @@ public class CharaStatusPannel : MonoBehaviour
             .Subscribe(eventData =>  // <= ObserveAddが提供するイベントデータ
             {
                 var buff = Instantiate(buffPrefab, buffPlace);
-                buff.sprite = SpriteManager.instance.GetDebuffSprite(eventData.Value.type);  // 引数(eventData).Valueでコレクションに追加された要素を取得
+                buff.sprite = SpriteManager.instance.GetDebuffSprite(eventData.Value.type);
+                buffs.Add(eventData.Value, buff);
+            })
+            .AddTo(this);
 
-                charaController.Status.Buffs
-                    .ObserveRemove()
-                    .Subscribe(eventData => Destroy(buff.gameObject));
+        charaController.Status.Buffs
+            .ObserveRemove()
+            .Subscribe(eventData =>
+            {
+                var buff = eventData.Value;
+
+                if (!buffs.TryGetValue(buff, out var icon))
+                    return;
+                    
+                Destroy(icon.gameObject);
+                buffs.Remove(buff);
             })
             .AddTo(this);
 

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
 
@@ -77,18 +78,18 @@ public class BattleManager : PopupBase
                 .AddTo(this);
         }
 
-        Battle();
+        Battle().Forget();  // Forget()で、この非同期処理は待たずに開始するだけでOKと明示
     }
 
     /// <summary>
     /// バトル〜終了まで
     /// </summary>
-    private void Battle()
+    private async UniTaskVoid Battle()  // UniTaskVoidで、待たない非同期処理だと明示
     {
         // 勝敗がつくまでターンをループ
         do
         {
-            ExecuteTurn();
+            await ExecuteTurn();
 
             // クールタイムを減らす
             // playerTeam.ForEach(chara => chara.ReduceCoolTimeByTurn());
@@ -110,7 +111,7 @@ public class BattleManager : PopupBase
     /// バトルのターン内で行う処理
     /// </summary>
     /// <returns>バトルを終わるかどうか。trueでバトル続行(ターンを繰り返す)、trueでバトル終了(このメソッドだけでなく、Battle()からも抜ける)</returns>
-    private void ExecuteTurn()
+    private async UniTask ExecuteTurn()
     {
         foreach (var chara in playerTeam.Concat(opponentTeam))  // Concat()でリスト2つを結合し、処理を簡素化
         {
@@ -134,7 +135,10 @@ public class BattleManager : PopupBase
                 playerTeam[count].ExecuteActiveSkill();
                 previousActChara = playerTeam[count];
 
+                // TODO タイミング要検討
                 foreach (var chara in playerTeam.Concat(opponentTeam)) chara.ReceivedCriticalDamage = false;
+
+                await BattleAnimationManager.instance.WaitAllAnimations();
 
                 // 行動後、バトル終了かどうかを判定。終了の場合trueを返し、Battle()内の処理によって、Battle()内からも抜け出す
                 if (IsBattleOver()) return;

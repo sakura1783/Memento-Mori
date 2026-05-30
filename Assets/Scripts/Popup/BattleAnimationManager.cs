@@ -35,7 +35,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
         animationTasks.Clear();
     }
 
-    public UniTask PlayAnimation(CharaController target, AnimationType animationType)
+    private UniTask PlayAnimation(CharaController target, AnimationType animationType)
     {
         RectTransform rect = target.CharaStatusPannel as RectTransform;
 
@@ -63,6 +63,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     private UniTask PlayAttackAnimation(RectTransform statusPanelRect, CharaController target)
     {
         Vector3 pos = new(40f, 0f, 0f);
+        
         return statusPanelRect
             .DOPunchPosition(pos, 0.7f, 2).ToUniTask();
     }
@@ -72,7 +73,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
         Vector3 pos = new(battleManager.playerTeam.Contains(target) ? -20f : 20f, 0f, 0f);
         
         return statusPanelRect
-            .DOPunchPosition(pos, 1f, 6).ToUniTask();  // TODO 下TODO部分のようにCancellationToken設定する必要あり？
+            .DOPunchPosition(pos, 1f, 6).ToUniTask();
     }
 
     private UniTask PlayApplyEffectAnimation(RectTransform pos)
@@ -92,22 +93,4 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     {
         return UniTask.CompletedTask;
     }
-
-    // TODO 消す
-    // DOTweenでアニメーション
-    //Vector2 punchPos = new(battleManager.playerTeam.Any(chara => chara == target) ? 20f : -20f, -10f);
-    //Debug.Log($"punchPos = {punchPos}");
-    //target.CharaStatusPannel.DOKill();  // 既存のトゥイーンを停止してから新しいトゥイーンを開始
-    // await target.CharaStatusPannel  
-    //     .DOPunchPosition(punchPos, 1f, 2).AsyncWaitForPosition(1f);  // AsyncWaitForCompletion()でトゥイーンのTaskを返す
-    // var cts = new CancellationTokenSource();
-    // var token = cts.Token;
-    // await target.CharaStatusPannel.DOPunchPosition(punchPos, 1f, 2)
-    //     .ToUniTask(cancellationToken: token);　　// TODO 
-
-    // クラッシュしないが、待ちもしない？もう一度確認してみる
-    // target.CharaStatusPannel.DOPunchPosition(punchPos, 1f, 2).OnComplete(() =>
-    // {
-    //     Debug.Log($"{user.Name}が{target.Name}に、{damageValue}の攻撃");
-    // });
 }

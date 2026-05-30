@@ -7644,6 +7644,7 @@ GameObject:
   - component: {fileID: 1015797302}
   - component: {fileID: 1015797304}
   - component: {fileID: 1015797305}
+  - component: {fileID: 1015797306}
   m_Layer: 5
   m_Name: Battle
   m_TagString: Untagged
@@ -7803,6 +7804,19 @@ MonoBehaviour:
   charaStatusPennel: {fileID: 1963139232622000288, guid: 4945b14c001f94b158070661cef881fa, type: 3}
   playerTran: {fileID: 434971776}
   opponentTran: {fileID: 1076289157}
+--- !u!114 &1015797306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1015797297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf7aca3975dac450783b381d82999b13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  battleManager: {fileID: 1015797305}
 --- !u!1 &1017471785
 GameObject:
   m_ObjectHideFlags: 0

@@ -140,8 +140,8 @@ public class CharaController
             // 通常攻撃
             chara.BasicAttack(this);
 
-            // TODO ここじゃなく、Attack()に渡すらしい　ChatGPT参照。アニメーション再生
-            // animeContext.AddAnimation(BattleAnimationManager.instance.PlayAnimation(this, AnimationType.Attack));
+            // アニメーション再生
+            BattleAnimationManager.instance.AddAnimation(this, AnimationType.Attack);
         }
     }
 

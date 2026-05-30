@@ -213,6 +213,9 @@ public static class SkillManager
         target.UpdateHp(-damageValue);
         target.ReceivedCriticalDamage = isCritical;
 
+        // アニメーション再生
+        BattleAnimationManager.instance.AddAnimation(target, AnimationType.Damage);
+
         // 「睡眠」状態を解除
         if (target.Status.Buffs.Any(debuff => debuff.type == BuffType.睡眠))
         {
@@ -311,24 +314,25 @@ public static class SkillManager
             return;
         }
 
-        // デバフを生成して、追加
+        // バフを生成して、追加
         var buff = new Buff(buffType, isPositiveEffect, isIrremovable, duration, effectRate, effectValue);
         target.Status.Buffs.Add(buff);
 
         // 監視処理。継続時間かEffectValueのいずれかが0以下になったら、バフを削除
         Observable.Merge(buff.Duration, buff.EffectValue)
             .Where(x => x <= 0)
-            .Subscribe(_ => RemoveBuff(target, buff.type));  // TODO Removeされたときにインスタンスの参照が切れるのでAddTo行わなくても大丈夫？必要な場合、どのように記述すれば良いか？
+            .Take(1)  // 最初の一度だけイベントを通す。その後、監視処理も終了される
+            .Subscribe(_ => RemoveBuff(target, buff.type));
     }
 
     /// <summary>
-    /// デバフを削除
+    /// バフ・デバフを削除
     /// </summary>
     /// <param name="target"></param>
     /// <param name="buffType"></param>
     public static void RemoveBuff(CharaController target, BuffType buffType)
     {
-        target.Status.Buffs.Remove(target.Status.Buffs.FirstOrDefault(debuff => debuff.type == buffType));
+        target.Status.Buffs.Remove(target.Status.Buffs.FirstOrDefault(buff => buff.type == buffType));
     }
 
     /// <summary>
