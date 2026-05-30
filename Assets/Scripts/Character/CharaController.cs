@@ -115,6 +115,9 @@ public class CharaController
             return;
         }
 
+        // TODO アニメーション群をまとめる箱を作る (1行動内のアニメーション処理が全て終わってから次のキャラの行動を開始するため)
+        //var animeContext = new BattleAnimationContext();
+
         // 「沈黙」状態の場合、スキルを使用できない
         if (!status.Buffs.Any(debuff => debuff.type == BuffType.沈黙))
         {
@@ -136,6 +139,9 @@ public class CharaController
         {
             // 通常攻撃
             chara.BasicAttack(this);
+
+            // TODO ここじゃなく、Attack()に渡すらしい　ChatGPT参照。アニメーション再生
+            // animeContext.AddAnimation(BattleAnimationManager.instance.PlayAnimation(this, AnimationType.Attack));
         }
     }
 

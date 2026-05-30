@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
@@ -11,12 +12,28 @@ public enum AnimationType
     ReceiveDebuff,
 }
 
-public class BattleAnimationPlayer : AbstractSingleton<BattleAnimationPlayer>
+public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
 {
     [SerializeField] private BattleManager battleManager;
 
+    private List<UniTask> animationTasks = new();
+
     // パーティクルシステムなどのプレハブ用変数
 
+
+    public void AddAnimation(CharaController target, AnimationType animationType)
+    {
+        animationTasks.Add(PlayAnimation(target, animationType));
+    }
+
+    public async UniTask WaitAllAnimations()
+    {
+        if (animationTasks.Count == 0)
+            return;
+
+        await UniTask.WhenAll(animationTasks);
+        animationTasks.Clear();
+    }
 
     public UniTask PlayAnimation(CharaController target, AnimationType animationType)
     {
@@ -26,14 +43,19 @@ public class BattleAnimationPlayer : AbstractSingleton<BattleAnimationPlayer>
         {
             AnimationType.Attack => 
                 PlayAttackAnimation(rect, target),
+
             AnimationType.Damage =>
                 PlayDamageAnimation(rect, target),
+
             AnimationType.ApplyEffect => 
                 PlayApplyEffectAnimation(rect),
+
             AnimationType.ReceiveBuff => 
                 PlayReceiveBuffAnimation(rect),
+
             AnimationType.ReceiveDebuff => 
                 PlayReceiveDebuffAnimation(rect),
+
             _ => UniTask.CompletedTask
         };
     }
@@ -71,7 +93,7 @@ public class BattleAnimationPlayer : AbstractSingleton<BattleAnimationPlayer>
         return UniTask.CompletedTask;
     }
 
-
+    // TODO 消す
     // DOTweenでアニメーション
     //Vector2 punchPos = new(battleManager.playerTeam.Any(chara => chara == target) ? 20f : -20f, -10f);
     //Debug.Log($"punchPos = {punchPos}");
