@@ -27,11 +27,6 @@ public class Rosevillea : CharacterBase
             SkillManager.Attack(user, target, user.Status.attackPower, 390);
             SkillManager.AddBuff(target, BuffType.気絶, false, false);
         });
-        // foreach (var target in targets)
-        // {
-        //     await SkillManager.Attack(user, target, user.Status.attackPower, 390);
-        //     SkillManager.AddBuff(target, BuffType.気絶, false, false);
-        // }
     }
 
     /// <summary>

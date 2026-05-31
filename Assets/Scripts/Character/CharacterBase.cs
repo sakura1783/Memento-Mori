@@ -1,3 +1,6 @@
+using System.Diagnostics;
+
+
 /// <summary>
 /// 各キャラのクラスに継承させるクラス(基底クラス)
 /// 共通して必要な情報のみ定義
@@ -21,6 +24,11 @@ public abstract class CharacterBase
     {
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
         targets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 100));
+
+        // アニメーション再生
+        BattleAnimationManager.instance.AddAnimation(user, AnimationType.Attack);
+
+        UnityEngine.Debug.Log("通常攻撃");
     }
 
     /// <summary>

@@ -115,33 +115,26 @@ public class CharaController
             return;
         }
 
-        // TODO アニメーション群をまとめる箱を作る (1行動内のアニメーション処理が全て終わってから次のキャラの行動を開始するため)
-        //var animeContext = new BattleAnimationContext();
-
         // 「沈黙」状態の場合、スキルを使用できない
-        if (!status.Buffs.Any(debuff => debuff.type == BuffType.沈黙))
-        {
-            // スキル使用(スキル1、スキル2...の順番、全てのスキルがクールタイム中の場合、通常攻撃。)
-            if (active1RemainingCoolTime <= 0)
-            {
-                chara.ActiveSkill1(this);
+        bool canUseSkill = !status.Buffs.Any(debuff => debuff.type == BuffType.沈黙);
 
-                // クールタイムを追加
-                active1RemainingCoolTime += chara.Active1CoolTime;
-            }
-            else if (active2RemainingCoolTime <= 0)
-            {
-                chara.ActiveSkill2(this);
-                active2RemainingCoolTime += chara.Active2CoolTime;
-            }
+        // スキル使用(スキル1、スキル2...の順番、全てのスキルがクールタイム中の場合、通常攻撃。)
+        if (canUseSkill && active1RemainingCoolTime <= 0)
+        {
+            chara.ActiveSkill1(this);
+
+            // クールタイムを追加
+            active1RemainingCoolTime += chara.Active1CoolTime;
+        }
+        else if (canUseSkill && active2RemainingCoolTime <= 0)
+        {
+            chara.ActiveSkill2(this);
+            active2RemainingCoolTime += chara.Active2CoolTime;
         }
         else
         {
             // 通常攻撃
             chara.BasicAttack(this);
-
-            // アニメーション再生
-            BattleAnimationManager.instance.AddAnimation(this, AnimationType.Attack);
         }
     }
 

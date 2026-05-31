@@ -62,8 +62,8 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
 
     private UniTask PlayAttackAnimation(RectTransform statusPanelRect, CharaController target)
     {
-        Vector3 pos = new(40f, 0f, 0f);
-        
+        Vector3 pos = new(battleManager.playerTeam.Contains(target) ? 40f : -40f, 0f, 0f);
+
         return statusPanelRect
             .DOPunchPosition(pos, 0.7f, 2).ToUniTask();
     }

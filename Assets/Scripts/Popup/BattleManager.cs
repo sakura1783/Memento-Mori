@@ -153,6 +153,8 @@ public class BattleManager : PopupBase
 
                 foreach (var chara in playerTeam.Concat(opponentTeam)) chara.ReceivedCriticalDamage = false;
 
+                await BattleAnimationManager.instance.WaitAllAnimations();
+
                 if (IsBattleOver()) return;
             }
 
