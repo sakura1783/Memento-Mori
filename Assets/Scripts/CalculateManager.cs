@@ -72,7 +72,7 @@ public static class CalculateManager
 
             // 上で求めた各ステータスから、戦闘力を計算。
             // 戦闘力 = 攻撃力+防御力+補正後HP+補正後クリティカル率
-            status.combatPower = (int)Math.Round(status.attackPower + status.defencePower + (status.Hp.Value * ConstData.HP_MODIFIRE) + (status.attackPower + status.attackPower * ConstData.CRITICAL_BONUS) / ConstData.ATTACK_MODIFIER * (status.criticalRate / 100), 0, MidpointRounding.AwayFromZero);
+            status.combatPower = (int)Math.Round(status.attackPower + status.defencePower + (status.Hp.Value * ConstData.HP_MODIFIRE) + (status.attackPower + status.attackPower * ConstData.CRITICAL_BONUS) / ConstData.ATTACK_MODIFIER * (status.criticalRate / 100f), 0, MidpointRounding.AwayFromZero);
         }
 
         // 呼び出し元に計算後のステータスの情報を返す
@@ -107,7 +107,7 @@ public static class CalculateManager
         bool isCritical = false;
 
         // (攻撃力*技/補正値)-(敵の防御力/補正値)
-        damageValue = (int)Math.Round(baseValue * (rate / 100) / ConstData.ATTACK_MODIFIER - (target.Status.defencePower / ConstData.DEFENCE_MODIFIRE), 0, MidpointRounding.AwayFromZero);
+        damageValue = (int)Math.Round(baseValue * (rate / 100f) / ConstData.ATTACK_MODIFIER - (target.Status.defencePower / ConstData.DEFENCE_MODIFIRE), 0, MidpointRounding.AwayFromZero);
 
         // 属性ボーナス
         if (ConstData.ATTRIBUTE_RELATIONSHIP[user.Attribute] == target.Attribute)
