@@ -26,8 +26,8 @@ public class CharaController
     public ReactiveProperty<int> Passive1RemainingCoolTime = new(1);  // ExecutePassiveSkill()内、コメントの処理を実現するために、ReactivePropertyで監視処理・初期値を1に設定
     public ReactiveProperty<int> Passive2RemainingCoolTime = new(1);
 
-    private Transform charaStatusPannel;  // DOTweenやエフェクトで使用するだけなのでTransform型。必要であればCharaStatusPannel型にしても良い
-    public Transform CharaStatusPannel
+    private CharaStatusPannel charaStatusPannel;
+    public CharaStatusPannel CharaStatusPannel
     {
         get => charaStatusPannel;
         set => charaStatusPannel = value;

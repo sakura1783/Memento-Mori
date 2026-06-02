@@ -5,8 +5,15 @@ using UnityEngine;
 
 public enum AnimationType
 {
+    // DOTWeen使用アニメーション
     Attack,  // 通常攻撃・追撃時
     Damage,
+
+    // パーティクルシステム使用アニメーション
+    DefaultHit,
+    SwordHit,
+    GunHit,
+    Heal,
     ApplyEffect,  // バフ・デバフの付与時
     ReceiveBuff,
     ReceiveDebuff,
@@ -16,9 +23,9 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
 {
     [SerializeField] private BattleManager battleManager;
 
-    private List<UniTask> animationTasks = new();
+    [SerializeField] private GameObject effects;  // AnimationType順に順番にプレハブを入れる
 
-    // パーティクルシステムなどのプレハブ用変数
+    private List<UniTask> animationTasks = new();
 
 
     public void AddAnimation(CharaController target, AnimationType animationType)
@@ -37,7 +44,12 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
 
     private UniTask PlayAnimation(CharaController target, AnimationType animationType)
     {
-        RectTransform rect = target.CharaStatusPannel as RectTransform;
+        // TODO 各メソッド内に記述
+        //RectTransform rect = target.CharaStatusPannel as RectTransform;  // TODO 消す
+        var rect = target.CharaStatusPannel.transform as RectTransform; 
+        
+        // TODO エフェクトアニメーションの際は、CharaPanelのキャラクターの顔のRectTransformが欲しい
+        var rect0 = target.CharaStatusPannel.ImgChara.transform as RectTransform;
 
         return animationType switch
         {
@@ -46,6 +58,10 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
 
             AnimationType.Damage =>
                 PlayDamageAnimation(rect, target),
+
+            // TODO 追加
+            // AnimationType.DefaultHit =>
+            //     PlayDefaultHitAnimation(rect)
 
             AnimationType.ApplyEffect => 
                 PlayApplyEffectAnimation(rect),

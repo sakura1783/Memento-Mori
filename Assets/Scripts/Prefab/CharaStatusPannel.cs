@@ -10,6 +10,7 @@ using System.Collections.Generic;
 public class CharaStatusPannel : MonoBehaviour
 {
     [SerializeField] private Image imgChara;
+    public Image ImgChara => imgChara;
 
     [SerializeField] private Text txtCharaInfo;  // txtCharaLv,Nameをアサイン
     [SerializeField] private Text txtHpValue;
@@ -24,7 +25,7 @@ public class CharaStatusPannel : MonoBehaviour
 
     public void Setup(CharaController charaController, GameData.CharaConstData charaData)
     {
-        charaController.CharaStatusPannel = transform;
+        charaController.CharaStatusPannel = this;
 
         imgChara.sprite = SpriteManager.instance.GetCharaSprite(charaData.name, CharaSpriteType.Face);
         txtCharaInfo.text = $"Lv{charaData.level} {DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.FirstOrDefault(data => data.englishName == charaData.name).name}";
