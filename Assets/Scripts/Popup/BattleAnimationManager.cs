@@ -21,9 +21,19 @@ public enum AnimationType
 
 public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
 {
+    [System.Serializable]
+    private class EffectObjData
+    {
+        [SerializeField] private GameObject effectPrefab;
+        public GameObject Effectprefab => effectPrefab;
+
+        [SerializeField] int scaleAdjustmentValue = 1;
+        public int ScaleAdjustmentValue => scaleAdjustmentValue;
+    }
+
     [SerializeField] private BattleManager battleManager;
 
-    [SerializeField] private GameObject effects;  // AnimationType順に順番にプレハブを入れる
+    [SerializeField] private EffectObjData[] effects = new EffectObjData[6];  // AnimationType順に順番にプレハブを入れる
 
     private List<UniTask> animationTasks = new();
 
@@ -44,69 +54,55 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
 
     private UniTask PlayAnimation(CharaController target, AnimationType animationType)
     {
-        // TODO 各メソッド内に記述
-        //RectTransform rect = target.CharaStatusPannel as RectTransform;  // TODO 消す
-        var rect = target.CharaStatusPannel.transform as RectTransform; 
-        
-        // TODO エフェクトアニメーションの際は、CharaPanelのキャラクターの顔のRectTransformが欲しい
-        var rect0 = target.CharaStatusPannel.ImgChara.transform as RectTransform;
+        var rect = animationType == AnimationType.Attack || animationType == AnimationType.Damage
+            ? target.CharaStatusPannel.transform as RectTransform
+            : target.CharaStatusPannel.ImgChara.transform as RectTransform;
 
         return animationType switch
         {
             AnimationType.Attack => 
-                PlayAttackAnimation(rect, target),
+                PlayAttackAnimation(rect,target),
 
             AnimationType.Damage =>
                 PlayDamageAnimation(rect, target),
 
-            // TODO 追加
-            // AnimationType.DefaultHit =>
-            //     PlayDefaultHitAnimation(rect)
-
-            AnimationType.ApplyEffect => 
-                PlayApplyEffectAnimation(rect),
-
-            AnimationType.ReceiveBuff => 
-                PlayReceiveBuffAnimation(rect),
-
-            AnimationType.ReceiveDebuff => 
-                PlayReceiveDebuffAnimation(rect),
+            AnimationType.DefaultHit
+            or AnimationType.SwordHit
+            or AnimationType.GunHit
+            or AnimationType.Heal
+            or AnimationType.ReceiveBuff
+            or AnimationType.ReceiveDebuff =>
+                InstantiateEffect(rect, (int)animationType),
 
             _ => UniTask.CompletedTask
         };
     }
 
-    private UniTask PlayAttackAnimation(RectTransform statusPanelRect, CharaController target)
+    private UniTask PlayAttackAnimation(RectTransform animePoint, CharaController target)
     {
         Vector3 pos = new(battleManager.playerTeam.Contains(target) ? 40f : -40f, 0f, 0f);
 
-        return statusPanelRect
+        return animePoint
             .DOPunchPosition(pos, 0.7f, 2).ToUniTask();
     }
 
-    private UniTask PlayDamageAnimation(RectTransform statusPanelRect, CharaController target)
+    private UniTask PlayDamageAnimation(RectTransform animePoint, CharaController target)
     {
-        Vector3 pos = new(battleManager.playerTeam.Contains(target) ? -20f : 20f, 0f, 0f);
+        Vector3 pos = new(battleManager.playerTeam.Contains(target) ? -15f : 15f, -5f, 0f);
         
-        return statusPanelRect
-            .DOPunchPosition(pos, 1f, 6).ToUniTask();
+        return animePoint
+            .DOPunchPosition(pos, 0.5f, 8).ToUniTask();
     }
 
-    private UniTask PlayApplyEffectAnimation(RectTransform pos)
+    private UniTask InstantiateEffect(RectTransform effectPoint, int effectIndex)
     {
-        // TODO パネルのキャラクターの顔の位置にエフェクトを生成したい→ 引数違うかも
+        var effectData = effects[effectIndex];
 
-        // パーティクルを生成してアニメーション
-        return UniTask.CompletedTask;
-    }
+        var obj = Instantiate(effectData.Effectprefab, effectPoint);
+        obj.transform.localPosition = Vector3.zero;
+        obj.transform.localScale = Vector3.one * effectData.ScaleAdjustmentValue;
 
-    private UniTask PlayReceiveBuffAnimation(RectTransform targetPos)
-    {
-        return UniTask.CompletedTask;
-    }
-
-    private UniTask PlayReceiveDebuffAnimation(RectTransform targetPos)
-    {
-        return UniTask.CompletedTask;
+        // パーティクルの再生が終了し、破棄されるまで待つ
+        return UniTask.WaitUntil(() => obj == null);
     }
 }
