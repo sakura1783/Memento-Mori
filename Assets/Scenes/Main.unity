@@ -12223,6 +12223,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   battleManager: {fileID: 1015797305}
+  effects:
+  - effectPrefab: {fileID: 8693284263492822141, guid: 4b1f549bec45442d4b1e626ce241931b, type: 3}
+    scaleAdjustmentValue: 55
+  - effectPrefab: {fileID: 6263782476919498309, guid: 1fd2749f2a4056446881dce86ed70c39, type: 3}
+    scaleAdjustmentValue: 65
+  - effectPrefab: {fileID: 725748389856807714, guid: 4bda94453d2ca7444a0fff05b2d425f5, type: 3}
+    scaleAdjustmentValue: 30
+  - effectPrefab: {fileID: 5318118474938795680, guid: 69d8f05fda8421849a84b27b8c0d773d, type: 3}
+    scaleAdjustmentValue: 80
+  - effectPrefab: {fileID: 1429954232896169633, guid: 83036083a4ebcd34f98131bd3cf6f4d2, type: 3}
+    scaleAdjustmentValue: 55
+  - effectPrefab: {fileID: 8771972552311404799, guid: bbf9e36a48d6c5648a13889afab076fd, type: 3}
+    scaleAdjustmentValue: 90
+  - effectPrefab: {fileID: 5824670795371433373, guid: f6fd568b816c64943a44efc3add3a881, type: 3}
+    scaleAdjustmentValue: 65
 --- !u!1 &1701532777
 GameObject:
   m_ObjectHideFlags: 0
