@@ -48,7 +48,16 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
         if (animationTasks.Count == 0)
             return;
 
-        await UniTask.WhenAll(animationTasks);
+        var waitAnimations = UniTask.WhenAll(animationTasks);
+        var waitMinimumTime = UniTask.Create(async () =>  // UniTask.Createで、メソッド化せずその場で記述
+        {
+            // 最低でも1秒は待つ
+            await UniTask.Delay(System.TimeSpan.FromSeconds(0.8f));
+            await battleManager.SkillUserImageGroup.DOFade(0, 0.2f).SetEase(Ease.Linear).AsyncWaitForCompletion();  // DOTweenの完了を待ちたいときは、AsyncWaitForCompletion()を使う
+        });
+        
+        await UniTask.WhenAll(waitAnimations, waitMinimumTime);
+
         animationTasks.Clear();
     }
 

@@ -3400,7 +3400,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1015797298}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
@@ -6165,6 +6165,7 @@ GameObject:
   - component: {fileID: 818299850}
   - component: {fileID: 818299852}
   - component: {fileID: 818299851}
+  - component: {fileID: 818299853}
   m_Layer: 5
   m_Name: imgSkillUser
   m_TagString: Untagged
@@ -6185,7 +6186,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1015797298}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -6206,7 +6207,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -6230,6 +6231,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 818299849}
   m_CullTransparentMesh: 1
+--- !u!225 &818299853
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 818299849}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &827246593
 GameObject:
   m_ObjectHideFlags: 0
@@ -7739,9 +7752,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 818299850}
   - {fileID: 434971776}
   - {fileID: 1076289157}
-  - {fileID: 818299850}
   - {fileID: 2005916534}
   m_Father: {fileID: 1701532781}
   m_RootOrder: 5
@@ -7880,6 +7893,8 @@ MonoBehaviour:
   charaStatusPennel: {fileID: 1963139232622000288, guid: 4945b14c001f94b158070661cef881fa, type: 3}
   playerTran: {fileID: 434971776}
   opponentTran: {fileID: 1076289157}
+  imgSkillUser: {fileID: 818299851}
+  skillUserImageGroup: {fileID: 818299853}
 --- !u!1 &1017471785
 GameObject:
   m_ObjectHideFlags: 0
@@ -8416,7 +8431,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1015797298}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
@@ -12310,7 +12325,7 @@ MonoBehaviour:
   - effectPrefab: {fileID: 5318118474938795680, guid: 69d8f05fda8421849a84b27b8c0d773d, type: 3}
     scaleAdjustmentValue: 80
   - effectPrefab: {fileID: 1429954232896169633, guid: 83036083a4ebcd34f98131bd3cf6f4d2, type: 3}
-    scaleAdjustmentValue: 55
+    scaleAdjustmentValue: 70
   - effectPrefab: {fileID: 8771972552311404799, guid: bbf9e36a48d6c5648a13889afab076fd, type: 3}
     scaleAdjustmentValue: 90
   - effectPrefab: {fileID: 5824670795371433373, guid: f6fd568b816c64943a44efc3add3a881, type: 3}

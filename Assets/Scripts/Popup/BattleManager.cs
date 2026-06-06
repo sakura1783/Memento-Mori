@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UniRx;
 using UnityEngine;
 
@@ -22,6 +23,11 @@ public class BattleManager : PopupBase
 
     [SerializeField] private Transform playerTran;
     [SerializeField] private Transform opponentTran;
+
+    [SerializeField] private UnityEngine.UI.Image imgSkillUser;
+
+    [SerializeField] private CanvasGroup skillUserImageGroup;
+    public CanvasGroup SkillUserImageGroup => skillUserImageGroup;
 
     private int turnCount;
     public int TurnCount => turnCount;
@@ -132,7 +138,7 @@ public class BattleManager : PopupBase
             //if (playerTeam[count] != null)
             if (playerTeam.Count > count)
             {
-                playerTeam[count].ExecuteActiveSkill();
+                playerTeam[count].ExecuteActiveSkill(this);
                 previousActChara = playerTeam[count];
 
                 // TODO タイミング要検討
@@ -148,7 +154,7 @@ public class BattleManager : PopupBase
             //if (opponentTeam[count] != null)
             if (opponentTeam.Count > count)
             {
-                opponentTeam[count].ExecuteActiveSkill();
+                opponentTeam[count].ExecuteActiveSkill(this);
                 previousActChara = opponentTeam[count];
 
                 foreach (var chara in playerTeam.Concat(opponentTeam)) chara.ReceivedCriticalDamage = false;
@@ -203,5 +209,21 @@ public class BattleManager : PopupBase
         // 一旦コメントアウト
         // playerTeam.Clear();
         // opponentTeam.Clear();
+    }
+
+    /// <summary>
+    /// スキル使用者の画像の表示/非表示を切り替える
+    /// </summary>
+    /// <param name="isVisible"></param>
+    /// <param name="charaName"></param>
+    public void SetSkillUserImage(bool isVisible, CharaName charaName = CharaName.None)
+    {
+        if (isVisible)
+        {
+            imgSkillUser.sprite = SpriteManager.instance.GetCharaSprite(charaName, CharaSpriteType.Full);
+            skillUserImageGroup.DOFade(1, 0.2f).SetEase(Ease.Linear);
+        }
+        else
+            skillUserImageGroup.DOFade(0, 0.2f).SetEase(Ease.Linear);
     }
 }

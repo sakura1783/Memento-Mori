@@ -11,7 +11,7 @@ public class CharaController
 {
     private CharacterBase chara;  // キャラの(クラス)インスタンスを生成して代入
 
-    private readonly CharaName name;  // TODO デバッグが終わったら削除
+    private readonly CharaName name;
     public CharaName Name => name;
 
     private readonly Attribute attribute;  // 属性はずっと変わらない情報なのでreadonly
@@ -107,7 +107,7 @@ public class CharaController
     /// <summary>
     /// アクティブスキルを発動
     /// </summary>
-    public void ExecuteActiveSkill()
+    public void ExecuteActiveSkill(BattleManager battleManager)
     {
         // 「気絶」または「睡眠」状態の場合、行動不能
         if (status.Buffs.Any(debuff => debuff.type == BuffType.気絶 || debuff.type == BuffType.睡眠))
@@ -126,7 +126,8 @@ public class CharaController
             // クールタイムを追加
             active1RemainingCoolTime += chara.Active1CoolTime;
 
-            // エフェクト再生
+            // キャラ画像の表示、エフェクト再生
+            battleManager.SetSkillUserImage(true, name);
             BattleAnimationManager.instance.AddAnimation(this, AnimationType.ActiveSkill);
         }
         else if (canUseSkill && active2RemainingCoolTime <= 0)
@@ -134,12 +135,13 @@ public class CharaController
             chara.ActiveSkill2(this);
             active2RemainingCoolTime += chara.Active2CoolTime;
 
+            battleManager.SetSkillUserImage(true, name);
             BattleAnimationManager.instance.AddAnimation(this, AnimationType.ActiveSkill);
         }
         else
         {
-            // 通常攻撃
             chara.BasicAttack(this);
+            battleManager.SetSkillUserImage(false);
         }
     }
 
