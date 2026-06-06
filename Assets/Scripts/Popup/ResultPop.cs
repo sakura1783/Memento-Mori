@@ -1,3 +1,4 @@
+using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +8,8 @@ public class ResultPop : PopupBase
 
     [SerializeField] private CanvasGroup winGroup;
     [SerializeField] private CanvasGroup loseGroup;
+
+    [SerializeField] private Button btnRematch;
 
 
     public override void Setup()
@@ -18,6 +21,12 @@ public class ResultPop : PopupBase
         loseGroup.blocksRaycasts = false;
 
         base.Setup();
+
+        // TODO 実装
+        // btnRematch.OnClickAsObservable()
+        //     .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
+        //     .Subscribe(_ => PopupManager.instance.Show<BattleManager>(true))
+        //     .AddTo(this);
     }
 
     public void ShowPopup(BattleState battleState)

@@ -242,6 +242,9 @@ public static class SkillManager
         }
 
         target.UpdateHp(CalculateManager.CalculateSkillEffectValue(baseValue, rate));
+
+        // エフェクト再生
+        BattleAnimationManager.instance.AddAnimation(target, AnimationType.Heal);
     }
 
     /// <summary>

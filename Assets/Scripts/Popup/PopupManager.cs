@@ -53,6 +53,10 @@ public class PopupManager : AbstractSingleton<PopupManager>
     /// <returns></returns>
     public T GetPopup<T>() where T : PopupBase
     {
-        return popups.OfType<T>().FirstOrDefault();
+        // TODO 以下2行追加したが問題ないか。
+        var targetPop = popups.OfType<T>().FirstOrDefault();
+        previousPop = targetPop;
+
+        return targetPop;
     }
 }

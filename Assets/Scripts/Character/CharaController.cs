@@ -126,14 +126,14 @@ public class CharaController
             // クールタイムを追加
             active1RemainingCoolTime += chara.Active1CoolTime;
 
-            // アニメーション再生
+            // エフェクト再生
             BattleAnimationManager.instance.AddAnimation(this, AnimationType.ActiveSkill);
         }
         else if (canUseSkill && active2RemainingCoolTime <= 0)
         {
             chara.ActiveSkill2(this);
             active2RemainingCoolTime += chara.Active2CoolTime;
-            
+
             BattleAnimationManager.instance.AddAnimation(this, AnimationType.ActiveSkill);
         }
         else
