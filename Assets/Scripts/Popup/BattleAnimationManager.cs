@@ -70,6 +70,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
             or AnimationType.SwordHit
             or AnimationType.GunHit
             or AnimationType.Heal
+            or AnimationType.ActiveSkill
             or AnimationType.ReceiveBuff
             or AnimationType.ReceiveDebuff =>
                 InstantiateEffect(rect, animationType),
@@ -96,7 +97,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
 
     private UniTask InstantiateEffect(RectTransform effectPoint, AnimationType animationType)
     {
-        var effectData = effects[(int)animationType];
+        var effectData = effects[(int)animationType - 2];  // AnimationType列挙型の最初の2つはDOTweenアニメーションなので、配列要素のインデックスを合わせるために-2する
 
         var obj = Instantiate(effectData.Effectprefab, effectPoint);
         obj.transform.localPosition = Vector3.zero;
