@@ -106,6 +106,7 @@ public class BattleManager : PopupBase
             }
 
             turnCount++;
+            Debug.Log(turnCount);  // TODO 消す
 
         }while (battleState == BattleState.Continue);
 

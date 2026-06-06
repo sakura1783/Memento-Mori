@@ -188,17 +188,14 @@ public class CharaController
         Passive1RemainingCoolTime.Value = ReduceCoolTime(Passive1RemainingCoolTime.Value);
         Passive2RemainingCoolTime.Value = ReduceCoolTime(Passive2RemainingCoolTime.Value);
         
-        // 各デバフのクールタイムを減少
-        foreach (var debuff in status.Buffs.Where(x => !x.isIrremovable))  // 解除不可でないバフのみ、クールタイムを減少
-        {
-            debuff.Duration.Value = ReduceCoolTime(debuff.Duration.Value);
-        }
-
+        // 各バフのクールタイムを減少
+        foreach (var buff in status.Buffs.Where(x => !x.isIrremovable).ToList())  // ToList()で、foreachがコピーリストを参照するようにする。(下の処理でRemoveBuff()が動き元Listの要素が削除されエラーが出るのを防ぐ)
+            buff.Duration.Value = ReduceCoolTime(buff.Duration.Value);
 
         // ローカル関数。このメソッド内でしか使えない
         int ReduceCoolTime(int reduceValue)  // 減らしたいクールタイムを引数で指定
         {
-            var coolTime = Mathf.Clamp(reduceValue - 1, 0, int.MaxValue);
+            var coolTime = Mathf.Max(reduceValue - 1, 0);
 
             return coolTime;
         }

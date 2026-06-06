@@ -17,7 +17,7 @@ public class CharaStatusPannel : MonoBehaviour
 
     [SerializeField] private Slider hpSlider;
 
-    [SerializeField] private Transform buffPlace;
+    [SerializeField] private RectTransform buffPlace;
     [SerializeField] private Image buffPrefab;
 
     private readonly Dictionary<Buff, Image> buffs = new();
@@ -59,8 +59,11 @@ public class CharaStatusPannel : MonoBehaviour
                 var buff = eventData.Value;
 
                 if (!buffs.TryGetValue(buff, out var icon))
+                {
+                    Debug.Log("バフアイコンを取得できませんでした");
                     return;
-                    
+                }
+                
                 Destroy(icon.gameObject);
                 buffs.Remove(buff);
             })
@@ -71,7 +74,10 @@ public class CharaStatusPannel : MonoBehaviour
             .Subscribe(_ =>
             {
                 // バフのオブジェクトを全て削除
-                foreach (Transform child in buffPlace) Destroy(child.gameObject);
+                foreach (Transform child in buffPlace)
+                    Destroy(child.gameObject);
+
+                buffs.Clear();
             })
             .AddTo(this);
     }

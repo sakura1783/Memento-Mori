@@ -203,11 +203,11 @@ public static class SkillManager
         var shieldBuff = target.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.シールド);
         if (shieldBuff != null)
         {
-            var shieldValue = shieldBuff.EffectValue;
+            var shieldValue = shieldBuff.EffectValue.Value;
 
             // シールド値を減少、残りのダメージを計算
-            shieldValue.Value -= damageValue;
-            damageValue = Math.Max(-shieldValue.Value, 0);
+            shieldValue = Mathf.Max(shieldValue - damageValue, 0);
+            damageValue = Mathf.Max(damageValue - shieldValue, 0);
         }
 
         target.UpdateHp(-damageValue);
@@ -215,6 +215,7 @@ public static class SkillManager
 
         // アニメーション再生
         BattleAnimationManager.instance.AddAnimation(target, AnimationType.Damage);
+        BattleAnimationManager.instance.AddAnimation(target, AnimationType.DefaultHit);
 
         // 「睡眠」状態を解除
         if (target.Status.Buffs.Any(debuff => debuff.type == BuffType.睡眠))
@@ -304,8 +305,8 @@ public static class SkillManager
     /// <param name="isIrremovable">解除不可かどうか</param>
     /// <param name="duration">解除不可バフは、デフォルト値で大きな値を設定(値減らさないけど、一応ね)</param>
     /// <param name="effectRate">基準値の?%分の影響を与えるか。「再生」「毒」「侵食」などで使用する</param>
-    /// <param name="effectValue">効果の量。「シールド」などで利用</param>
-    public static void AddBuff(CharaController target, BuffType buffType, bool isPositiveEffect, bool isIrremovable, int duration = 100, int effectRate = 0, int effectValue = 0)
+    /// <param name="effectValue">効果の量。「シールド」などで利用。(デフォルト値として-1を設定。0になるとRemoveBuff()が動くので、値を減らす際は0以下にならないように制御する)</param>
+    public static void AddBuff(CharaController target, BuffType buffType, bool isPositiveEffect, bool isIrremovable, int duration = 100, int effectRate = 0, int effectValue = -1)
     {
         // 重ね掛け不可。継続時間とダメージ割合を置き換えて、処理を終了
         var duplicateBuff = target.Status.Buffs.FirstOrDefault(x => x.type == buffType);
@@ -323,7 +324,7 @@ public static class SkillManager
 
         // 監視処理。継続時間かEffectValueのいずれかが0以下になったら、バフを削除
         Observable.Merge(buff.Duration, buff.EffectValue)
-            .Where(x => x <= 0)
+            .Where(x => x == 0)
             .Take(1)  // 最初の一度だけイベントを通す。その後、監視処理も終了される
             .Subscribe(_ => RemoveBuff(target, buff.type));
     }
