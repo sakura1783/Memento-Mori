@@ -14,7 +14,7 @@ public enum AnimationType
     SwordHit,
     GunHit,
     Heal,
-    ApplyEffect,  // バフ・デバフの付与時
+    ActiveSkill,  // アクティブスキル使用時
     ReceiveBuff,
     ReceiveDebuff,
 }
@@ -72,7 +72,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
             or AnimationType.Heal
             or AnimationType.ReceiveBuff
             or AnimationType.ReceiveDebuff =>
-                InstantiateEffect(rect, (int)animationType),
+                InstantiateEffect(rect, animationType),
 
             _ => UniTask.CompletedTask
         };
@@ -94,13 +94,22 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
             .DOPunchPosition(pos, 0.5f, 8).ToUniTask();
     }
 
-    private UniTask InstantiateEffect(RectTransform effectPoint, int effectIndex)
+    private UniTask InstantiateEffect(RectTransform effectPoint, AnimationType animationType)
     {
-        var effectData = effects[effectIndex];
+        var effectData = effects[(int)animationType];
 
         var obj = Instantiate(effectData.Effectprefab, effectPoint);
         obj.transform.localPosition = Vector3.zero;
         obj.transform.localScale = Vector3.one * effectData.ScaleAdjustmentValue;
+
+        // receiveBuffエフェクトはゲーム実行中に複数の子が生成されるため、OrderInLayerも動的に変更
+        if (animationType == AnimationType.ReceiveBuff)
+        {
+            var renderers = obj.GetComponentsInChildren<ParticleSystemRenderer>(true);
+
+            foreach (var renderer in renderers)
+                renderer.sortingOrder = 1;
+        }
 
         // パーティクルの再生が終了し、破棄されるまで待つ
         return UniTask.WaitUntil(() => obj == null);
