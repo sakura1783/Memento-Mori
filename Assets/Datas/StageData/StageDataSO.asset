@@ -31,6 +31,9 @@ MonoBehaviour:
       rarity: 0
   - stageNo: 3
     enemyDataList:
+    - name: 2
+      level: 1
+      rarity: 0
     - name: 3
       level: 1
       rarity: 2

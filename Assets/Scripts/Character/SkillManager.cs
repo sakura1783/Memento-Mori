@@ -205,8 +205,7 @@ public static class SkillManager
         {
             var shieldValue = shieldBuff.EffectValue.Value;
 
-            // シールド値を減少、残りのダメージを計算
-            shieldValue = Mathf.Max(shieldValue - damageValue, 0);
+            shieldBuff.EffectValue.Value = Mathf.Max(shieldValue - damageValue, 0);
             damageValue = Mathf.Max(damageValue - shieldValue, 0);
         }
 
@@ -303,7 +302,7 @@ public static class SkillManager
     /// <param name="buffType"></param>
     /// <param name="isPositiveEffect"></param>
     /// <param name="isIrremovable">解除不可かどうか</param>
-    /// <param name="duration">解除不可バフは、デフォルト値で大きな値を設定(値減らさないけど、一応ね)</param>
+    /// <param name="duration">解除不可バフは、デフォルト値で大きな値を設定(値減らさないけど、一応)</param>
     /// <param name="effectRate">基準値の?%分の影響を与えるか。「再生」「毒」「侵食」などで使用する</param>
     /// <param name="effectValue">効果の量。「シールド」などで利用。(デフォルト値として-1を設定。0になるとRemoveBuff()が動くので、値を減らす際は0以下にならないように制御する)</param>
     public static void AddBuff(CharaController target, BuffType buffType, bool isPositiveEffect, bool isIrremovable, int duration = 100, int effectRate = 0, int effectValue = -1)
@@ -349,15 +348,7 @@ public static class SkillManager
         int turnCount = battleManager.TurnCount;
         await UniTask.WaitUntil(() => battleManager.TurnCount == turnCount + waitTurn);
     }
-
-
-    /* */
-    // 単純な攻撃
-    // 回復
-    // 最大HP増加
-    // 攻撃力増加・減少  // baseValue
-    // 防御力増加・減少
-    // クリティカル率増加・減少
+    
 
     /* 未実装 */
     // スピード増加・減少

@@ -59,10 +59,7 @@ public class CharaStatusPannel : MonoBehaviour
                 var buff = eventData.Value;
 
                 if (!buffs.TryGetValue(buff, out var icon))
-                {
-                    Debug.Log("バフアイコンを取得できませんでした");
                     return;
-                }
                 
                 Destroy(icon.gameObject);
                 buffs.Remove(buff);
