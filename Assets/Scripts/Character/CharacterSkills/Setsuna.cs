@@ -81,7 +81,7 @@ public class Setsuna : CharacterBase
     {
         user.Status.Hp
             .Where(value => value < user.Status.MaxHp.Value / 2)  // TODO これだと、デバフでダメージを受けた際も50%未満になれば発動してしまう
-            .Take(1)  // 最初の一度だけイベントを通す
+            .Take(1)  // 最初の一度だけイベントを通す  // TODO これだと、毎ターンこのメソッドを呼ばないといけないかも。検討する
             .Subscribe(_ => SkillManager.IncreaseCriticalRate(user, 30));
     }
 }

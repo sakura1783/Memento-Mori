@@ -74,7 +74,8 @@ public class Elliot : CharacterBase
             var targets = SkillManager.PickTarget(user, TargetType.Aggressor);
             targets.ForEach(target => decreaseValue = SkillManager.ModifyAttackPower(target, target.Status.attackPower, 15, false));
 
-            await SkillManager.WaitTurnsAsync(1);
+            // 以下2つの処理、ModifyAttackPower()に追加する？(値を元に戻す場合、戻さない場合のbool型の引数を作る？)
+            await SkillManager.WaitTurnsAsync(1);  
 
             // 減少させた攻撃力を元に戻す
             targets.ForEach(target => target.Status.attackPower += decreaseValue);

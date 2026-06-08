@@ -62,6 +62,7 @@ public class CharaController
         // 監視処理。戦闘不能になった時、バフを全て削除
         status.Hp
             .Where(value => value <= 0)
+            .Take(1)
             .Subscribe(_ =>
             {
                 status.Buffs.Clear();

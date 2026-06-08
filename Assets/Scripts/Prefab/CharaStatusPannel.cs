@@ -20,6 +20,8 @@ public class CharaStatusPannel : MonoBehaviour
     [SerializeField] private RectTransform buffPlace;
     [SerializeField] private Image buffPrefab;
 
+    [SerializeField] private CanvasGroup inactiveGroup;
+
     private readonly Dictionary<Buff, Image> buffs = new();
 
 
@@ -34,11 +36,23 @@ public class CharaStatusPannel : MonoBehaviour
 
         // 購読処理
         Observable.Merge(charaController.Status.Hp, charaController.Status.MaxHp)  // Observable.Merge()で、括弧内の値いずれかが変更された場合にSubscribe()の処理が動く
-            .Where(_ => charaController.Status.Hp.Value > 0)  // 戦闘不能の場合は処理しない
-            .Subscribe(value =>
+            .Subscribe(_ =>
             {
-                txtHpValue.text = $"{charaController.Status.Hp} / {charaController.Status.MaxHp}";
-                hpSlider.value = (float)charaController.Status.Hp.Value / charaController.Status.MaxHp.Value;
+                int hp = charaController.Status.Hp.Value;
+                int maxHp = charaController.Status.MaxHp.Value;
+
+                txtHpValue.text = $"{hp} / {maxHp}";
+                hpSlider.value = (float)hp / maxHp;
+
+                // 戦闘不能になった時、パネルを暗くする/文字を赤色にする
+                if (hp <= 0)
+                {
+                    inactiveGroup.alpha = 1;
+
+                    var defeatedColor = new Color32(210, 55, 55, 255);
+                    txtCharaInfo.color = defeatedColor;
+                    txtHpValue.color = defeatedColor;
+                }
             })
             .AddTo(this);
 

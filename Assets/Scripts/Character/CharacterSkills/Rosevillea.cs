@@ -48,6 +48,4 @@ public class Rosevillea : CharacterBase
     {
         SkillManager.ModifyAttackPower(user, user.Status.attackPower, 20, true);
     }
-
-    // TODO 必要であればPassiveSkill2()も記述
 }
