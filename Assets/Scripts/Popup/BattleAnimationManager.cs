@@ -64,7 +64,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     private UniTask PlayAnimation(CharaController target, AnimationType animationType)
     {
         var rect = animationType == AnimationType.Attack || animationType == AnimationType.Damage
-            ? target.CharaStatusPannel.transform as RectTransform
+            ? target.CharaStatusPannel.AnimationRoot
             : target.CharaStatusPannel.ImgChara.transform as RectTransform;
 
         return animationType switch

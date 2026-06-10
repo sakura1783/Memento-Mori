@@ -22,6 +22,9 @@ public class CharaStatusPannel : MonoBehaviour
 
     [SerializeField] private CanvasGroup inactiveGroup;
 
+    [SerializeField] private RectTransform animationRoot;
+    public RectTransform AnimationRoot => animationRoot;
+
     private readonly Dictionary<Buff, Image> buffs = new();
 
 
