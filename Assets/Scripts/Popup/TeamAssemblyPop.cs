@@ -40,6 +40,8 @@ public class TeamAssemblyPop : PopupBase
     /// </summary>
     public void ShowPopup(int mapNo, int stageNo)
     {
+        opponentTeamInfo.Clear();  // 敵チームの情報だけクリア(SOから情報を持ってきて、その都度Listに追加されるため。味方キャラは前回の編成を保存。)
+
         AssembleOpponentTeam(mapNo, stageNo);
 
         // TODO 保存しておいた前回のチーム編成でキャラのボタンを画面うえに生成

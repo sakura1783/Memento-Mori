@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UniRx;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum BattleState
 {
@@ -14,15 +16,15 @@ public enum BattleState
 
 public class BattleManager : PopupBase
 {
-    public List<CharaController> playerTeam = new();  // CharaStatusPannelクラスからCharaControllerクラスに変更！=> SkillManager等の処理がうまくいく気がする！
+    public List<CharaController> playerTeam = new();  // TODO readonlyとプロパティに変更
     public List<CharaController> opponentTeam = new();
 
     [SerializeField] private TeamAssemblyPop teamAssemblyPop;
 
     [SerializeField] private CharaStatusPannel charaStatusPennel;
 
-    [SerializeField] private Transform playerTran;
-    [SerializeField] private Transform opponentTran;
+    [SerializeField] private RectTransform playerTran;
+    [SerializeField] private RectTransform opponentTran;
 
     [SerializeField] private UnityEngine.UI.Image imgSkillUser;
 
@@ -37,11 +39,26 @@ public class BattleManager : PopupBase
     private CharaController previousActChara;  // 直前に(前回)行動したキャラ
     public CharaController PreviousActChara => previousActChara;
 
+    private List<GameObject> generatedObjs = new();
+
+    private CompositeDisposable battleDisposables = new();
+
 
     public override void ShowPopup()
     {
+        // 前回使用したオブジェクト・情報を削除
+        generatedObjs.ForEach(obj =>
+        {
+            //obj.SetActive(false);
+            Destroy(obj);
+        });
+        generatedObjs.Clear();
+
+        playerTeam.Clear();
+        opponentTeam.Clear();
+
         base.ShowPopup();
-        PrepareBattle();
+        PrepareBattle();  // TODO タイミング検討。Battle().Forget()の処理だけ、Show()の後？
     }
 
     /// <summary>
@@ -53,38 +70,39 @@ public class BattleManager : PopupBase
         turnCount = 0;
         battleState = BattleState.Continue;
 
-        // 各チーム各キャラのステータスを計算し、リストに追加  // TODO リファクタリング
-        foreach (var data in teamAssemblyPop.playerTeamInfo)
-        {
-            // CharaControllerの作成(キャラの制御)
-            CharaController chara = new CharaController(CalculateManager.CalculateCharaStatus(data.name, data.level), data.name);
-            playerTeam.Add(chara);  // チームのリストにキャラを追加
+        CreateTeamCharacters(teamAssemblyPop.playerTeamInfo, playerTeam, playerTran);
+        CreateTeamCharacters(teamAssemblyPop.opponentTeamInfo, opponentTeam, opponentTran);
 
-            // CharaPannelの生成(キャラの状態の可視化)
-            var charaPannel = Instantiate(charaStatusPennel, playerTran);
-            charaPannel.Setup(chara, data);
-
-            // キャラが戦闘不能になったら、リストから削除  // TODO if(戦闘不能なら)を各処理に追加するか、無視してそのまま処理を実行するか？(CharaControllerは破棄されないため)
-            chara.Status.Hp
-                .Where(value => value <= 0)
-                .Subscribe(_ => playerTeam.Remove(chara))
-                .AddTo(this);
-        }
-        foreach (var data in teamAssemblyPop.opponentTeamInfo)
-        {
-            var chara = new CharaController(CalculateManager.CalculateCharaStatus(data.name, data.level), data.name);
-            opponentTeam.Add(chara);
-
-            var charaPannel = Instantiate(charaStatusPennel, opponentTran);
-            charaPannel.Setup(chara, data);
-
-            chara.Status.Hp
-                .Where(value => value <= 0)
-                .Subscribe(_ => opponentTeam.Remove(chara))
-                .AddTo(this);
-        }
+        // LayoutRebuilder.ForceRebuildLayoutImmediate(opponentTran);
 
         Battle().Forget();  // Forget()で、この非同期処理は待たずに開始するだけでOKと明示
+    }
+
+    /// <summary>
+    /// チームの各キャラを生成
+    /// </summary>
+    /// <param name="teamCharaDatas"></param>
+    /// <param name="team"></param>
+    /// <param name="generateTran"></param>
+    private void CreateTeamCharacters(List<GameData.CharaConstData> teamCharaDatas, List<CharaController> team, RectTransform generateTran)
+    {
+        foreach (var data in teamCharaDatas)
+        {
+            // CharaControllerの作成(キャラの制御)
+            var chara = new CharaController(CalculateManager.CalculateCharaStatus(data.name, data.level), data.name);
+            team.Add(chara);
+
+            // CharaPannelの生成(キャラの状態の可視化)
+            var charaPannel = Instantiate(charaStatusPennel, generateTran);
+            charaPannel.Setup(chara, data);
+            generatedObjs.Add(charaPannel.gameObject);
+
+            // キャラが戦闘不能になったら、リストから削除
+            chara.Status.Hp
+                .Where(value => value <= 0)
+                .Subscribe(_ => team.Remove(chara))
+                .AddTo(battleDisposables);
+        }
     }
 
     /// <summary>
@@ -203,13 +221,10 @@ public class BattleManager : PopupBase
     {
         Debug.Log($"{battleState}");
 
-        PopupManager.instance.GetPopup<ResultPop>().ShowPopup(battleState);
-        
-        // TODO 生成したゲームオブジェクト等を全て破棄して、最初の状態に戻す
+        battleDisposables.Clear();  // Disposeしてしまうと、battleDisposable自体がなくなってしまう
 
-        // 一旦コメントアウト
-        // playerTeam.Clear();
-        // opponentTeam.Clear();
+        HidePopup();
+        PopupManager.instance.GetPopup<ResultPop>().ShowPopup(battleState);
     }
 
     /// <summary>

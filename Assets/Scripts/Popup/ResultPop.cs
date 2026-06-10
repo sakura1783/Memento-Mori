@@ -23,29 +23,26 @@ public class ResultPop : PopupBase
         base.Setup();
 
         // TODO 実装
-        // btnRematch.OnClickAsObservable()
-        //     .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
-        //     .Subscribe(_ => PopupManager.instance.Show<BattleManager>(true))
-        //     .AddTo(this);
+        btnRematch.OnClickAsObservable()
+            .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
+            .Subscribe(_ => PopupManager.instance.Show<BattleManager>(true))
+            .AddTo(this);
     }
 
     public void ShowPopup(BattleState battleState)
     {
-        if (battleState == BattleState.Win)
-        {
-            winGroup.alpha = 1;
-            winGroup.blocksRaycasts = true;
+        var canvasGroup = battleState == BattleState.Win ? winGroup : loseGroup;
 
-            txtResult.text = battleState.ToString().ToUpper();  // ToUpper()で大文字に変換
-        }
-        else
-        {
-            loseGroup.alpha = 1;
-            loseGroup.blocksRaycasts = true;
-
-            txtResult.text = battleState.ToString().ToUpper();
-        }
+        canvasGroup.alpha = 1;
+        canvasGroup.blocksRaycasts = true;
+        txtResult.text = battleState.ToString().ToUpper();  // ToUpper()で大文字に変換
 
         base.ShowPopup();
+        PopupManager.instance.PreviousPop = this;
+    }
+
+    public override void HidePopup()
+    {
+        base.HidePopup();
     }
 }
