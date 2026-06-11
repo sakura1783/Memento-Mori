@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UniRx;
 using UnityEngine;
-using UnityEngine.UI;
 
 public enum BattleState
 {
@@ -16,8 +14,11 @@ public enum BattleState
 
 public class BattleManager : PopupBase
 {
-    public List<CharaController> playerTeam = new();  // TODO readonlyとプロパティに変更
-    public List<CharaController> opponentTeam = new();
+    private readonly List<CharaController> playerTeam = new();  // 内部からだけ、要素の変更を許可(外部からは参照のみ許可)
+    public IReadOnlyList<CharaController> PlayerTeam => playerTeam;
+
+    private readonly List<CharaController> opponentTeam = new();
+    public IReadOnlyList<CharaController> OpponentTeam => opponentTeam;
 
     [SerializeField] private TeamAssemblyPop teamAssemblyPop;
 
@@ -46,12 +47,8 @@ public class BattleManager : PopupBase
 
     public override void ShowPopup()
     {
-        // 前回使用したオブジェクト・情報を削除
-        generatedObjs.ForEach(obj =>
-        {
-            //obj.SetActive(false);
-            Destroy(obj);
-        });
+        // 前回使用したオブジェクトと情報を削除
+        generatedObjs.ForEach(obj => Destroy(obj));
         generatedObjs.Clear();
 
         playerTeam.Clear();
@@ -72,8 +69,6 @@ public class BattleManager : PopupBase
 
         CreateTeamCharacters(teamAssemblyPop.playerTeamInfo, playerTeam, playerTran);
         CreateTeamCharacters(teamAssemblyPop.opponentTeamInfo, opponentTeam, opponentTran);
-
-        // LayoutRebuilder.ForceRebuildLayoutImmediate(opponentTran);
 
         Battle().Forget();  // Forget()で、この非同期処理は待たずに開始するだけでOKと明示
     }
@@ -241,5 +236,18 @@ public class BattleManager : PopupBase
         }
         else
             skillUserImageGroup.DOFade(0, 0.2f).SetEase(Ease.Linear);
+    }
+
+    /// <summary>
+    /// キャラの所属チームと、チーム内での位置を取得
+    /// </summary>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    public (List<CharaController>, int) GetCharaTeamAndIndex(CharaController target)
+    {
+        var team = playerTeam.Contains(target) ? playerTeam : opponentTeam;
+        var charaIndex = team.FindIndex(chara => chara == target);
+
+        return (team, charaIndex);
     }
 }

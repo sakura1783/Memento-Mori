@@ -22,7 +22,6 @@ public class ResultPop : PopupBase
 
         base.Setup();
 
-        // TODO 実装
         btnRematch.OnClickAsObservable()
             .ThrottleFirst(System.TimeSpan.FromSeconds(0.1f))
             .Subscribe(_ => PopupManager.instance.Show<BattleManager>(true))

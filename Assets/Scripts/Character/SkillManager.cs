@@ -69,11 +69,11 @@ public static class SkillManager
                 break;
 
             case TargetType.Ally:
-                targetList.AddRange(battleManager.playerTeam.Contains(user) ? battleManager.playerTeam : battleManager.opponentTeam);
+                targetList.AddRange(battleManager.PlayerTeam.Contains(user) ? battleManager.PlayerTeam : battleManager.OpponentTeam);
                 break;
 
             case TargetType.Opponent:
-                targetList.AddRange(battleManager.playerTeam.Contains(user) ? battleManager.opponentTeam : battleManager.playerTeam);
+                targetList.AddRange(battleManager.PlayerTeam.Contains(user) ? battleManager.OpponentTeam : battleManager.PlayerTeam);
                 break;
 
             case TargetType.Neighbor:
@@ -160,11 +160,8 @@ public static class SkillManager
     /// <returns></returns>
     private static List<CharaController> PickNeighbor(CharaController user)
     {
-        // userが所属するチームのリストを取得
-        var team = battleManager.playerTeam.Contains(user) ? battleManager.playerTeam : battleManager.opponentTeam;
-
         // userのインデックス番号を取得
-        var userIndex = team.FindIndex(chara => chara == user);
+        (var team,var userIndex) = PopupManager.instance.GetPopup<BattleManager>().GetCharaTeamAndIndex(user);
         
         List<CharaController> neighbors = new();
         if (userIndex - 1 >= 0)  // 左隣にキャラが存在したら

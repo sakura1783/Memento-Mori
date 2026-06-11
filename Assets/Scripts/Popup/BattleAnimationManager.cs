@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
@@ -90,7 +91,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
 
     private UniTask PlayAttackAnimation(RectTransform animePoint, CharaController target)
     {
-        Vector3 pos = new(battleManager.playerTeam.Contains(target) ? 40f : -40f, 0f, 0f);
+        Vector3 pos = new(battleManager.PlayerTeam.Contains(target) ? 40f : -40f, 0f, 0f);
 
         return animePoint
             .DOPunchPosition(pos, 0.7f, 2).ToUniTask();
@@ -98,7 +99,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
 
     private UniTask PlayDamageAnimation(RectTransform animePoint, CharaController target)
     {
-        Vector3 pos = new(battleManager.playerTeam.Contains(target) ? -15f : 15f, -5f, 0f);
+        Vector3 pos = new(battleManager.PlayerTeam.Contains(target) ? -15f : 15f, -5f, 0f);
         
         return animePoint
             .DOPunchPosition(pos, 0.5f, 8).ToUniTask();
