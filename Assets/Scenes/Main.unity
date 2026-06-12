@@ -3404,7 +3404,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 300, y: 36}
+  m_AnchoredPosition: {x: 250, y: 36}
   m_SizeDelta: {x: 600, y: 800}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &434971777
@@ -7889,7 +7889,8 @@ MonoBehaviour:
   canvasGroup: {fileID: 1015797304}
   btnClose: {fileID: 0}
   teamAssemblyPop: {fileID: 2044851257}
-  charaStatusPennel: {fileID: 1963139232622000288, guid: 4945b14c001f94b158070661cef881fa, type: 3}
+  allyCharaPanel: {fileID: 1963139232622000288, guid: 4945b14c001f94b158070661cef881fa, type: 3}
+  opponentCharaPanel: {fileID: 3124968904542333899, guid: c4da37d7ec2e746b681f73a9d47325d9, type: 3}
   playerTran: {fileID: 434971776}
   opponentTran: {fileID: 1076289157}
   imgSkillUser: {fileID: 818299851}
@@ -8434,7 +8435,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -300, y: 36}
+  m_AnchoredPosition: {x: -250, y: 36}
   m_SizeDelta: {x: 600, y: 800}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1076289158

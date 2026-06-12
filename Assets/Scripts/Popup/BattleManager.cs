@@ -22,7 +22,8 @@ public class BattleManager : PopupBase
 
     [SerializeField] private TeamAssemblyPop teamAssemblyPop;
 
-    [SerializeField] private CharaStatusPannel charaStatusPennel;
+    [SerializeField] private CharaStatusPannel allyCharaPanel;
+    [SerializeField] private CharaStatusPannel opponentCharaPanel;
 
     [SerializeField] private RectTransform playerTran;
     [SerializeField] private RectTransform opponentTran;
@@ -88,7 +89,8 @@ public class BattleManager : PopupBase
             team.Add(chara);
 
             // CharaPannelの生成(キャラの状態の可視化)
-            var charaPannel = Instantiate(charaStatusPennel, generateTran);
+            var panelPrefab = team == playerTeam ? allyCharaPanel : opponentCharaPanel;
+            var charaPannel = Instantiate(panelPrefab, generateTran);
             charaPannel.Setup(chara, data);
             generatedObjs.Add(charaPannel.gameObject);
 
