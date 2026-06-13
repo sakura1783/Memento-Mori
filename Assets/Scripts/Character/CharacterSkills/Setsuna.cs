@@ -9,6 +9,12 @@ public class Setsuna : CharacterBase
     public override int Active2CoolTime => 4;
 
 
+    public override void OnBattleStarted(CharaController chara)
+    {
+        PassiveSkill1(chara);
+        PassiveSkill2(chara);
+    }
+
     /// <summary>
     /// ランダムな敵に3回攻撃力*400%の攻撃。クリティカルヒットした場合、1ターンの間自身の攻撃力が30%増加する。クリティカルヒットするたび攻撃力増加のターン数が1ターン多くなる。
     /// </summary>
@@ -65,7 +71,7 @@ public class Setsuna : CharacterBase
     }
 
     /// <summary>
-    /// 1ターン目のターン開始時、自身に3ターンの間攻撃力*250%の「シールド」を付与
+    /// バトル開始時、自身に3ターンの間攻撃力*250%の「シールド」を付与
     /// </summary>
     /// <param name="user"></param>
     public override void PassiveSkill1(CharaController user)
@@ -74,14 +80,14 @@ public class Setsuna : CharacterBase
     }
 
     /// <summary>
-    /// 毎ターン開始時、または自身が攻撃を受けた時、自身のHP割合が50%未満の場合、自身のクリティカル率が30%増加する(解除不可)。
+    /// 自身のHP割合が50%未満の場合、自身のクリティカル率が30%増加する(解除不可)。
     /// </summary>
     /// <param name="user"></param>
     public override void PassiveSkill2(CharaController user)
     {
         user.Status.Hp
-            .Where(value => value < user.Status.MaxHp.Value / 2)  // TODO これだと、デバフでダメージを受けた際も50%未満になれば発動してしまう
-            .Take(1)  // 最初の一度だけイベントを通す  // TODO これだと、毎ターンこのメソッドを呼ばないといけないかも。検討する
+            .Where(value => value < user.Status.MaxHp.Value / 2)
+            .Take(1)  // 最初の一度だけイベントを通す
             .Subscribe(_ => SkillManager.IncreaseCriticalRate(user, 30));
     }
 }

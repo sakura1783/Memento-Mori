@@ -4,6 +4,11 @@ public class Nina : CharacterBase
     public override int Active2CoolTime => 4;
 
 
+    public override void OnBattleStarted(CharaController chara)
+    {
+        PassiveSkill1(chara);
+    }
+
     /// <summary>
     /// ランダムな敵4体に攻撃力*290%の攻撃。さらに、自身のHPをこのスキルの総与ダメージ*10%回復
     /// </summary>

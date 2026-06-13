@@ -6,8 +6,13 @@ public class Elliot : CharacterBase
     public override int Active1CoolTime => 4;
     public override int Active2CoolTime => 4;
 
-    public override int Passive2CoolTime => 1;
+    private bool Passive2ActivatedThisTurn = false;
 
+
+    public override void OnBattleStarted(CharaController chara)
+    {
+        PassiveSkill1(chara);
+    }
 
     /// <summary>
     /// 2ターンの間、味方全体の攻撃力を自身の攻撃力*15%増加
@@ -65,6 +70,7 @@ public class Elliot : CharacterBase
     /// <param name="user"></param>
     public override async void PassiveSkill2(CharaController user)
     {
+        // TODO 購読処理に変更。passive2ActivatedThisTurn変数を利用。
         if (user.ReceivedCriticalDamage)
         {
             int decreaseValue = 0;

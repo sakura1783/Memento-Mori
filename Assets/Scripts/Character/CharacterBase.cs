@@ -1,5 +1,12 @@
-using System.Diagnostics;
-
+/// <summary>
+/// パッシブスキルのクールタイム減少タイミング
+/// </summary>
+public enum PassiveCoolTimeReductionBasis
+{
+    None,  // クールタイムを使用しない
+    Turn,
+    Action,
+}
 
 /// <summary>
 /// 各キャラのクラスに継承させるクラス(基底クラス)
@@ -13,7 +20,9 @@ public abstract class CharacterBase
     public abstract int Active2CoolTime { get; }  // 抽象プロパティでは本体を宣言できないが、getかsetどちらかのアクセサの宣言は必須。(= 変数をポリモーフィズムかつ、派生クラスで必ず実装を提供させたい(抽象プロパティを作りたい)場合は自動実装プロパティが必要となる？)
 
     public virtual int Passive1CoolTime { get; }  // バトル開始時一度きりの発動のパッシブもあるので、virtualを使って派生クラスでの実装は自由にする。(抽象プロパティとは違い、この場合はprivateの変数のプロパティを作ってカプセル化を行っても良い)
+    public virtual PassiveCoolTimeReductionBasis passive1CoolTimeReductionBasis => PassiveCoolTimeReductionBasis.None;
     public virtual int Passive2CoolTime { get; }
+    public virtual PassiveCoolTimeReductionBasis passive2CoolTimeReductionBasis => PassiveCoolTimeReductionBasis.None;
 
 
     /// <summary>
@@ -32,22 +41,43 @@ public abstract class CharacterBase
     }
 
     /// <summary>
-    /// アクティブスキル1
+    /// バトル開始時、最初に1回だけ行う処理
     /// </summary>
-    public abstract void ActiveSkill1(CharaController user);
+    /// <param name="user"></param>
+    public virtual void OnBattleStarted(CharaController chara){}
 
     /// <summary>
-    /// アクティブスキル2
+    /// ターン開始時に行う処理
     /// </summary>
+    /// <param name="chara"></param>
+    public virtual void OnTurnStarted(CharaController chara){}
+
+    /// <summary>
+    /// キャラの行動開始時に行う処理
+    /// </summary>
+    /// <param name="chara"></param>
+    public virtual void OnActionStarted(CharaController chara){}
+
+    public abstract void ActiveSkill1(CharaController user);  // TODO protectedに変更？
     public abstract void ActiveSkill2(CharaController user);
-
-    /// <summary>
-    /// パッシブスキル1
-    /// </summary>
+    
     public virtual void PassiveSkill1(CharaController user){}  // ※ virtualのわけ= アリロシャの処理
+    public virtual void PassiveSkill2(CharaController user){}  // パッシブスキルは2個あるキャラと1個だけのキャラがいるのでabstractではなくvirtualにして、派生クラスでの実装は自由にする
 
     /// <summary>
-    /// パッシブスキル2
+    /// クールタイム経過毎にパッシブスキルを発動  // TODO いる？
     /// </summary>
-    public virtual void PassiveSkill2(CharaController user){}  // パッシブスキルは2個あるキャラと1個だけのキャラがいるのでabstractではなくvirtualにして、派生クラスでの実装は自由にする
+    /// <param name="action">実処理のメソッド</param>
+    /// <param name="remainingCoolTime"></param>
+    /// <param name="coolTime">パッシブ発動に必要なクールタイム</param>
+    // protected void ExecutePassiveSkillByCoolTime(Action action, ReactiveProperty<int> remainingCoolTime, int coolTime)
+    // {
+    //     remainingCoolTime
+    //         .Where(value => value <= 0)
+    //         .Subscribe(_ =>
+    //         {
+    //             action();
+    //             remainingCoolTime.Value = coolTime;
+    //         });
+    // }
 }
