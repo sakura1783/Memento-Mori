@@ -158,7 +158,7 @@ public class BattleManager : PopupBase
                 previousActChara = playerTeam[count];
 
                 // TODO タイミング要検討
-                foreach (var chara in playerTeam.Concat(opponentTeam)) chara.ReceivedCriticalDamage = false;
+                foreach (var chara in playerTeam.Concat(opponentTeam)) chara.ReceivedCriticalDamage.Value = false;
 
                 await BattleAnimationManager.instance.WaitAllAnimations();
 
@@ -173,7 +173,7 @@ public class BattleManager : PopupBase
                 opponentTeam[count].ExecuteActiveSkill(this);
                 previousActChara = opponentTeam[count];
 
-                foreach (var chara in playerTeam.Concat(opponentTeam)) chara.ReceivedCriticalDamage = false;
+                foreach (var chara in playerTeam.Concat(opponentTeam)) chara.ReceivedCriticalDamage.Value = false;
 
                 await BattleAnimationManager.instance.WaitAllAnimations();
 

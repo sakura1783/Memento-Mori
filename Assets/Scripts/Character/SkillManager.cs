@@ -207,7 +207,7 @@ public static class SkillManager
         }
 
         target.UpdateHp(-damageValue);
-        target.ReceivedCriticalDamage = isCritical;
+        target.ReceivedCriticalDamage.Value = isCritical;
 
         // アニメーション再生
         BattleAnimationManager.instance.AddAnimation(target, AnimationType.Damage);
