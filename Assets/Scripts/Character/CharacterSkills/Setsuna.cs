@@ -28,9 +28,9 @@ public class Setsuna : CharacterBase
         {
             SkillManager.Attack(user, target, user.Status.attackPower, 400);
             
-            if (target.ReceivedCriticalDamage)
+            if (target.ReceivedCriticalDamage.Value)
             {
-                target.ReceivedCriticalDamage = false;
+                target.ReceivedCriticalDamage.Value = false;
                 criticalCount++;
             }
         });

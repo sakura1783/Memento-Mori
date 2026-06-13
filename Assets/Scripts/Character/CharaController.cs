@@ -26,18 +26,13 @@ public class CharaController
     public ReactiveProperty<int> Passive1RemainingCoolTime = new(1);  // ExecutePassiveSkill()内、コメントの処理を実現するために、ReactivePropertyで監視処理・初期値を1に設定
     public ReactiveProperty<int> Passive2RemainingCoolTime = new(1);
 
+    public ReactiveProperty<bool> ReceivedCriticalDamage = new(false);
+
     private CharaStatusPannel charaStatusPannel;
     public CharaStatusPannel CharaStatusPannel
     {
         get => charaStatusPannel;
         set => charaStatusPannel = value;
-    }
-
-    private bool receivedCriticalDamage;  // TODO スキル発動の条件が増えると、こういった変数が多くなる。他にいい方法はないか
-    public bool ReceivedCriticalDamage
-    {
-        get => receivedCriticalDamage;
-        set => receivedCriticalDamage = value;
     }
 
     private CompositeDisposable disposables = new();

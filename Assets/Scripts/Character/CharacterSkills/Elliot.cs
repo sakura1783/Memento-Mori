@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using UniRx;
 
 public class Elliot : CharacterBase
 {
     public override int Active1CoolTime => 4;
     public override int Active2CoolTime => 4;
-
-    private bool Passive2ActivatedThisTurn = false;
 
 
     public override void OnBattleStarted(CharaController chara)
@@ -68,23 +67,24 @@ public class Elliot : CharacterBase
     /// クリティカルヒットを受けた場合、1ターンの間攻撃してきた敵の攻撃力を15%減少させる
     /// </summary>
     /// <param name="user"></param>
-    public override async void PassiveSkill2(CharaController user)
+    public override void PassiveSkill2(CharaController user)
     {
-        // TODO 購読処理に変更。passive2ActivatedThisTurn変数を利用。
-        if (user.ReceivedCriticalDamage)
-        {
-            int decreaseValue = 0;
+        user.ReceivedCriticalDamage
+            .Where(value => value == true)
+            .Subscribe(async _ =>
+            {
+                int decreaseValue = 0;
 
-            user.ReceivedCriticalDamage = false;  // これを忘れるとこのメソッドが実行されるたび毎回発動してしまうので注意
+                user.ReceivedCriticalDamage.Value = false;  // これを忘れるとこのメソッドが実行されるたび毎回発動してしまうので注意
 
-            var targets = SkillManager.PickTarget(user, TargetType.Aggressor);
-            targets.ForEach(target => decreaseValue = SkillManager.ModifyAttackPower(target, target.Status.attackPower, 15, false));
+                var targets = SkillManager.PickTarget(user, TargetType.Aggressor);
+                targets.ForEach(target => decreaseValue = SkillManager.ModifyAttackPower(target, target.Status.attackPower, 15, false));
 
-            // 以下2つの処理、ModifyAttackPower()に追加する？(値を元に戻す場合、戻さない場合のbool型の引数を作る？)
-            await SkillManager.WaitTurnsAsync(1);  
+                // 以下2つの処理、ModifyAttackPower()に追加する？(値を元に戻す場合、戻さない場合のbool型の引数を作る？)
+                await SkillManager.WaitTurnsAsync(1);  
 
-            // 減少させた攻撃力を元に戻す
-            targets.ForEach(target => target.Status.attackPower += decreaseValue);
-        }
+                // 減少させた攻撃力を元に戻す
+                targets.ForEach(target => target.Status.attackPower += decreaseValue);
+            });
     }
 }
