@@ -1,3 +1,7 @@
+using System;
+using UniRx;
+
+
 /// <summary>
 /// パッシブスキルのクールタイム減少タイミング
 /// </summary>
@@ -65,19 +69,19 @@ public abstract class CharacterBase
     public virtual void PassiveSkill2(CharaController user){}  // パッシブスキルは2個あるキャラと1個だけのキャラがいるのでabstractではなくvirtualにして、派生クラスでの実装は自由にする
 
     /// <summary>
-    /// クールタイム経過毎にパッシブスキルを発動  // TODO いる？
+    /// クールタイム経過ごとにパッシブスキルを発動
     /// </summary>
-    /// <param name="action">実処理のメソッド</param>
+    /// <param name="action"></param>
     /// <param name="remainingCoolTime"></param>
-    /// <param name="coolTime">パッシブ発動に必要なクールタイム</param>
-    // protected void ExecutePassiveSkillByCoolTime(Action action, ReactiveProperty<int> remainingCoolTime, int coolTime)
-    // {
-    //     remainingCoolTime
-    //         .Where(value => value <= 0)
-    //         .Subscribe(_ =>
-    //         {
-    //             action();
-    //             remainingCoolTime.Value = coolTime;
-    //         });
-    // }
+    /// <param name="requiredCoolTime"></param>
+    protected void ExecutePassiveSkillByCoolTime(Action action, ReactiveProperty<int> remainingCoolTime, int requiredCoolTime)
+    {
+            remainingCoolTime
+            .Where(value => value <= 0)
+            .Subscribe(_ =>
+            {
+                action();
+                remainingCoolTime.Value = requiredCoolTime;
+            });
+    }
 }

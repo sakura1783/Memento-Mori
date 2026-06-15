@@ -11,6 +11,7 @@ public class Elliot : CharacterBase
     public override void OnBattleStarted(CharaController chara)
     {
         PassiveSkill1(chara);
+        PassiveSkill2(chara);
     }
 
     /// <summary>
