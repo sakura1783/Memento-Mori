@@ -74,7 +74,7 @@ public class Setsuna : CharacterBase
     /// バトル開始時、自身に3ターンの間攻撃力*250%の「シールド」を付与
     /// </summary>
     /// <param name="user"></param>
-    public override void PassiveSkill1(CharaController user)
+    protected override void PassiveSkill1(CharaController user)
     {
         SkillManager.AddBuff(user, BuffType.シールド, true, false, 3, effectValue: CalculateManager.CalculateSkillEffectValue(user.Status.attackPower, 250));
     }
@@ -83,7 +83,7 @@ public class Setsuna : CharacterBase
     /// 自身のHP割合が50%未満の場合、自身のクリティカル率が30%増加する(解除不可)。
     /// </summary>
     /// <param name="user"></param>
-    public override void PassiveSkill2(CharaController user)
+    protected override void PassiveSkill2(CharaController user)
     {
         user.Status.Hp
             .Where(value => value < user.Status.MaxHp.Value / 2)

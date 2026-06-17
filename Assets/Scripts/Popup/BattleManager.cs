@@ -107,17 +107,32 @@ public class BattleManager : PopupBase
     /// </summary>
     private async UniTaskVoid Battle()  // UniTaskVoidで、待たない非同期処理だと明示
     {
+        var allcharacters = playerTeam.Concat(opponentTeam);
+        
+
+
         // 勝敗がつくまでターンをループ
         do
         {
             await ExecuteTurn();
 
-            // クールタイムを減らす
-            // playerTeam.ForEach(chara => chara.ReduceCoolTimeByTurn());
-            // opponentTeam.ForEach(chara => chara.ReduceCoolTimeByTurn());
-            foreach (var chara in playerTeam.Concat(opponentTeam))  // 上記の処理を簡略化
+            foreach (var chara in playerTeam.Concat(opponentTeam))
             {
-                chara.ReduceCoolTimeByTurn();
+                // TODO アクティブスキル・パッシブスキル・バフのクールタイム減少処理をそれぞれ分けてCharaControllerにメソッドを作る？
+                // アクティブスキルのクールタイムを減少
+                chara.active1RemainingCoolTime = ReduceCoolTime(chara.active1RemainingCoolTime);
+                chara.active2RemainingCoolTime = ReduceCoolTime(chara.active2RemainingCoolTime);
+                
+                // 各バフのクールタイムを減少
+                foreach (var buff in chara.Status.Buffs.Where(x => !x.isIrremovable).ToList())  // ToList()で、foreachがコピーリストを参照するようにする。(下の処理でRemoveBuff()が動き元Listの要素が削除されエラーが出るのを防ぐ)
+                    buff.Duration.Value = ReduceCoolTime(buff.Duration.Value);
+
+                // ローカル関数。このメソッド内でしか使えない  // TODO メンバ関数に変更
+                int ReduceCoolTime(int reductionValue)
+                {
+                    var coolTime = Mathf.Max(reductionValue - 1, 0);
+                    return coolTime;
+                }
             }
 
             turnCount++;

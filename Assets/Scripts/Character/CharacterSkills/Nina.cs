@@ -39,7 +39,7 @@ public class Nina : CharacterBase
     /// 自身に「再生」を付与。毎ターン行動開始時にHPを最大HP*5%回復(解除不可)。
     /// </summary>
     /// <param name="user"></param>
-    public override void PassiveSkill1(CharaController user)
+    protected override void PassiveSkill1(CharaController user)
     {   
         SkillManager.AddBuff(user, BuffType.再生, true, true, effectRate: 5);  // 引数:値とすることで、必要な引数のみ指定することができる
     }

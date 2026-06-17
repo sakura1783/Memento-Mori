@@ -47,7 +47,7 @@ public class Rosevillea : CharacterBase
     /// 自身の攻撃力が20%増加する(解除不可)。
     /// </summary>
     /// <param name="user"></param>
-    public override void PassiveSkill1(CharaController user)
+    protected override void PassiveSkill1(CharaController user)
     {
         SkillManager.ModifyAttackPower(user, user.Status.attackPower, 20, true);
     }

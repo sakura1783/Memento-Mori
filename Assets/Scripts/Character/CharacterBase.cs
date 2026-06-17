@@ -5,7 +5,7 @@ using UniRx;
 /// <summary>
 /// パッシブスキルのクールタイム減少タイミング
 /// </summary>
-public enum PassiveCoolTimeReductionBasis
+public enum PassiveCoolTimeReductionBasis  // TODO 必要に応じて各キャラクラスでoverrideする
 {
     None,  // クールタイムを使用しない
     Turn,
@@ -60,13 +60,13 @@ public abstract class CharacterBase
     /// キャラの行動開始時に行う処理
     /// </summary>
     /// <param name="chara"></param>
-    public virtual void OnActionStarted(CharaController chara){}
+    //public virtual void OnActionStarted(CharaController chara){}
 
-    public abstract void ActiveSkill1(CharaController user);  // TODO protectedに変更？
+    public abstract void ActiveSkill1(CharaController user);
     public abstract void ActiveSkill2(CharaController user);
     
-    public virtual void PassiveSkill1(CharaController user){}  // ※ virtualのわけ= アリロシャの処理
-    public virtual void PassiveSkill2(CharaController user){}  // パッシブスキルは2個あるキャラと1個だけのキャラがいるのでabstractではなくvirtualにして、派生クラスでの実装は自由にする
+    protected virtual void PassiveSkill1(CharaController user){}  // ※ virtualのわけ= アリロシャの処理
+    protected virtual void PassiveSkill2(CharaController user){}  // パッシブスキルは2個あるキャラと1個だけのキャラがいるのでabstractではなくvirtualにして、派生クラスでの実装は自由にする
 
     /// <summary>
     /// クールタイム経過ごとにパッシブスキルを発動

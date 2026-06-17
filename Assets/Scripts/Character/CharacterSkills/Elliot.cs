@@ -59,7 +59,7 @@ public class Elliot : CharacterBase
     /// 自身の最大HPが20%増加する(解除不可)。
     /// </summary>
     /// <param name="user"></param>
-    public override void PassiveSkill1(CharaController user)
+    protected override void PassiveSkill1(CharaController user)
     {
         SkillManager.IncreaseMaxHp(user, 20);
     }
@@ -68,7 +68,7 @@ public class Elliot : CharacterBase
     /// クリティカルヒットを受けた場合、1ターンの間攻撃してきた敵の攻撃力を15%減少させる
     /// </summary>
     /// <param name="user"></param>
-    public override void PassiveSkill2(CharaController user)
+    protected override void PassiveSkill2(CharaController user)
     {
         user.ReceivedCriticalDamage
             .Where(value => value == true)

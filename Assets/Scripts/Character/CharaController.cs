@@ -10,6 +10,7 @@ using System.Linq;
 public class CharaController
 {
     private CharacterBase chara;  // キャラの(クラス)インスタンスを生成して代入
+    public CharacterBase Chara { get; private set; }
 
     private readonly CharaName name;
     public CharaName Name => name;
@@ -20,8 +21,8 @@ public class CharaController
     private CalculateManager.VariableStatus status = new();
     public CalculateManager.VariableStatus Status => status;
 
-    private int active1RemainingCoolTime;  // アクティブスキル1の残りのクールタイム
-    private int active2RemainingCoolTime = 1;  // スキル1を最初に優先して発動するため、初期値は1に設定
+    public int active1RemainingCoolTime;
+    public int active2RemainingCoolTime;  // スキル1を最初に優先して発動するため、初期値は1に設定
 
     public ReactiveProperty<int> Passive1RemainingCoolTime = new(1);  // ExecutePassiveSkill()内、コメントの処理を実現するために、ReactivePropertyで監視処理・初期値を1に設定
     public ReactiveProperty<int> Passive2RemainingCoolTime = new(1);
@@ -141,61 +142,61 @@ public class CharaController
         }
     }
 
+    // TODO 
     /// <summary>
     /// パッシブスキルを発動
     /// </summary>
-    public void ExecutePassiveSkill()  // TODO 全てのパネルとCharaControllerを生成し終わって、バトルの一番最初で実行
-    {
-        // パッシブのみ、ReactivePropertyの監視処理でクールタイムが0になった時に自動で処理(最初に発動してバトル中ずっと効果が続くものもあれば、何回か行動終了(ターン経過)して再発動するものもあるため)
-        Passive1RemainingCoolTime
-            .Where(coolTime => coolTime <= 0)
-            .Subscribe(_ =>
-            {
-                chara.PassiveSkill1(this);
-                Passive1RemainingCoolTime.Value += chara.Passive1CoolTime;
-            })
-            .AddTo(disposables);
+    // public void ExecutePassiveSkill()
+    // {
+    //     // パッシブのみ、ReactivePropertyの監視処理でクールタイムが0になった時に自動で処理(最初に発動してバトル中ずっと効果が続くものもあれば、何回か行動終了(ターン経過)して再発動するものもあるため)
+    //     Passive1RemainingCoolTime
+    //         .Where(coolTime => coolTime <= 0)
+    //         .Subscribe(_ =>
+    //         {
+    //             chara.PassiveSkill1(this);
+    //             Passive1RemainingCoolTime.Value += chara.Passive1CoolTime;
+    //         })
+    //         .AddTo(disposables);
 
-        Passive2RemainingCoolTime
-            .Where(coolTime => coolTime <= 0)
-            .Subscribe(_ =>
-            {
-                chara.PassiveSkill2(this);
-                Passive2RemainingCoolTime.Value += chara.Passive2CoolTime;
-            })
-            .AddTo(disposables);  
+    //     Passive2RemainingCoolTime
+    //         .Where(coolTime => coolTime <= 0)
+    //         .Subscribe(_ =>
+    //         {
+    //             chara.PassiveSkill2(this);
+    //             Passive2RemainingCoolTime.Value += chara.Passive2CoolTime;
+    //         })
+    //         .AddTo(disposables);  
 
-        disposables.Add(Passive1RemainingCoolTime);
-        disposables.Add(Passive2RemainingCoolTime);  
+    //     disposables.Add(Passive1RemainingCoolTime);
+    //     disposables.Add(Passive2RemainingCoolTime);  
 
-        // 初期値を1に設定した変数の値を1減らすことで、バトルの一番最初で監視処理を動かす(バトルの最初で全てのパッシブスキルが動き、以降はターン経過で再度発動されるもののみ、監視処理で動く)
-        Passive1RemainingCoolTime.Value = Mathf.Clamp(Passive1RemainingCoolTime.Value - 1, 0, int.MaxValue);
-        Passive2RemainingCoolTime.Value = Mathf.Clamp(Passive2RemainingCoolTime.Value - 1, 0, int.MaxValue);
-    }
+    //     // 初期値を1に設定した変数の値を1減らすことで、バトルの一番最初で監視処理を動かす(バトルの最初で全てのパッシブスキルが動き、以降はターン経過で再度発動されるもののみ、監視処理で動く)
+    //     Passive1RemainingCoolTime.Value = Mathf.Clamp(Passive1RemainingCoolTime.Value - 1, 0, int.MaxValue);
+    //     Passive2RemainingCoolTime.Value = Mathf.Clamp(Passive2RemainingCoolTime.Value - 1, 0, int.MaxValue);
+    // }
 
+    // TODO 確認
     /// <summary>
-    /// ターン毎に全てのスキルとデバフのクールタイムを1減少
+    /// ターン毎にアクティブスキルとバフのクールタイムを1減少
     /// </summary>
-    public void ReduceCoolTimeByTurn()
-    {
-        // 各スキルのクールタイムを減少
-        active1RemainingCoolTime = ReduceCoolTime(active1RemainingCoolTime);
-        active2RemainingCoolTime = ReduceCoolTime(active2RemainingCoolTime);
-        Passive1RemainingCoolTime.Value = ReduceCoolTime(Passive1RemainingCoolTime.Value);
-        Passive2RemainingCoolTime.Value = ReduceCoolTime(Passive2RemainingCoolTime.Value);
+    // public void ReduceCoolTimeByTurn()
+    // {
+    //     // アクティブスキルのクールタイムを減少
+    //     active1RemainingCoolTime = ReduceCoolTime(active1RemainingCoolTime);
+    //     active2RemainingCoolTime = ReduceCoolTime(active2RemainingCoolTime);
         
-        // 各バフのクールタイムを減少
-        foreach (var buff in status.Buffs.Where(x => !x.isIrremovable).ToList())  // ToList()で、foreachがコピーリストを参照するようにする。(下の処理でRemoveBuff()が動き元Listの要素が削除されエラーが出るのを防ぐ)
-            buff.Duration.Value = ReduceCoolTime(buff.Duration.Value);
+    //     // 各バフのクールタイムを減少
+    //     foreach (var buff in status.Buffs.Where(x => !x.isIrremovable).ToList())  // ToList()で、foreachがコピーリストを参照するようにする。(下の処理でRemoveBuff()が動き元Listの要素が削除されエラーが出るのを防ぐ)
+    //         buff.Duration.Value = ReduceCoolTime(buff.Duration.Value);
 
-        // ローカル関数。このメソッド内でしか使えない
-        int ReduceCoolTime(int reduceValue)  // 減らしたいクールタイムを引数で指定
-        {
-            var coolTime = Mathf.Max(reduceValue - 1, 0);
+    //     // ローカル関数。このメソッド内でしか使えない
+    //     int ReduceCoolTime(int reduceValue)  // 減らしたいクールタイムを引数で指定
+    //     {
+    //         var coolTime = Mathf.Max(reduceValue - 1, 0);
 
-            return coolTime;
-        }
-    }
+    //         return coolTime;
+    //     }
+    // }
 
     /// <summary>
     /// ReactivePropertyの監視処理を停止(CharaController破棄時に使う)
