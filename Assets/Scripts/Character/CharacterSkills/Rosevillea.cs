@@ -10,11 +10,6 @@ public class Rosevillea : CharacterBase
     public override int Active2CoolTime => 3;
 
 
-    public override void OnBattleStarted(CharaController chara)
-    {
-        PassiveSkill1(chara);
-    }
-
     /// <summary>
     /// ランダムな敵1体に攻撃力*390%の攻撃。さらに、2ターンの間「気絶」を付与
     /// </summary>

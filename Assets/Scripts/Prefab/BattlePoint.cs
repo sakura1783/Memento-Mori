@@ -22,8 +22,6 @@ public class BattlePoint : MonoBehaviour
     /// </summary>
     public void OnClick()
     {
-        Debug.Log("押されました");
-        
         var teamAssemblyPop = PopupManager.instance.GetPopup<TeamAssemblyPop>();
         teamAssemblyPop.ShowPopup(mapNo, stageNo);
     }

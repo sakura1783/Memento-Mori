@@ -1,9 +1,9 @@
 public class PassiveSkillState
 {
+    public bool isDisabled;
     public int remainingDuration;
     public int remainingActionCount;
     public int remainingActivationCount;
-    public bool isDisabled;
 
     /// <summary>
     /// コンストラクタ

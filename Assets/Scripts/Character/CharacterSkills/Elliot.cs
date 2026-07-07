@@ -8,12 +8,6 @@ public class Elliot : CharacterBase
     public override int Active2CoolTime => 4;
 
 
-    public override void OnBattleStarted(CharaController chara)
-    {
-        PassiveSkill1(chara);
-        PassiveSkill2(chara);
-    }
-
     /// <summary>
     /// 2ターンの間、味方全体の攻撃力を自身の攻撃力*15%増加
     /// </summary>
@@ -65,7 +59,7 @@ public class Elliot : CharacterBase
     }
 
     /// <summary>
-    /// クリティカルヒットを受けた場合、1ターンの間攻撃してきた敵の攻撃力を15%減少させる
+    /// クリティカルヒットを受けた場合、1ターンの間攻撃してきた敵の攻撃力を15%減少させる  // TODO Logで動作確認
     /// </summary>
     /// <param name="user"></param>
     public override void PassiveSkill2(CharaController user)
@@ -75,8 +69,6 @@ public class Elliot : CharacterBase
             .Subscribe(async _ =>
             {
                 int decreaseValue = 0;
-
-                user.ReceivedCriticalDamage.Value = false;  // これを忘れるとこのメソッドが実行されるたび毎回発動してしまうので注意
 
                 var targets = SkillManager.PickTarget(user, TargetType.Aggressor);
                 targets.ForEach(target => decreaseValue = SkillManager.ModifyAttackPower(target, target.Status.attackPower, 15, false));

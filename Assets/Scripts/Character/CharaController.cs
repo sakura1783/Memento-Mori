@@ -24,10 +24,10 @@ public class CharaController
     public int active1RemainingCoolTime;
     public int active2RemainingCoolTime = 1;  // スキル1を最初に優先して発動するため、初期値は1に設定
 
-    public PassiveSkillState Passive1State { get; private set; }  // TODO private変数に変更
-    public PassiveSkillState Passive2State { get; private set; }
+    private PassiveSkillState passive1State;
+    private PassiveSkillState passive2State;
 
-    public ReactiveProperty<bool> ReceivedCriticalDamage = new(false);
+    public ReactiveProperty<bool> ReceivedCriticalDamage = new(false);  // 競合が起きるので、この値は各キャラクラスからは変更しない
 
     private CharaStatusPannel charaStatusPannel;
     public CharaStatusPannel CharaStatusPannel
@@ -66,8 +66,8 @@ public class CharaController
             });
 
         // パッシブの状態を管理するクラスの作成
-        Passive1State = new(chara.Passive1Config);
-        Passive2State = new(chara.Passive2Config);
+        passive1State = new(chara.Passive1Config);
+        passive2State = new(chara.Passive2Config);
     }
 
     /// <summary>
@@ -157,10 +157,10 @@ public class CharaController
         PassiveSkillConfig config;
         PassiveSkillState state;
 
-        if (TryExecutePassiveSkill(chara.Passive1Config, Passive1State, activationTiming, battleManager.TurnCount))
+        if (TryExecutePassiveSkill(chara.Passive1Config, passive1State, activationTiming, battleManager.TurnCount))
         {
             config = chara.Passive1Config;
-            state = Passive1State;
+            state = passive1State;
 
             // パッシブ発動
             chara.PassiveSkill1(this);
@@ -170,22 +170,38 @@ public class CharaController
             state.remainingActionCount = config.requiredActionsForReactivation;
 
             // 発動可能回数を1減らす(この値はバトルで共通)
-            state.remainingActionCount--;
-            if (state.remainingActivationCount <= 0) state.isDisabled = true;
+            if (!state.isDisabled)
+            {
+                state.remainingActionCount--;
+
+                if (state.remainingActivationCount <= 0)
+                {
+                    state.isDisabled = true;
+                    Debug.Log($"パッシブスキルを無効化：{name}");  // TODO 消す
+                }
+            }
         }
             
-        if (TryExecutePassiveSkill(chara.Passive2Config, Passive2State, activationTiming, battleManager.TurnCount))
+        if (TryExecutePassiveSkill(chara.Passive2Config, passive2State, activationTiming, battleManager.TurnCount))
         {
             config = chara.Passive2Config;
-            state = Passive2State;
+            state = passive2State;
 
             chara.PassiveSkill2(this);
 
             state.remainingDuration = config.duration;
             state.remainingActionCount = config.requiredActionsForReactivation;
 
-            state.remainingActionCount--;
-            if (state.remainingActivationCount <= 0) state.isDisabled = true;
+            if (!state.isDisabled)
+            {
+                state.remainingActionCount--;
+                
+                if (state.remainingActivationCount <= 0)
+                {
+                    state.isDisabled = true;
+                    Debug.Log($"パッシブスキルを無効化：{name}");
+                }
+            }
         }
     }
 
@@ -193,6 +209,8 @@ public class CharaController
     {
         if (config.activationTiming != activationTiming)
             return false;
+        if (activationTiming == PassiveActivationTiming.BattleStart)
+            return true;
         if (state.isDisabled)
             return false;
         if (config.startTurn < currentTurn)
@@ -206,14 +224,6 @@ public class CharaController
     }
 
     /// <summary>
-    /// ターン開始時の処理
-    /// </summary>
-    public void OnTurnStarted()  // TODO このメソッドは必要でなければ削除
-    {
-
-    }
-
-    /// <summary>
     /// ターン終了時の処理
     /// </summary>
     public void OnTurnEnded()
@@ -221,8 +231,8 @@ public class CharaController
         // アクティブスキルとパッシブスキルのクールタイムを減少
         active1RemainingCoolTime--;
         active2RemainingCoolTime--;
-        Passive1State.remainingDuration--;
-        Passive2State.remainingDuration--;
+        passive1State.remainingDuration--;
+        passive2State.remainingDuration--;
 
         // バフのクールタイムを減少
         foreach (var buff in status.Buffs.Where(x => !x.isIrremovable).ToList())  // ToList()で、foreachがコピーリストを参照するようにする。(下の処理でRemoveBuff()が動き元Listの要素が削除されエラーが出るのを防ぐ)
@@ -235,8 +245,8 @@ public class CharaController
     public void OnActionEnded()
     {   
         // パッシブスキル再発動までに必要な行動回数を減少
-        Passive1State.remainingActionCount--;
-        Passive2State.remainingActionCount--;
+        passive1State.remainingActionCount--;
+        passive2State.remainingActionCount--;
     }
 
     /// <summary>
@@ -245,7 +255,7 @@ public class CharaController
     /// </summary>
     /// <param name="reductionValue"></param>
     /// <returns></returns>
-    private int ReduceBuffCoolTime(int reductionValue)  // TODO BattleManager側にローカルメソッドとして用意してある
+    private int ReduceBuffCoolTime(int reductionValue)
     {
         return Mathf.Max(reductionValue - 1, 0);
     }

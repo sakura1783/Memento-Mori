@@ -120,6 +120,7 @@ public class BattleManager : PopupBase
                 chara.OnTurnEnded();
 
             turnCount++;
+            Debug.Log($"ターンカウント：{turnCount}");
         }while (battleState == BattleState.Continue);
 
         OnBattleEnd();
@@ -175,7 +176,8 @@ public class BattleManager : PopupBase
                 opponentTeam[count].ExecuteActiveSkill(this);
                 opponentTeam[count].OnActionEnded();
 
-                foreach (var chara in playerTeam.Concat(opponentTeam)) chara.ReceivedCriticalDamage.Value = false;
+                foreach (var chara in playerTeam.Concat(opponentTeam))
+                    chara.ReceivedCriticalDamage.Value = false;
 
                 await BattleAnimationManager.instance.WaitAllAnimations();
 

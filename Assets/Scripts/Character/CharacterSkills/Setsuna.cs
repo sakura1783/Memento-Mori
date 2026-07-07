@@ -9,12 +9,6 @@ public class Setsuna : CharacterBase
     public override int Active2CoolTime => 4;
 
 
-    public override void OnBattleStarted(CharaController chara)
-    {
-        PassiveSkill1(chara);
-        PassiveSkill2(chara);
-    }
-
     /// <summary>
     /// ランダムな敵に3回攻撃力*400%の攻撃。クリティカルヒットした場合、1ターンの間自身の攻撃力が30%増加する。クリティカルヒットするたび攻撃力増加のターン数が1ターン多くなる。
     /// </summary>
@@ -29,10 +23,7 @@ public class Setsuna : CharacterBase
             SkillManager.Attack(user, target, user.Status.attackPower, 400);
             
             if (target.ReceivedCriticalDamage.Value)
-            {
-                target.ReceivedCriticalDamage.Value = false;
                 criticalCount++;
-            }
         });
 
         int increaseValue = 0;
