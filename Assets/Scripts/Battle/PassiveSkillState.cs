@@ -1,7 +1,19 @@
 public class PassiveSkillState
 {
-    public bool isActivate;  // 発動中かどうか
     public int remainingDuration;
     public int remainingActionCount;
+    public int remainingActivationCount;
     public bool isDisabled;
+
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="config"></param>
+    public PassiveSkillState(PassiveSkillConfig config)
+    {
+        remainingDuration = config.duration;
+        remainingActionCount = config.requiredActionsForReactivation;
+        remainingActivationCount = config.maxActivationCount;
+        isDisabled = false;
+    }
 }

@@ -22,10 +22,10 @@ public class CharaController
     public CalculateManager.VariableStatus Status => status;
 
     public int active1RemainingCoolTime;
-    public int active2RemainingCoolTime;  // スキル1を最初に優先して発動するため、初期値は1に設定
+    public int active2RemainingCoolTime = 1;  // スキル1を最初に優先して発動するため、初期値は1に設定
 
-    public ReactiveProperty<int> Passive1RemainingCoolTime = new(1);  // ExecutePassiveSkill()内、コメントの処理を実現するために、ReactivePropertyで監視処理・初期値を1に設定
-    public ReactiveProperty<int> Passive2RemainingCoolTime = new(1);
+    public PassiveSkillState Passive1State { get; private set; }  // TODO private変数に変更
+    public PassiveSkillState Passive2State { get; private set; }
 
     public ReactiveProperty<bool> ReceivedCriticalDamage = new(false);
 
@@ -55,7 +55,7 @@ public class CharaController
         // キャラクターとスキルを紐付け
         CreateSkillEffect(charaName);
 
-        // 監視処理。戦闘不能になった時、バフを全て削除
+        // 戦闘不能になった時、バフを全て削除
         status.Hp
             .Where(value => value <= 0)
             .Take(1)
@@ -64,6 +64,10 @@ public class CharaController
                 status.Buffs.Clear();
                 Debug.Log($"{name}が戦闘不能になりました");
             });
+
+        // パッシブの状態を管理するクラスの作成
+        Passive1State = new(chara.Passive1Config);
+        Passive2State = new(chara.Passive2Config);
     }
 
     /// <summary>
@@ -142,61 +146,109 @@ public class CharaController
         }
     }
 
-    // TODO 
     /// <summary>
     /// パッシブスキルを発動
     /// </summary>
-    // public void ExecutePassiveSkill()
-    // {
-    //     // パッシブのみ、ReactivePropertyの監視処理でクールタイムが0になった時に自動で処理(最初に発動してバトル中ずっと効果が続くものもあれば、何回か行動終了(ターン経過)して再発動するものもあるため)
-    //     Passive1RemainingCoolTime
-    //         .Where(coolTime => coolTime <= 0)
-    //         .Subscribe(_ =>
-    //         {
-    //             chara.PassiveSkill1(this);
-    //             Passive1RemainingCoolTime.Value += chara.Passive1CoolTime;
-    //         })
-    //         .AddTo(disposables);
+    /// <param name="config"></param>
+    /// <param name="state"></param>
+    /// <param name="currentTurnCount"></param>
+    public void ExecutePassiveSkill(PassiveActivationTiming activationTiming, BattleManager battleManager)
+    {
+        PassiveSkillConfig config;
+        PassiveSkillState state;
 
-    //     Passive2RemainingCoolTime
-    //         .Where(coolTime => coolTime <= 0)
-    //         .Subscribe(_ =>
-    //         {
-    //             chara.PassiveSkill2(this);
-    //             Passive2RemainingCoolTime.Value += chara.Passive2CoolTime;
-    //         })
-    //         .AddTo(disposables);  
+        if (TryExecutePassiveSkill(chara.Passive1Config, Passive1State, activationTiming, battleManager.TurnCount))
+        {
+            config = chara.Passive1Config;
+            state = Passive1State;
 
-    //     disposables.Add(Passive1RemainingCoolTime);
-    //     disposables.Add(Passive2RemainingCoolTime);  
+            // パッシブ発動
+            chara.PassiveSkill1(this);
 
-    //     // 初期値を1に設定した変数の値を1減らすことで、バトルの一番最初で監視処理を動かす(バトルの最初で全てのパッシブスキルが動き、以降はターン経過で再度発動されるもののみ、監視処理で動く)
-    //     Passive1RemainingCoolTime.Value = Mathf.Clamp(Passive1RemainingCoolTime.Value - 1, 0, int.MaxValue);
-    //     Passive2RemainingCoolTime.Value = Mathf.Clamp(Passive2RemainingCoolTime.Value - 1, 0, int.MaxValue);
-    // }
+            // Stateの初期設定
+            state.remainingDuration = config.duration;
+            state.remainingActionCount = config.requiredActionsForReactivation;
 
-    // TODO 確認
+            // 発動可能回数を1減らす(この値はバトルで共通)
+            state.remainingActionCount--;
+            if (state.remainingActivationCount <= 0) state.isDisabled = true;
+        }
+            
+        if (TryExecutePassiveSkill(chara.Passive2Config, Passive2State, activationTiming, battleManager.TurnCount))
+        {
+            config = chara.Passive2Config;
+            state = Passive2State;
+
+            chara.PassiveSkill2(this);
+
+            state.remainingDuration = config.duration;
+            state.remainingActionCount = config.requiredActionsForReactivation;
+
+            state.remainingActionCount--;
+            if (state.remainingActivationCount <= 0) state.isDisabled = true;
+        }
+    }
+
+    private bool TryExecutePassiveSkill(PassiveSkillConfig config, PassiveSkillState state, PassiveActivationTiming activationTiming, int currentTurn)
+    {
+        if (config.activationTiming != activationTiming)
+            return false;
+        if (state.isDisabled)
+            return false;
+        if (config.startTurn < currentTurn)
+            return false;
+        if (state.remainingDuration > 0)  // パッシブが発動中
+            return false;
+        if (state.remainingActionCount > 0)
+            return false;
+
+        return true;
+    }
+
     /// <summary>
-    /// ターン毎にアクティブスキルとバフのクールタイムを1減少
+    /// ターン開始時の処理
     /// </summary>
-    // public void ReduceCoolTimeByTurn()
-    // {
-    //     // アクティブスキルのクールタイムを減少
-    //     active1RemainingCoolTime = ReduceCoolTime(active1RemainingCoolTime);
-    //     active2RemainingCoolTime = ReduceCoolTime(active2RemainingCoolTime);
-        
-    //     // 各バフのクールタイムを減少
-    //     foreach (var buff in status.Buffs.Where(x => !x.isIrremovable).ToList())  // ToList()で、foreachがコピーリストを参照するようにする。(下の処理でRemoveBuff()が動き元Listの要素が削除されエラーが出るのを防ぐ)
-    //         buff.Duration.Value = ReduceCoolTime(buff.Duration.Value);
+    public void OnTurnStarted()  // TODO このメソッドは必要でなければ削除
+    {
 
-    //     // ローカル関数。このメソッド内でしか使えない
-    //     int ReduceCoolTime(int reduceValue)  // 減らしたいクールタイムを引数で指定
-    //     {
-    //         var coolTime = Mathf.Max(reduceValue - 1, 0);
+    }
 
-    //         return coolTime;
-    //     }
-    // }
+    /// <summary>
+    /// ターン終了時の処理
+    /// </summary>
+    public void OnTurnEnded()
+    {
+        // アクティブスキルとパッシブスキルのクールタイムを減少
+        active1RemainingCoolTime--;
+        active2RemainingCoolTime--;
+        Passive1State.remainingDuration--;
+        Passive2State.remainingDuration--;
+
+        // バフのクールタイムを減少
+        foreach (var buff in status.Buffs.Where(x => !x.isIrremovable).ToList())  // ToList()で、foreachがコピーリストを参照するようにする。(下の処理でRemoveBuff()が動き元Listの要素が削除されエラーが出るのを防ぐ)
+            buff.Duration.Value = ReduceBuffCoolTime(buff.Duration.Value);
+    }
+
+    /// <summary>
+    /// 行動終了時の処理
+    /// </summary>
+    public void OnActionEnded()
+    {   
+        // パッシブスキル再発動までに必要な行動回数を減少
+        Passive1State.remainingActionCount--;
+        Passive2State.remainingActionCount--;
+    }
+
+    /// <summary>
+    /// バフのクールタイムを1減らす
+    /// EffectValueの初期値を-1にしている関係で、値==0のみでバフが削除されるようになっているため、バフはこのメソッドを通してクールタイムを減らす
+    /// </summary>
+    /// <param name="reductionValue"></param>
+    /// <returns></returns>
+    private int ReduceBuffCoolTime(int reductionValue)  // TODO BattleManager側にローカルメソッドとして用意してある
+    {
+        return Mathf.Max(reductionValue - 1, 0);
+    }
 
     /// <summary>
     /// ReactivePropertyの監視処理を停止(CharaController破棄時に使う)

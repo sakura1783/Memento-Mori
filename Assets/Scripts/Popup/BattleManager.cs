@@ -107,9 +107,9 @@ public class BattleManager : PopupBase
     /// </summary>
     private async UniTaskVoid Battle()  // UniTaskVoidで、待たない非同期処理だと明示
     {
-        var allcharacters = playerTeam.Concat(opponentTeam);
-        
-
+        // バトル開始時パッシブを発動
+        playerTeam.Concat(opponentTeam).ToList()
+            .ForEach(chara => chara.ExecutePassiveSkill(PassiveActivationTiming.BattleStart, this));
 
         // 勝敗がつくまでターンをループ
         do
@@ -117,30 +117,11 @@ public class BattleManager : PopupBase
             await ExecuteTurn();
 
             foreach (var chara in playerTeam.Concat(opponentTeam))
-            {
-                // TODO アクティブスキル・パッシブスキル・バフのクールタイム減少処理をそれぞれ分けてCharaControllerにメソッドを作る？
-                // アクティブスキルのクールタイムを減少
-                chara.active1RemainingCoolTime = ReduceCoolTime(chara.active1RemainingCoolTime);
-                chara.active2RemainingCoolTime = ReduceCoolTime(chara.active2RemainingCoolTime);
-                
-                // 各バフのクールタイムを減少
-                foreach (var buff in chara.Status.Buffs.Where(x => !x.isIrremovable).ToList())  // ToList()で、foreachがコピーリストを参照するようにする。(下の処理でRemoveBuff()が動き元Listの要素が削除されエラーが出るのを防ぐ)
-                    buff.Duration.Value = ReduceCoolTime(buff.Duration.Value);
-
-                // ローカル関数。このメソッド内でしか使えない  // TODO メンバ関数に変更
-                int ReduceCoolTime(int reductionValue)
-                {
-                    var coolTime = Mathf.Max(reductionValue - 1, 0);
-                    return coolTime;
-                }
-            }
+                chara.OnTurnEnded();
 
             turnCount++;
-            Debug.Log(turnCount);  // TODO 消す
-
         }while (battleState == BattleState.Continue);
 
-        // バトル後の処理
         OnBattleEnd();
     }
 
@@ -150,6 +131,9 @@ public class BattleManager : PopupBase
     /// <returns>バトルを終わるかどうか。trueでバトル続行(ターンを繰り返す)、trueでバトル終了(このメソッドだけでなく、Battle()からも抜ける)</returns>
     private async UniTask ExecuteTurn()
     {
+        playerTeam.Concat(opponentTeam).ToList()
+            .ForEach(chara => chara.ExecutePassiveSkill(PassiveActivationTiming.TurnStart, this));
+
         foreach (var chara in playerTeam.Concat(opponentTeam))  // Concat()でリスト2つを結合し、処理を簡素化
         {
             // 「毒」状態の場合、現在HP*?%のダメージを受ける
@@ -166,14 +150,16 @@ public class BattleManager : PopupBase
         do
         {
             // 味方の行動
-            //if (playerTeam[count] != null)
             if (playerTeam.Count > count)
             {
-                playerTeam[count].ExecuteActiveSkill(this);
                 previousActChara = playerTeam[count];
 
-                // TODO タイミング要検討
-                foreach (var chara in playerTeam.Concat(opponentTeam)) chara.ReceivedCriticalDamage.Value = false;
+                playerTeam[count].ExecuteActiveSkill(this);
+                playerTeam[count].OnActionEnded();
+
+                // 1キャラの行動終了ごとに、receivedCriticalDamageをfalseにリセット(次のキャラの行動に影響しないようにする)。競合が起きるため、各キャラクラスのスキルメソッド内ではいじらない。
+                foreach (var chara in playerTeam.Concat(opponentTeam))
+                    chara.ReceivedCriticalDamage.Value = false;
 
                 await BattleAnimationManager.instance.WaitAllAnimations();
 
@@ -182,11 +168,12 @@ public class BattleManager : PopupBase
             }
 
             // 敵の行動
-            //if (opponentTeam[count] != null)
             if (opponentTeam.Count > count)
             {
-                opponentTeam[count].ExecuteActiveSkill(this);
                 previousActChara = opponentTeam[count];
+
+                opponentTeam[count].ExecuteActiveSkill(this);
+                opponentTeam[count].OnActionEnded();
 
                 foreach (var chara in playerTeam.Concat(opponentTeam)) chara.ReceivedCriticalDamage.Value = false;
 
