@@ -26,12 +26,14 @@ public class Setsuna : CharacterBase
                 criticalCount++;
         });
 
-        int increaseValue = 0;
-        if (criticalCount >= 0) increaseValue = SkillManager.ModifyAttackPower(user, user.Status.attackPower, 30, true);
+        if (criticalCount > 0)
+        {
+            int increaseValue = SkillManager.ModifyAttackPower(user, user.Status.attackPower, 30, true);
 
-        await SkillManager.WaitTurnsAsync(criticalCount);
+            await SkillManager.WaitTurnsAsync(criticalCount);
 
-        if (user != null) user.Status.attackPower -= increaseValue;
+            if (user != null) user.Status.attackPower -= increaseValue;
+        }
     }
 
     /// <summary>

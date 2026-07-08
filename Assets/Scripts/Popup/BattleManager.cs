@@ -143,7 +143,7 @@ public class BattleManager : PopupBase
  
             // 「再生」状態の場合、HPを最大HP*?%回復
             var regenerationBuff = chara.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.再生);
-            if (regenerationBuff != null) chara.UpdateHp(-CalculateManager.CalculateSkillEffectValue(chara.Status.MaxHp.Value, regenerationBuff.effectRate));
+            if (regenerationBuff != null) chara.UpdateHp(CalculateManager.CalculateSkillEffectValue(chara.Status.MaxHp.Value, regenerationBuff.effectRate));
         }
         
         int count = 0;  // do-while文が何回回ったか
