@@ -59,7 +59,7 @@ public class Elliot : CharacterBase
     }
 
     /// <summary>
-    /// クリティカルヒットを受けた場合、1ターンの間攻撃してきた敵の攻撃力を15%減少させる  // TODO Logで動作確認
+    /// クリティカルヒットを受けた場合、1ターンの間攻撃してきた敵の攻撃力を15%減少させる
     /// </summary>
     /// <param name="user"></param>
     public override void PassiveSkill2(CharaController user)
@@ -73,10 +73,9 @@ public class Elliot : CharacterBase
                 var targets = SkillManager.PickTarget(user, TargetType.Aggressor);
                 targets.ForEach(target => decreaseValue = SkillManager.ModifyAttackPower(target, target.Status.attackPower, 15, false));
 
-                // 以下2つの処理、ModifyAttackPower()に追加する？(値を元に戻す場合、戻さない場合のbool型の引数を作る？)
-                await SkillManager.WaitTurnsAsync(1);  
+                await SkillManager.WaitTurnsAsync(1);  // TODO ターン内のタイミングによっては、効果がすぐに解除されてしまう
 
-                // 減少させた攻撃力を元に戻す
+                // 減少させた攻撃力を元に戻す (攻撃力減少→元に戻す処理の間に、他の場所で攻撃力の増減が行われる場合もあるため、元の値ではなく、減少させた分の値を保持しておき、その分減らす必要がある)
                 targets.ForEach(target => target.Status.attackPower += decreaseValue);
             });
     }
