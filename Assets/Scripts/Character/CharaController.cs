@@ -157,8 +157,11 @@ public class CharaController
         PassiveSkillConfig config;
         PassiveSkillState state;
 
+        // パッシブスキル1を発動
         if (TryExecutePassiveSkill(chara.Passive1Config, passive1State, activationTiming, battleManager.TurnCount))
         {
+            Debug.Log($"パッシブスキル1が発動しました：{name}");
+
             config = chara.Passive1Config;
             state = passive1State;
 
@@ -172,7 +175,7 @@ public class CharaController
             // 発動可能回数を1減らす(この値はバトルで共通)
             if (!state.isDisabled)
             {
-                state.remainingActionCount--;
+                state.remainingActivationCount--;
 
                 if (state.remainingActivationCount <= 0)
                 {
@@ -181,9 +184,12 @@ public class CharaController
                 }
             }
         }
-            
+        
+        // パッシブスキル2を発動
         if (TryExecutePassiveSkill(chara.Passive2Config, passive2State, activationTiming, battleManager.TurnCount))
         {
+            Debug.Log($"パッシブスキル2が発動しました：{name}");
+            
             config = chara.Passive2Config;
             state = passive2State;
 
@@ -194,7 +200,7 @@ public class CharaController
 
             if (!state.isDisabled)
             {
-                state.remainingActionCount--;
+                state.remainingActivationCount--;
                 
                 if (state.remainingActivationCount <= 0)
                 {
@@ -205,15 +211,23 @@ public class CharaController
         }
     }
 
+    /// <summary>
+    /// パッシブスキルが発動可能かどうか判定
+    /// </summary>
+    /// <param name="config"></param>
+    /// <param name="state"></param>
+    /// <param name="activationTiming"></param>
+    /// <param name="currentTurn"></param>
+    /// <returns></returns>
     private bool TryExecutePassiveSkill(PassiveSkillConfig config, PassiveSkillState state, PassiveActivationTiming activationTiming, int currentTurn)
     {
         if (config.activationTiming != activationTiming)
             return false;
-        if (activationTiming == PassiveActivationTiming.BattleStart)
-            return true;
         if (state.isDisabled)
             return false;
-        if (config.startTurn < currentTurn)
+        if (activationTiming == PassiveActivationTiming.BattleStart)
+            return true;
+        if (currentTurn < config.startTurn)
             return false;
         if (state.remainingDuration > 0)  // パッシブが発動中
             return false;

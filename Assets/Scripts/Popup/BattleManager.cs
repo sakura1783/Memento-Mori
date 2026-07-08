@@ -220,8 +220,6 @@ public class BattleManager : PopupBase
     /// </summary>
     private void OnBattleEnd()
     {
-        Debug.Log($"{battleState}");
-
         battleDisposables.Clear();  // Disposeしてしまうと、battleDisposable自体がなくなってしまう
 
         HidePopup();

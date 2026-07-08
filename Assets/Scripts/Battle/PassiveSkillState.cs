@@ -11,8 +11,8 @@ public class PassiveSkillState
     /// <param name="config"></param>
     public PassiveSkillState(PassiveSkillConfig config)
     {
-        remainingDuration = config.duration;
-        remainingActionCount = config.requiredActionsForReactivation;
+        remainingDuration = 0;
+        remainingActionCount = 0;
         remainingActivationCount = config.maxActivationCount;
         isDisabled = false;
     }
