@@ -1,7 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Latelily : CharacterBase
@@ -51,21 +49,21 @@ public class Latelily : CharacterBase
             target.Status.attackPower -= increaseValue;
     }
 
-    // TODO 実装
-    // public override bool MeetsPassive2ActivationCondition(CharaController user)
-    // {
-    //     if ((float)user.Status.Hp.Value / user.Status.MaxHp.Value * 100 < 50)
-    //     {
-
-    //     }
-    // }
-
     /// <summary>
     /// 自身のHP割合が50%未満で、自身が最大HP*30%を超えるダメージの攻撃を受けた場合、超えた分のダメージを100%遮断する
     /// </summary>
     /// <param name="user"></param>
     public override void PassiveSkill2(CharaController user)
     {
+        user.SetInComingDamageModifier(damage =>
+        {
+            var hpRate = (float)user.Status.Hp.Value / user.Status.MaxHp.Value;
 
+            if (hpRate >= 0.5)
+                return damage;
+
+            var limit = CalculateManager.CalculateSkillEffectValue(user.Status.MaxHp.Value, 15);
+            return Mathf.Min(damage, limit);
+        });
     }
 }

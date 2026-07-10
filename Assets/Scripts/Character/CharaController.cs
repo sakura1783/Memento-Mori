@@ -36,6 +36,9 @@ public class CharaController
         set => charaStatusPannel = value;
     }
 
+    // TODO Listに変更
+    private Func<int, int> incomingDamageModifier = damage => damage;  // damage => damageで、デフォルトで受け取った値をそのまま返すように制御。(incomingDamagemodifierに値を設定しないキャラでは、中身はnullでエラーが発生する)
+
     private CompositeDisposable disposables = new();
 
 
@@ -103,6 +106,25 @@ public class CharaController
         }
 
         status.Hp.Value += amount;
+    }
+
+    /// <summary>
+    /// 被ダメージを補正
+    /// </summary>
+    /// <param name="damage"></param>
+    /// <returns></returns>
+    public int ModifyIncomingDamage(int damage)
+    {
+        return incomingDamageModifier(damage);
+    }
+
+    /// <summary>
+    /// 被ダメージ補正処理をセット
+    /// </summary>
+    /// <param name="modifier"></param>
+    public void SetInComingDamageModifier(Func<int, int> modifier)
+    {
+        incomingDamageModifier = modifier;
     }
 
     /// <summary>

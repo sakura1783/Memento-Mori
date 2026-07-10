@@ -208,6 +208,9 @@ public static class SkillManager
             damageValue = Mathf.Max(damageValue - shieldValue, 0);
         }
 
+        // ダメージ補正 
+        target.ModifyIncomingDamage(damageValue);
+
         target.UpdateHp(-damageValue);
         target.ReceivedCriticalDamage.Value = isCritical;
 
