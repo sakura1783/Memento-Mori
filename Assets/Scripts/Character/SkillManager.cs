@@ -27,6 +27,7 @@ public enum ValueType
     ByAttackPower,
     ByDefencePower,
     ByCurrentHp,
+    ByCurrentHpRate,
     ByMaxHp,
     ByCriticalRate,
 }
@@ -89,11 +90,12 @@ public static class SkillManager
         if (valueType != ValueType.None)
         {
             // ValueTypeによって、targetListの並び替えで使用する値(ステータス)を変更
-            var valueDic = new Dictionary<ValueType, Func<CharaController, int>>  // Func<引数1, 戻り値>。戻り値の型が1つに決まらない場合、IComparableを利用する(ただし、比較可能な型(大小関係や順序比較が意味を持つ型)のみ)
+            var valueDic = new Dictionary<ValueType, Func<CharaController, float>>  // Func<引数1, 戻り値>。戻り値の型が1つに決まらない場合、IComparableを利用する(ただし、比較可能な型(大小関係や順序比較が意味を持つ型)のみ)
             {
                 { ValueType.ByAttackPower, target => target.Status.attackPower },  // valueDic[ValueType.ByAttackPower]した時、target.Status.attackPowerを返す
                 { ValueType.ByDefencePower, target => target.Status.defencePower },
                 { ValueType.ByCurrentHp, target => target.Status.Hp.Value },
+                { ValueType.ByCurrentHpRate, target => (float)target.Status.Hp.Value / target.Status.MaxHp.Value},
                 { ValueType.ByMaxHp, target => target.Status.MaxHp.Value },
                 { ValueType.ByCriticalRate, target => target.Status.criticalRate },
             };

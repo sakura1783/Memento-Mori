@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum CharaName
+public enum CharaName  // TODO キャラが追加された時に、いちいち追加するのは面倒。SOから取得する？
 {
     None,
     
@@ -10,6 +10,7 @@ public enum CharaName
     Elliot,
     Arilosha,
     Setsuna,
+    Latelily,
 }
 
 /// <summary>
@@ -17,8 +18,8 @@ public enum CharaName
 /// </summary>
 public enum Profession
 {
+    スナイパー,
     ウォーリア,
-    ガーディアン,
     ソーサラー,
 }
 

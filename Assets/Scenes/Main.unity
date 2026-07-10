@@ -12235,6 +12235,9 @@ MonoBehaviour:
   - name: 5
     level: 5
     rarity: 2
+  - name: 6
+    level: 5
+    rarity: 2
   clearMapNo: 0
   clearStageNo: 0
 --- !u!114 &1692895454

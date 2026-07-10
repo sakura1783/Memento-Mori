@@ -22,7 +22,7 @@ public class CharaController
     public CalculateManager.VariableStatus Status => status;
 
     public int active1RemainingCoolTime;
-    public int active2RemainingCoolTime = 1;  // スキル1を最初に優先して発動するため、初期値は1に設定
+    public int active2RemainingCoolTime = 1;  // スキル1を最初に優先して発動するため、初期値は1に設定  // TODO これいらなくね？
 
     private PassiveSkillState passive1State;
     private PassiveSkillState passive2State;
@@ -154,8 +154,8 @@ public class CharaController
     /// <param name="currentTurnCount"></param>
     public void ExecutePassiveSkill(PassiveActivationTiming activationTiming, BattleManager battleManager)
     {
-        TryExecutePassiveSkill(chara.Passive1Config, passive1State, activationTiming, battleManager.TurnCount, () => chara.PassiveSkill1(this));
-        TryExecutePassiveSkill(chara.Passive2Config, passive2State, activationTiming, battleManager.TurnCount, () => chara.PassiveSkill2(this));
+        TryExecutePassiveSkill(chara.Passive1Config, passive1State, activationTiming, battleManager.TurnCount, () => chara.MeetsPassive1ActivationCondition(this), () => chara.PassiveSkill1(this));
+        TryExecutePassiveSkill(chara.Passive2Config, passive2State, activationTiming, battleManager.TurnCount, () => chara.MeetsPassive2ActivationCondition(this), () => chara.PassiveSkill2(this));
     }
     
     /// <summary>
@@ -165,14 +165,19 @@ public class CharaController
     /// <param name="state"></param>
     /// <param name="activationTiming"></param>
     /// <param name="currentTurn"></param>
+    /// <param name="condition"></param>
     /// <param name="passive"></param>
-    private void TryExecutePassiveSkill(PassiveSkillConfig config, PassiveSkillState state, PassiveActivationTiming activationTiming, int currentTurn, Action passive)
+    private void TryExecutePassiveSkill(PassiveSkillConfig config, PassiveSkillState state, PassiveActivationTiming activationTiming, int currentTurn, Func<bool> condition, Action passive)
     {
+        // 共通の発動条件判定
         if (!CanExecutePassiveSkill(config, state, activationTiming, currentTurn))
+            return;
+        // キャラ固有の発動条件判定
+        if (!condition())
             return;
 
         passive();
-        Debug.Log(config == chara.Passive1Config ? $"パッシブスキル1が発動しました：{name}" : $"パッシブスキル2が発動しました：{name}");  // TODO 確認終わったら消す
+        // Debug.Log(config == chara.Passive1Config ? $"パッシブスキル1が発動しました：{name}" : $"パッシブスキル2が発動しました：{name}");  // TODO 確認終わったら消す
 
         state.remainingDuration = config.duration;
         state.remainingActionCount = config.requiredActionsForReactivation;
@@ -181,7 +186,7 @@ public class CharaController
         if (state.remainingActivationCount <= 0)
         {
             state.isDisabled = true;
-            Debug.Log($"パッシブスキルを無効化：{name}");  // TODO 確認終わったら消す
+            // Debug.Log($"パッシブスキルを無効化：{name}");  // TODO 確認終わったら消す
         }
     }
 

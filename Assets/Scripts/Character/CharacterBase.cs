@@ -22,7 +22,16 @@ public abstract class CharacterBase
 
     public abstract void ActiveSkill1(CharaController user);
     public abstract void ActiveSkill2(CharaController user);
+
+    public virtual bool MeetsPassive1ActivationCondition(CharaController user)  // キャラ固有の発動条件をクリアするか判定
+    {
+        return true;
+    }
+    public virtual bool MeetsPassive2ActivationCondition(CharaController user)
+    {
+        return true;
+    }
     
-    public virtual void PassiveSkill1(CharaController user){}  // ※ virtualのわけ= アリロシャの処理
-    public virtual void PassiveSkill2(CharaController user){}  // パッシブスキルは2個あるキャラと1個だけのキャラがいるのでabstractではなくvirtualにして、派生クラスでの実装は自由にする
+    public virtual void PassiveSkill1(CharaController user){}  // パッシブを持つキャラと持たないキャラがいるので、abstractではなくvirtualにして派生クラスでの実装は自由にする
+    public virtual void PassiveSkill2(CharaController user){}
 }
