@@ -62,7 +62,7 @@ public class Latelily : CharacterBase
             if (hpRate >= 0.5)
                 return damage;
 
-            var limit = CalculateManager.CalculateSkillEffectValue(user.Status.MaxHp.Value, 15);
+            var limit = CalculateManager.CalculateValueByRate(user.Status.MaxHp.Value, 15);
             return Mathf.Min(damage, limit);
         });
     }

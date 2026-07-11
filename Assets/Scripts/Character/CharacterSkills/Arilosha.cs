@@ -24,7 +24,7 @@ public class Arilosha : CharacterBase
     /// <param name="user"></param>
     public override void ActiveSkill1(CharaController user)
     {
-        user.UpdateHp(-CalculateManager.CalculateSkillEffectValue(user.Status.Hp.Value, 10));
+        user.UpdateHp(-CalculateManager.CalculateValueByRate(user.Status.Hp.Value, 10));
 
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1, ValueType.ByCurrentHp, false);
         targets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 480));
@@ -36,7 +36,7 @@ public class Arilosha : CharacterBase
     /// <param name="user"></param>
     public override async void ActiveSkill2(CharaController user)
     {
-        user.UpdateHp(-CalculateManager.CalculateSkillEffectValue(user.Status.Hp.Value, 10));
+        user.UpdateHp(-CalculateManager.CalculateValueByRate(user.Status.Hp.Value, 10));
 
         float hpRatio = (float)user.Status.Hp.Value / user.Status.MaxHp.Value;
         int hpPercentage = (int)Math.Round(hpRatio * 100, 0, MidpointRounding.AwayFromZero);  // HP割合 = HP(%)

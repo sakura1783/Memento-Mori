@@ -36,7 +36,7 @@ public class CharaController
         set => charaStatusPannel = value;
     }
 
-    // TODO Listに変更
+    // TODO Listに変更?
     private Func<int, int> incomingDamageModifier = damage => damage;  // damage => damageで、デフォルトで受け取った値をそのまま返すように制御。(incomingDamagemodifierに値を設定しないキャラでは、中身はnullでエラーが発生する)
 
     private CompositeDisposable disposables = new();

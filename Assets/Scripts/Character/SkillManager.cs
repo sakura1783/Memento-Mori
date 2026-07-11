@@ -241,7 +241,7 @@ public static class SkillManager
             return;
         }
 
-        target.UpdateHp(CalculateManager.CalculateSkillEffectValue(baseValue, rate));
+        target.UpdateHp(CalculateManager.CalculateValueByRate(baseValue, rate));
 
         // エフェクト再生
         BattleAnimationManager.instance.AddAnimation(target, AnimationType.Heal);
@@ -254,7 +254,7 @@ public static class SkillManager
     /// <param name="rate"></param>
     public static void IncreaseMaxHp(CharaController target, int rate)
     {
-        target.Status.MaxHp.Value += CalculateManager.CalculateSkillEffectValue(target.Status.MaxHp.Value, rate);
+        target.Status.MaxHp.Value += CalculateManager.CalculateValueByRate(target.Status.MaxHp.Value, rate);
     }
 
     /// <summary>
@@ -267,7 +267,7 @@ public static class SkillManager
     /// <returns>元の値に戻す際に、この値ぶん増加後の値から引く</returns>
     public static int ModifyAttackPower(CharaController target, int baseValue, int rate, bool isIncrease)
     {
-        int value = CalculateManager.CalculateSkillEffectValue(baseValue, rate);
+        int value = CalculateManager.CalculateValueByRate(baseValue, rate);
         target.Status.attackPower += isIncrease ? +value : -value;
 
         return value;
@@ -281,7 +281,7 @@ public static class SkillManager
     /// <param name="isIncrease"></param>
     public static void ModifyDefencePower(CharaController target, int rate, bool isIncrease)
     {
-        target.Status.defencePower += isIncrease ? +CalculateManager.CalculateSkillEffectValue(target.Status.defencePower, rate) : -CalculateManager.CalculateSkillEffectValue(target.Status.defencePower, rate);
+        target.Status.defencePower += isIncrease ? +CalculateManager.CalculateValueByRate(target.Status.defencePower, rate) : -CalculateManager.CalculateValueByRate(target.Status.defencePower, rate);
     }
 
     /// <summary>

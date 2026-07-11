@@ -69,7 +69,7 @@ public class Setsuna : CharacterBase
     /// <param name="user"></param>
     public override void PassiveSkill1(CharaController user)
     {
-        SkillManager.AddBuff(user, BuffType.シールド, true, false, 3, effectValue: CalculateManager.CalculateSkillEffectValue(user.Status.attackPower, 250));
+        SkillManager.AddBuff(user, BuffType.シールド, true, false, 3, effectValue: CalculateManager.CalculateValueByRate(user.Status.attackPower, 250));
     }
 
     /// <summary>

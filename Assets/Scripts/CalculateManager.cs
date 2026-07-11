@@ -80,13 +80,13 @@ public static class CalculateManager
     }
 
     /// <summary>
-    /// スキルが与えるステータスの変化量を計算
-    /// (例えば、「攻撃力の30%の値を回復」の場合、baseValue=攻撃力、rate=30を指定する)
+    /// baseValueのx％の値を計算する
+    /// (例えば、「攻撃力の30%の値」を計算する場合、baseValue=攻撃力、rate=30を指定する)
     /// </summary>
     /// <param name="baseValue">基準となる値</param>
     /// <param name="rate">baseValueの何%分か</param>
     /// <returns></returns>
-    public static int CalculateSkillEffectValue(int baseValue, int rate)
+    public static int CalculateValueByRate(int baseValue, int rate)
     {
         int value = (int)Math.Round(baseValue * (rate / 100f), 0, MidpointRounding.AwayFromZero);  // 少数第一位を四捨五入。Math.Round(四捨五入したい値, 少数第何位で(0で少数第一位), MidpointRounding.AwayFromZeroで通常の四捨五入(指定しない場合、銀行丸めになる))
 
