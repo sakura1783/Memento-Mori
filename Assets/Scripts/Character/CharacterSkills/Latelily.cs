@@ -7,7 +7,7 @@ public class Latelily : CharacterBase
     public override int Active1CoolTime => 4;
     public override int Active2CoolTime => 4;
 
-    public override PassiveSkillConfig Passive1Config { get; } = new(0, 1, 4, 100, PassiveActivationTiming.TurnStart);
+    public override PassiveSkillConfig Passive1Config { get; } = new(0, 1, PassiveReactivationBasis.Turn, 4, 100, PassiveActivationTiming.TurnStart);
 
 
     /// <summary>
@@ -35,7 +35,7 @@ public class Latelily : CharacterBase
     }
 
     /// <summary>
-    /// ターン開始時1ターンの間、攻撃力が最も高い味方の攻撃力を自身の攻撃力*20%増加させる。// TODO このスキルは4ターンに1回発動する
+    /// ターン開始時1ターンの間、攻撃力が最も高い味方の攻撃力を自身の攻撃力*20%増加させる。このスキルは4ターンに1回発動する。
     /// </summary>
     /// <param name="user"></param>
     public override async void PassiveSkill1(CharaController user)

@@ -3,8 +3,8 @@ public abstract class CharacterBase
     public abstract int Active1CoolTime { get; }  // 外部から参照したいが、値は変更されたくないので、読み取り専用プロパティを定義。
     public abstract int Active2CoolTime { get; }  // 抽象プロパティでは本体を宣言できないが、getかsetどちらかのアクセサの宣言は必須。(= 変数をポリモーフィズムかつ、派生クラスで必ず実装を提供させたい(抽象プロパティを作りたい)場合は自動実装プロパティが必要となる？)
 
-    public virtual PassiveSkillConfig Passive1Config { get; } = new(0, 0, 0, 1, PassiveActivationTiming.BattleStart);  // TODO 必要であれば派生クラスでoverrideする
-    public virtual PassiveSkillConfig Passive2Config { get; } = new(0, 0, 0, 1, PassiveActivationTiming.BattleStart);
+    public virtual PassiveSkillConfig Passive1Config { get; } = new(0, 0, PassiveReactivationBasis.None, 0, 1, PassiveActivationTiming.BattleStart);  // TODO 必要であれば派生クラスでoverrideする
+    public virtual PassiveSkillConfig Passive2Config { get; } = new(0, 0, PassiveReactivationBasis.None, 0, 1, PassiveActivationTiming.BattleStart);
 
 
     /// <summary>

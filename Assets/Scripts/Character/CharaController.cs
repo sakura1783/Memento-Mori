@@ -202,7 +202,7 @@ public class CharaController
         // Debug.Log(config == chara.Passive1Config ? $"パッシブスキル1が発動しました：{name}" : $"パッシブスキル2が発動しました：{name}");  // TODO 確認終わったら消す
 
         state.remainingDuration = config.duration;
-        state.remainingActionCount = config.requiredActionsForReactivation;
+        state.remainingCountForReactivation = config.requiredCountForReactivation;
 
         state.remainingActivationCount--;
         if (state.remainingActivationCount <= 0)
@@ -232,7 +232,7 @@ public class CharaController
             return false;
         if (state.remainingDuration > 0)  // パッシブが発動中
             return false;
-        if (state.remainingActionCount > 0)
+        if (state.remainingCountForReactivation > 0)
             return false;
 
         return true;
@@ -243,11 +243,15 @@ public class CharaController
     /// </summary>
     public void OnTurnEnded()
     {
-        // アクティブスキルとパッシブスキルのクールタイムを減少
         active1RemainingCoolTime--;
         active2RemainingCoolTime--;
+
         passive1State.remainingDuration--;
         passive2State.remainingDuration--;
+
+        // パッシブスキル再発動に必要なターン数を減少
+        ReduceRequiredCountForPassiveReactivation(chara.Passive1Config, passive1State, PassiveReactivationBasis.Turn);
+        ReduceRequiredCountForPassiveReactivation(chara.Passive2Config, passive2State, PassiveReactivationBasis.Turn);
 
         // バフのクールタイムを減少
         foreach (var buff in status.Buffs.Where(x => !x.isIrremovable).ToList())  // ToList()で、foreachがコピーリストを参照するようにする。(下の処理でRemoveBuff()が動き元Listの要素が削除されエラーが出るのを防ぐ)
@@ -259,9 +263,9 @@ public class CharaController
     /// </summary>
     public void OnActionEnded()
     {   
-        // パッシブスキル再発動までに必要な行動回数を減少
-        passive1State.remainingActionCount--;
-        passive2State.remainingActionCount--;
+        // パッシブスキル再発動に必要な行動回数を減少
+        ReduceRequiredCountForPassiveReactivation(chara.Passive1Config, passive1State, PassiveReactivationBasis.Action);
+        ReduceRequiredCountForPassiveReactivation(chara.Passive2Config, passive2State, PassiveReactivationBasis.Action);
     }
 
     /// <summary>
@@ -273,6 +277,20 @@ public class CharaController
     private int ReduceBuffCoolTime(int reductionValue)
     {
         return Mathf.Max(reductionValue - 1, 0);
+    }
+
+    /// <summary>
+    /// パッシブ再発動に必要なターン数or行動回数を減少
+    /// </summary>
+    /// <param name="config"></param>
+    /// <param name="state"></param>
+    /// <param name="reactivationBasis"></param>
+    private void ReduceRequiredCountForPassiveReactivation(PassiveSkillConfig config, PassiveSkillState state, PassiveReactivationBasis reactivationBasis)
+    {
+        if (config.reactivationBasis != reactivationBasis)
+            return;
+
+        state.remainingCountForReactivation--;
     }
 
     /// <summary>
