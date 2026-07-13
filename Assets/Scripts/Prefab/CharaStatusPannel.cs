@@ -24,6 +24,8 @@ public class CharaStatusPannel : MonoBehaviour
 
     [SerializeField] private RectTransform animationRoot;
     public RectTransform AnimationRoot => animationRoot;
+    
+    public Vector2 DefaultAnimationRootPos { get; private set; }
 
     private readonly Dictionary<Buff, Image> buffs = new();
 
@@ -37,11 +39,13 @@ public class CharaStatusPannel : MonoBehaviour
         txtHpValue.text = $"{charaController.Status.Hp} / {charaController.Status.MaxHp}";
         hpSlider.value = 1;
 
+        DefaultAnimationRootPos = animationRoot.anchoredPosition;
+
         // 購読処理
-        Observable.Merge(charaController.Status.Hp, charaController.Status.MaxHp)  // Observable.Merge()で、括弧内の値いずれかが変更された場合にSubscribe()の処理が動く
+        Observable.Merge(charaController.DisplayedHp, charaController.Status.MaxHp)  // Observable.Merge()で、括弧内の値いずれかが変更された場合にSubscribe()の処理が動く
             .Subscribe(_ =>
             {
-                int hp = charaController.Status.Hp.Value;
+                int hp = charaController.DisplayedHp.Value;
                 int maxHp = charaController.Status.MaxHp.Value;
 
                 txtHpValue.text = $"{hp} / {maxHp}";

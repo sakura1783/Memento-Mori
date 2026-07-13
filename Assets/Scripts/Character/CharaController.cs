@@ -2,6 +2,16 @@ using UnityEngine;
 using UniRx;
 using System;
 using System.Linq;
+using Cysharp.Threading.Tasks;
+
+/// <summary>
+/// HP表示の更新タイミング
+/// </summary>
+public enum HpDisplayUpdateTiming
+{
+    Immediate,
+    Delayed,
+}
 
 /// <summary>
 /// バトル時、キャラクター制御クラス
@@ -20,6 +30,9 @@ public class CharaController
 
     private CalculateManager.VariableStatus status = new();
     public CalculateManager.VariableStatus Status => status;
+
+    private ReactiveProperty<int> displayedHp = new();  // 内部処理のHPと、ゲーム画面に表示されるHPを分けて考える
+    public IReadOnlyReactiveProperty<int> DisplayedHp => displayedHp;
 
     public int active1RemainingCoolTime;
     public int active2RemainingCoolTime = 1;  // スキル1を最初に優先して発動するため、初期値は1に設定  // TODO これいらなくね？
@@ -50,6 +63,7 @@ public class CharaController
     {
         // 計算後の各ステータスの値を受け取り、キャラに反映
         status = statusData;
+        displayedHp.Value = status.Hp.Value;
         name = charaName;  // TODO 削除
 
         // 属性をスクリプタブルオブジェクトから取得
@@ -62,11 +76,7 @@ public class CharaController
         status.Hp
             .Where(value => value <= 0)
             .Take(1)
-            .Subscribe(_ =>
-            {
-                status.Buffs.Clear();
-                Debug.Log($"{name}が戦闘不能になりました");
-            });
+            .Subscribe(_ => status.Buffs.Clear());
 
         // パッシブの状態を管理するクラスの作成
         passive1State = new(chara.Passive1Config);
@@ -97,15 +107,31 @@ public class CharaController
     /// HPの更新
     /// </summary>
     /// <param name="amount"></param>
-    public void UpdateHp(int amount)
+    public int UpdateHp(int amount, HpDisplayUpdateTiming displayUpdateTiming = HpDisplayUpdateTiming.Immediate)
     {
         // 「ダメージ無効」状態の場合、ダメージを受けない
         if (amount < 0 && status.Buffs.Any(buff => buff.type == BuffType.ダメージ無効))
-        {
-            return;
-        }
+            return status.Hp.Value;
+        
+        // HPの実データを更新
+        status.Hp.Value = Mathf.Clamp(status.Hp.Value + amount, 0, status.MaxHp.Value);
 
-        status.Hp.Value += amount;
+        if (displayUpdateTiming == HpDisplayUpdateTiming.Immediate)
+            SetDisplayedHp(status.Hp.Value);  // HP表示の更新
+
+        return status.Hp.Value;
+    }
+
+    /// <summary>
+    /// 表示用HPを更新
+    /// </summary>
+    /// <param name="hp"></param>
+    public async void SetDisplayedHp(int hp, float delay = 0f)
+    {
+        if (delay > 0f)
+            await UniTask.Delay(TimeSpan.FromSeconds(delay));
+
+        displayedHp.Value = Mathf.Clamp(status.Hp.Value, 0, status.MaxHp.Value);
     }
 
     /// <summary>

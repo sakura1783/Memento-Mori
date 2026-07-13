@@ -184,8 +184,9 @@ public static class SkillManager
     /// <param name="target"></param>
     /// <param name="baseValue">基準となる値</param>
     /// <param name="rate"></param>
+    /// <param name="hitIndex"></param>
     /// <returns>ダメージ値を返す(総与ダメージを実装する際に使う)</returns>
-    public static int Attack(CharaController user, CharaController target, int baseValue, int rate)
+    public static int Attack(CharaController user, CharaController target, int baseValue, int rate, int hitIndex = 0, int maxHitCount = 1)
     {
         // 「バリア」を持っている場合、一層消費してダメージを無効化
         var barrierBuff = target.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.バリア);
@@ -211,12 +212,13 @@ public static class SkillManager
         // ダメージ補正 
         target.ModifyIncomingDamage(damageValue);
 
-        target.UpdateHp(-damageValue);
+        var hp = target.UpdateHp(-damageValue, HpDisplayUpdateTiming.Delayed);
         target.ReceivedCriticalDamage.Value = isCritical;
-
-        // アニメーション再生
-        BattleAnimationManager.instance.AddAnimation(target, AnimationType.Damage);
-        BattleAnimationManager.instance.AddAnimation(target, AnimationType.DefaultHit);
+        
+        // HP表示の更新→ ダメージアニメーション
+        target.SetDisplayedHp(hp, hitIndex * BattleAnimationManager.HIT_DELAY);
+        BattleAnimationManager.instance.AddAnimation(target, AnimationType.Damage, hitIndex, maxHitCount);
+        BattleAnimationManager.instance.AddAnimation(target, AnimationType.DefaultHit, hitIndex, maxHitCount);
 
         // 「睡眠」状態を解除
         if (target.Status.Buffs.Any(debuff => debuff.type == BuffType.睡眠))
