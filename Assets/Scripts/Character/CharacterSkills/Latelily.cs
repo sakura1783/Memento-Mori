@@ -11,7 +11,7 @@ public class Latelily : CharacterBase
 
 
     /// <summary>
-    /// 攻撃力が最も高い敵に4回攻撃力*340%の攻撃
+    /// 攻撃力が最も高い敵に4回攻撃力*200%の攻撃
     /// </summary>
     /// <param name="user"></param>
     public override void ActiveSkill1(CharaController user)
@@ -19,11 +19,11 @@ public class Latelily : CharacterBase
         var target = SkillManager.PickTarget(user, TargetType.Opponent, 1, ValueType.ByAttackPower, true).FirstOrDefault();
 
         for (int i = 0; i < 4; i++)
-            SkillManager.Attack(user, target, user.Status.attackPower, 150, hitIndex: i, maxHitCount: 4);
+            SkillManager.Attack(user, target, user.Status.attackPower, 200, hitIndex: i, maxHitCount: 4);
     }
 
     /// <summary>
-    /// HP割合が最も低い敵に5回攻撃力*280%の攻撃  // TODO この攻撃は必ず命中する
+    /// HP割合が最も低い敵に5回攻撃力*160%の攻撃  // TODO この攻撃は必ず命中する
     /// </summary>
     /// <param name="user"></param>
     public override void ActiveSkill2(CharaController user)
@@ -31,7 +31,7 @@ public class Latelily : CharacterBase
         var target = SkillManager.PickTarget(user, TargetType.Opponent, 1, ValueType.ByCurrentHpRate, false).FirstOrDefault();
 
         for (int i = 0; i < 5; i++)
-            SkillManager.Attack(user, target, user.Status.attackPower, 200, hitIndex: i, maxHitCount: 5);
+            SkillManager.Attack(user, target, user.Status.attackPower, 160, hitIndex: i, maxHitCount: 5);
     }
 
     /// <summary>

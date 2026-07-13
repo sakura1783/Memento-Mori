@@ -131,7 +131,7 @@ public class CharaController
         if (delay > 0f)
             await UniTask.Delay(TimeSpan.FromSeconds(delay));
 
-        displayedHp.Value = Mathf.Clamp(status.Hp.Value, 0, status.MaxHp.Value);
+        displayedHp.Value = Mathf.Clamp(hp, 0, status.MaxHp.Value);
     }
 
     /// <summary>
