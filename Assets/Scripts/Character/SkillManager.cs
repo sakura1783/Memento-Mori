@@ -188,6 +188,8 @@ public static class SkillManager
     /// <returns>ダメージ値を返す(総与ダメージを実装する際に使う)</returns>
     public static int Attack(CharaController user, CharaController target, int baseValue, int rate, int hitIndex = 0, int maxHitCount = 1)
     {
+        BattleAnimationManager.instance.AddAnimation(target, AnimationType.Trajectory, user: user);
+
         // 「バリア」を持っている場合、一層消費してダメージを無効化
         var barrierBuff = target.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.バリア);
         if (barrierBuff != null)

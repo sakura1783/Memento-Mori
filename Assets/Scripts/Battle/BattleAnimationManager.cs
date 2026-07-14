@@ -19,6 +19,8 @@ public enum AnimationType
     ActiveSkill,  // アクティブスキル使用時
     ReceiveBuff,
     ReceiveDebuff,
+
+    Trajectory,  // 攻撃者→ターゲットへの軌跡エフェクト
 }
 
 public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
@@ -36,15 +38,16 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     [SerializeField] private BattleManager battleManager;
 
     [SerializeField] private EffectObjData[] effects = new EffectObjData[6];  // AnimationType順に順番にプレハブを入れる
+    [SerializeField] private GameObject trajectoryEffect;
 
     private List<UniTask> animationTasks = new();
 
     public const float HIT_DELAY = 0.17f;  // ヒット間のインターバル
 
 
-    public void AddAnimation(CharaController target, AnimationType animationType, int hitIndex = 0, int maxHitCount = 1)
+    public void AddAnimation(CharaController target, AnimationType animationType, int hitIndex = 0, int maxHitCount = 1, CharaController user = null)
     {
-        animationTasks.Add(PlayAnimation(target, animationType, hitIndex, maxHitCount));
+        animationTasks.Add(PlayAnimation(target, animationType, hitIndex, maxHitCount, user));
     }
 
     public async UniTask WaitAllAnimations()
@@ -65,7 +68,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
         animationTasks.Clear();
     }
 
-    private async UniTask PlayAnimation(CharaController target, AnimationType animationType, int hitIndex = 0, int maxHitCount = 1)
+    private async UniTask PlayAnimation(CharaController target, AnimationType animationType, int hitIndex = 0, int maxHitCount = 1, CharaController user = null)
     {
         if (hitIndex > 0)
             await UniTask.Delay(TimeSpan.FromSeconds(hitIndex * HIT_DELAY));
@@ -90,6 +93,9 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
             or AnimationType.ReceiveBuff
             or AnimationType.ReceiveDebuff 
                 => InstantiateEffect(rect, animationType),
+            
+            AnimationType.Trajectory when user != null =>
+                InstantiateTrajectoryEffect(user, target),
 
             _ => UniTask.CompletedTask
         });
@@ -142,5 +148,16 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
 
         // パーティクルの再生が終了し、破棄されるまで待つ
         return UniTask.WaitUntil(() => obj == null);
+    }
+
+    private async UniTask InstantiateTrajectoryEffect(CharaController attacker, CharaController target)
+    {
+        var startPos = attacker.CharaStatusPannel.ImgChara.rectTransform.position;
+        var endPos = target.CharaStatusPannel.ImgChara.rectTransform.position;
+
+        var effect = Instantiate(trajectoryEffect, startPos, Quaternion.identity);
+
+        await effect.transform
+            .DOMove(endPos, 0.1f).SetEase(Ease.InQuad).ToUniTask();
     }
 }
