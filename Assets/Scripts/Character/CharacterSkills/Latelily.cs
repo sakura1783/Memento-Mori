@@ -19,7 +19,7 @@ public class Latelily : CharacterBase
         var target = SkillManager.PickTarget(user, TargetType.Opponent, 1, ValueType.ByAttackPower, true).FirstOrDefault();
 
         for (int i = 0; i < 4; i++)
-            SkillManager.Attack(user, target, user.Status.attackPower, 200, hitIndex: i, maxHitCount: 4);
+            SkillManager.Attack(user, target, user.Status.attackPower, 200, hitIndex: i, maxHitCount: 4, playTrajectoryEffect: i == 0);
     }
 
     /// <summary>
@@ -31,7 +31,7 @@ public class Latelily : CharacterBase
         var target = SkillManager.PickTarget(user, TargetType.Opponent, 1, ValueType.ByCurrentHpRate, false).FirstOrDefault();
 
         for (int i = 0; i < 5; i++)
-            SkillManager.Attack(user, target, user.Status.attackPower, 160, hitIndex: i, maxHitCount: 5);
+            SkillManager.Attack(user, target, user.Status.attackPower, 160, hitIndex: i, maxHitCount: 5, playTrajectoryEffect: i == 0);
     }
 
     /// <summary>

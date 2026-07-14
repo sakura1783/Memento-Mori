@@ -10,7 +10,7 @@ public class Setsuna : CharacterBase
 
 
     /// <summary>
-    /// ランダムな敵に3回攻撃力*400%の攻撃。クリティカルヒットした場合、1ターンの間自身の攻撃力が30%増加する。クリティカルヒットするたび攻撃力増加のターン数が1ターン多くなる。
+    /// ランダムな敵に3回攻撃力*200%の攻撃。クリティカルヒットした場合、1ターンの間自身の攻撃力が30%増加する。クリティカルヒットするたび攻撃力増加のターン数が1ターン多くなる。
     /// </summary>
     /// <param name="user"></param>
     public override async void ActiveSkill1(CharaController user)
@@ -18,13 +18,13 @@ public class Setsuna : CharacterBase
         int criticalCount = 0;
 
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 3, allowDuplicates: true);
-        targets.ForEach(target =>
+        for (int i = 0; i < targets.Count; i++)
         {
-            SkillManager.Attack(user, target, user.Status.attackPower, 400);
+            SkillManager.Attack(user, targets[i], user.Status.attackPower, 200, hitIndex: i, maxHitCount: 3);
             
-            if (target.ReceivedCriticalDamage.Value)
+            if (targets[i].ReceivedCriticalDamage.Value)
                 criticalCount++;
-        });
+        }
 
         if (criticalCount > 0)
         {
@@ -37,13 +37,13 @@ public class Setsuna : CharacterBase
     }
 
     /// <summary>
-    /// ランダムな敵4体に攻撃力*350%の攻撃。このスキルで敵を戦闘不能にした場合、HP割合が最も低い敵に攻撃力*480%の攻撃を行う。敵を戦闘不能にするたび、追加攻撃の回数が1回多くなる(最大4回まで)
+    /// ランダムな敵4体に攻撃力*160%の攻撃。このスキルで敵を戦闘不能にした場合、HP割合が最も低い敵に攻撃力*480%の攻撃を行う。敵を戦闘不能にするたび、追加攻撃の回数が1回多くなる(最大4回まで)
     /// </summary>
     /// <param name="user"></param>
     public override void ActiveSkill2(CharaController user)
     {
-        var targets = SkillManager.PickTarget(user, TargetType.Opponent, 4);
-        targets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 350));
+        var targets = SkillManager.PickTarget(user, TargetType.Opponent, 4, allowDuplicates: true);
+        targets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 160));
         
         // 追加攻撃
         int additionalAttackCount = 0;

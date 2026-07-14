@@ -33,7 +33,7 @@ public class Elliot : CharacterBase
     }
 
     /// <summary>
-    /// ランダムな敵3体に攻撃力*200%の攻撃。さらに、HP割合が低い味方2体のHPを自身の攻撃力*50%回復し、1ターンの間「再生」を付与。毎ターン行動開始時にHPを自身の最大HP*3%回復。
+    /// ランダムな敵3体に攻撃力*200%の一斉攻撃。さらに、HP割合が低い味方2体のHPを自身の攻撃力*50%回復し、1ターンの間「再生」を付与。毎ターン行動開始時にHPを自身の最大HP*3%回復。
     /// </summary>
     /// <param name="user"></param>
     public override void ActiveSkill2(CharaController user)

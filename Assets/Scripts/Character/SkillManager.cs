@@ -181,13 +181,17 @@ public static class SkillManager
     /// <summary>
     /// 攻撃
     /// </summary>
+    /// <param name="user"></param>
     /// <param name="target"></param>
-    /// <param name="baseValue">基準となる値</param>
+    /// <param name="baseValue"></param>
     /// <param name="rate"></param>
-    /// <param name="hitIndex"></param>
-    /// <returns>ダメージ値を返す(総与ダメージを実装する際に使う)</returns>
-    public static int Attack(CharaController user, CharaController target, int baseValue, int rate, int hitIndex = 0, int maxHitCount = 1)
+    /// <param name="hitIndex">これにより、ダメージアニメーションの遅延処理を制御</param>
+    /// <param name="maxHitCount">〃</param>
+    /// <param name="playTrajectoryEffect">同一キャラに集中攻撃する場合は最初の一回のみtrue</param>
+    /// <returns></returns>
+    public static int Attack(CharaController user, CharaController target, int baseValue, int rate, int hitIndex = 0, int maxHitCount = 1, bool playTrajectoryEffect = true)
     {
+        if (playTrajectoryEffect)
         BattleAnimationManager.instance.AddAnimation(target, AnimationType.Trajectory, user: user);
 
         // 「バリア」を持っている場合、一層消費してダメージを無効化
@@ -219,8 +223,8 @@ public static class SkillManager
         
         // HP表示の更新→ ダメージアニメーション
         target.SetDisplayedHp(hp, hitIndex * BattleAnimationManager.HIT_DELAY);
-        BattleAnimationManager.instance.AddAnimation(target, AnimationType.Damage, hitIndex, maxHitCount);
-        BattleAnimationManager.instance.AddAnimation(target, AnimationType.DefaultHit, hitIndex, maxHitCount);
+        BattleAnimationManager.instance.AddAnimation(target, AnimationType.Damage, hitIndex, maxHitCount, playTrajectoryEffect: playTrajectoryEffect);
+        BattleAnimationManager.instance.AddAnimation(target, AnimationType.DefaultHit, hitIndex, maxHitCount, playTrajectoryEffect: playTrajectoryEffect);
 
         // 「睡眠」状態を解除
         if (target.Status.Buffs.Any(debuff => debuff.type == BuffType.睡眠))

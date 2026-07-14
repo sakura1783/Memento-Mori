@@ -5,7 +5,7 @@ public class Nina : CharacterBase
 
 
     /// <summary>
-    /// ランダムな敵4体に攻撃力*290%の攻撃。さらに、自身のHPをこのスキルの総与ダメージ*10%回復
+    /// ランダムな敵4体に攻撃力*290%の一斉攻撃。さらに、自身のHPをこのスキルの総与ダメージ*10%回復
     /// </summary>
     /// <param name="user"></param>
     public override void ActiveSkill1(CharaController user)
@@ -19,7 +19,7 @@ public class Nina : CharacterBase
     }
 
     /// <summary>
-    /// ランダムな敵2体に攻撃力*420%の攻撃。さらに、自身に1ターンの間「ダメージ無効」を付与
+    /// ランダムな敵2体に攻撃力*420%の一斉攻撃。さらに、自身に1ターンの間「ダメージ無効」を付与
     /// </summary>
     /// <param name="user"></param>
     public override void ActiveSkill2(CharaController user)

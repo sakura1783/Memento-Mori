@@ -41,13 +41,14 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     [SerializeField] private GameObject trajectoryEffect;
 
     private List<UniTask> animationTasks = new();
-
+    
+    public const float TRAJECTORY_DURATION = 0.1f;
     public const float HIT_DELAY = 0.17f;  // ヒット間のインターバル
 
 
-    public void AddAnimation(CharaController target, AnimationType animationType, int hitIndex = 0, int maxHitCount = 1, CharaController user = null)
+    public void AddAnimation(CharaController target, AnimationType animationType, int hitIndex = 0, int maxHitCount = 1, CharaController user = null, bool playTrajectoryEffect = true)
     {
-        animationTasks.Add(PlayAnimation(target, animationType, hitIndex, maxHitCount, user));
+        animationTasks.Add(PlayAnimation(target, animationType, hitIndex, maxHitCount, user, playTrajectoryEffect));
     }
 
     public async UniTask WaitAllAnimations()
@@ -68,10 +69,11 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
         animationTasks.Clear();
     }
 
-    private async UniTask PlayAnimation(CharaController target, AnimationType animationType, int hitIndex = 0, int maxHitCount = 1, CharaController user = null)
+    private async UniTask PlayAnimation(CharaController target, AnimationType animationType, int hitIndex = 0, int maxHitCount = 1, CharaController user = null, bool playTrajectoryEffect = true)
     {
-        if (hitIndex > 0)
-            await UniTask.Delay(TimeSpan.FromSeconds(hitIndex * HIT_DELAY));
+        var delay = playTrajectoryEffect ? (hitIndex * HIT_DELAY) + TRAJECTORY_DURATION : hitIndex * HIT_DELAY;
+        if (delay > 0)
+            await UniTask.Delay(TimeSpan.FromSeconds(delay));
 
         var rect = animationType == AnimationType.Attack || animationType == AnimationType.Damage
             ? target.CharaStatusPannel.AnimationRoot
@@ -159,6 +161,6 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
         effect.transform.localPosition = Vector3.zero;  // ローカル位置を親の(0, 0, 0)に合わせる
 
         await effect.transform
-            .DOMove(targetRect.position, 0.1f).SetEase(Ease.InQuad).ToUniTask();  // DOMove()にはワールド座標を指定する必要がある
+            .DOMove(targetRect.position, TRAJECTORY_DURATION).SetEase(Ease.InQuad).ToUniTask();  // DOMove()にはワールド座標を指定する必要がある
     }
 }
