@@ -75,7 +75,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
 
         var rect = animationType == AnimationType.Attack || animationType == AnimationType.Damage
             ? target.CharaStatusPannel.AnimationRoot
-            : target.CharaStatusPannel.ImgChara.transform as RectTransform;
+            : target.CharaStatusPannel.ImgChara.rectTransform;
 
         await (animationType switch
         {
@@ -124,7 +124,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
             await animePoint
                 .DOPunchAnchorPos(pos, 0.5f, 8).ToUniTask();
             
-            // 位置が誤差程度ずれるので、強制的に元の位置に戻す
+            // 位置が誤差程度ずれるので、強制的に元の位置に戻す  // TODO タイミング変更
             animePoint.anchoredPosition = target.CharaStatusPannel.DefaultAnimationRootPos;
         }
     }
@@ -152,12 +152,13 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
 
     private async UniTask InstantiateTrajectoryEffect(CharaController attacker, CharaController target)
     {
-        var startPos = attacker.CharaStatusPannel.ImgChara.rectTransform.position;
-        var endPos = target.CharaStatusPannel.ImgChara.rectTransform.position;
+        var attackerRect = attacker.CharaStatusPannel.ImgChara.rectTransform;
+        var targetRect = target.CharaStatusPannel.ImgChara.rectTransform;
 
-        var effect = Instantiate(trajectoryEffect, startPos, Quaternion.identity);
+        var effect = Instantiate(trajectoryEffect, attackerRect);  // 親の子として生成
+        effect.transform.localPosition = Vector3.zero;  // ローカル位置を親の(0, 0, 0)に合わせる
 
         await effect.transform
-            .DOMove(endPos, 0.1f).SetEase(Ease.InQuad).ToUniTask();
+            .DOMove(targetRect.position, 0.1f).SetEase(Ease.InQuad).ToUniTask();  // DOMove()にはワールド座標を指定する必要がある
     }
 }

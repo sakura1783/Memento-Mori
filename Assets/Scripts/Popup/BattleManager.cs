@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UniRx;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum BattleState
 {
@@ -28,7 +29,7 @@ public class BattleManager : PopupBase
     [SerializeField] private RectTransform playerTran;
     [SerializeField] private RectTransform opponentTran;
 
-    [SerializeField] private UnityEngine.UI.Image imgSkillUser;
+    [SerializeField] private Image imgSkillUser;
 
     [SerializeField] private CanvasGroup skillUserImageGroup;
     public CanvasGroup SkillUserImageGroup => skillUserImageGroup;
@@ -70,6 +71,10 @@ public class BattleManager : PopupBase
 
         CreateTeamCharacters(teamAssemblyPop.playerTeamInfo, playerTeam, playerTran);
         CreateTeamCharacters(teamAssemblyPop.opponentTeamInfo, opponentTeam, opponentTran);
+        
+        // LayoutGroupの更新を確定させる
+        LayoutRebuilder.ForceRebuildLayoutImmediate(playerTran);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(opponentTran);
 
         Battle().Forget();  // Forget()で、この非同期処理は待たずに開始するだけでOKと明示
     }
