@@ -185,14 +185,14 @@ public static class SkillManager
     /// <param name="target"></param>
     /// <param name="baseValue"></param>
     /// <param name="rate"></param>
-    /// <param name="hitIndex">これにより、ダメージアニメーションの遅延処理を制御</param>
+    /// <param name="hitIndex">これにより、ダメージアニメーションの遅延処理を制御。アニメを遅延させたい場合、この値を引数に渡す</param>
     /// <param name="maxHitCount">〃</param>
     /// <param name="playTrajectoryEffect">同一キャラに集中攻撃する場合は最初の一回のみtrue</param>
     /// <returns></returns>
     public static int Attack(CharaController user, CharaController target, int baseValue, int rate, int hitIndex = 0, int maxHitCount = 1, bool playTrajectoryEffect = true)
     {
         if (playTrajectoryEffect)
-        BattleAnimationManager.instance.AddAnimation(target, AnimationType.Trajectory, user: user);
+        BattleAnimationManager.instance.AddAnimation(target, AnimationType.Trajectory, hitIndex, maxHitCount, user);
 
         // 「バリア」を持っている場合、一層消費してダメージを無効化
         var barrierBuff = target.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.バリア);

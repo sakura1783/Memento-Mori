@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using UniRx;
@@ -20,7 +21,7 @@ public class Setsuna : CharacterBase
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 3, allowDuplicates: true);
         for (int i = 0; i < targets.Count; i++)
         {
-            SkillManager.Attack(user, targets[i], user.Status.attackPower, 200, hitIndex: i, maxHitCount: 3);
+            SkillManager.Attack(user, targets[i], user.Status.attackPower, 200, hitIndex: i, maxHitCount: targets.Count);
             
             if (targets[i].ReceivedCriticalDamage.Value)
                 criticalCount++;
@@ -37,29 +38,31 @@ public class Setsuna : CharacterBase
     }
 
     /// <summary>
-    /// ランダムな敵4体に攻撃力*160%の攻撃。このスキルで敵を戦闘不能にした場合、HP割合が最も低い敵に攻撃力*480%の攻撃を行う。敵を戦闘不能にするたび、追加攻撃の回数が1回多くなる(最大4回まで)
+    /// ランダムな敵4体に攻撃力*160%の攻撃。このスキルで敵を戦闘不能にした場合、HP割合が最も低い敵に攻撃力*210%の攻撃を行う。敵を戦闘不能にするたび、追加攻撃の回数が1回多くなる(最大4回まで)
     /// </summary>
     /// <param name="user"></param>
     public override void ActiveSkill2(CharaController user)
     {
-        var targets = SkillManager.PickTarget(user, TargetType.Opponent, 4, allowDuplicates: true);
-        targets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 160));
-        
-        // 追加攻撃
-        int additionalAttackCount = 0;
-        if (targets.Any(target => target.Status.Hp.Value <= 0)) additionalAttackCount++;
+        int remainingAttackCount = 4;
+        int attackIndex = 0;  // 現在何回目の攻撃か
 
-        while (additionalAttackCount > 0)
-        {
-            var additionalTargets = SkillManager.PickTarget(user, TargetType.Opponent, 1, ValueType.ByCurrentHp, false);
-            additionalTargets.ForEach(target =>
-            {
-                SkillManager.Attack(user, target, user.Status.attackPower, 480);
-                Mathf.Clamp(additionalAttackCount--, 0, 4);  // 追加攻撃の回数を1減少
+        while (remainingAttackCount > 0 && attackIndex < 8)
+        {   
+            // 最初4回はランダムな敵、以降の追加攻撃はHP割合が最も低い敵を選択
+            CharaController target = attackIndex < 4
+                ? SkillManager.PickTarget(user, TargetType.Opponent, 1).FirstOrDefault()
+                : SkillManager.PickTarget(user, TargetType.Opponent, 1, ValueType.ByCurrentHp, false).FirstOrDefault();
 
-                // 戦闘不能にするたび、追加で攻撃
-                if (target.Status.Hp.Value <= 0) Mathf.Clamp(additionalAttackCount++, 0, 4);
-            });
+            // 最初4回は攻撃力*160%、以降の追加攻撃は攻撃力*210%で攻撃
+            int attackRate = attackIndex < 4 ? 160 : 210;
+            SkillManager.Attack(user, target, user.Status.attackPower, attackRate, 1, 1);  // TODO 引数(1, 1)はわかりにくい
+            remainingAttackCount--;
+
+            // 戦闘不能にするたび、攻撃回数+1
+            if (target.Status.Hp.Value <= 0)
+                remainingAttackCount++;
+
+            attackIndex++;
         }
     }
 

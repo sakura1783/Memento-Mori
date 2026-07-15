@@ -33,11 +33,15 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
 
         [SerializeField] int scaleAdjustmentValue = 1;
         public int ScaleAdjustmentValue => scaleAdjustmentValue;
+
+        // TODO enumと紐付け
     }
 
     [SerializeField] private BattleManager battleManager;
 
-    [SerializeField] private EffectObjData[] effects = new EffectObjData[6];  // AnimationType順に順番にプレハブを入れる
+    [SerializeField] private RectTransform effectRoot;  // 軌跡エフェクトをこれの子として生成する
+
+    [SerializeField] private List<EffectObjData> effects = new();  // AnimationType順に順番にプレハブを入れる
     [SerializeField] private GameObject trajectoryEffect;
 
     private List<UniTask> animationTasks = new();
@@ -71,10 +75,15 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
 
     private async UniTask PlayAnimation(CharaController target, AnimationType animationType, int hitIndex = 0, int maxHitCount = 1, CharaController user = null, bool playTrajectoryEffect = true)
     {
-        var delay = playTrajectoryEffect ? (hitIndex * HIT_DELAY) + TRAJECTORY_DURATION : hitIndex * HIT_DELAY;
+        float delay;
+        if (animationType == AnimationType.Trajectory)
+            delay = hitIndex * HIT_DELAY;
+        else
+            delay = (hitIndex * HIT_DELAY) + TRAJECTORY_DURATION;
+
         if (delay > 0)
             await UniTask.Delay(TimeSpan.FromSeconds(delay));
-
+        
         var rect = animationType == AnimationType.Attack || animationType == AnimationType.Damage
             ? target.CharaStatusPannel.AnimationRoot
             : target.CharaStatusPannel.ImgChara.rectTransform;
@@ -115,7 +124,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     {
         Vector3 pos = new(battleManager.PlayerTeam.Contains(target) ? -15f : 15f, -5f, 0f);
         
-        // 最後のダメージアニメーションだけ長く、それ以外は短くアニメーションさせる
+        // 最後のダメージアニメーションだけ長く、それ以外は短くアニメーションさせる  // TODO コメント修正
         if (hitIndex < maxHitCount - 1)  // indexは0始まりなのでmaxHitCount-1をする
         {
             await animePoint
@@ -157,10 +166,12 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
         var attackerRect = attacker.CharaStatusPannel.ImgChara.rectTransform;
         var targetRect = target.CharaStatusPannel.ImgChara.rectTransform;
 
-        var effect = Instantiate(trajectoryEffect, attackerRect);  // 親の子として生成
-        effect.transform.localPosition = Vector3.zero;  // ローカル位置を親の(0, 0, 0)に合わせる
+        var effect = Instantiate(trajectoryEffect, effectRoot);  // 指定した親の子として生成
+        effect.transform.position = attackerRect.position;  // ローカル位置を親の(0, 0, 0)に合わせる
 
         await effect.transform
             .DOMove(targetRect.position, TRAJECTORY_DURATION).SetEase(Ease.InQuad).ToUniTask();  // DOMove()にはワールド座標を指定する必要がある
+
+        Debug.Log($"Particle Count : {effect.GetComponent<ParticleSystem>().particleCount}");
     }
 }
