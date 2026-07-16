@@ -21,7 +21,7 @@ public class Setsuna : CharacterBase
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 3, allowDuplicates: true);
         for (int i = 0; i < targets.Count; i++)
         {
-            SkillManager.Attack(user, targets[i], user.Status.attackPower, 200, hitIndex: i, maxHitCount: targets.Count);
+            SkillManager.Attack(user, targets[i], user.Status.attackPower, 200, AttackPattern.Random, i, targets.Count);
             
             if (targets[i].ReceivedCriticalDamage.Value)
                 criticalCount++;
@@ -55,7 +55,7 @@ public class Setsuna : CharacterBase
 
             // 最初4回は攻撃力*160%、以降の追加攻撃は攻撃力*210%で攻撃
             int attackRate = attackIndex < 4 ? 160 : 210;
-            SkillManager.Attack(user, target, user.Status.attackPower, attackRate, 1, 1);  // TODO 引数(1, 1)はわかりにくい
+            SkillManager.Attack(user, target, user.Status.attackPower, attackRate, AttackPattern.Random);
             remainingAttackCount--;
 
             // 戦闘不能にするたび、攻撃回数+1

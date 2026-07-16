@@ -185,14 +185,12 @@ public static class SkillManager
     /// <param name="target"></param>
     /// <param name="baseValue"></param>
     /// <param name="rate"></param>
-    /// <param name="hitIndex">これにより、ダメージアニメーションの遅延処理を制御。アニメを遅延させたい場合、この値を引数に渡す</param>
-    /// <param name="maxHitCount">〃</param>
-    /// <param name="playTrajectoryEffect">同一キャラに集中攻撃する場合は最初の一回のみtrue</param>
+    /// <param name="hitIndex"></param>
+    /// <param name="hitCount">〃</param>
     /// <returns></returns>
-    public static int Attack(CharaController user, CharaController target, int baseValue, int rate, int hitIndex = 0, int maxHitCount = 1, bool playTrajectoryEffect = true)
+    public static int Attack(CharaController user, CharaController target, int baseValue, int rate, AttackPattern attackPattern, int hitIndex = 0, int hitCount = 1)
     {
-        if (playTrajectoryEffect)
-        BattleAnimationManager.instance.AddAnimation(target, AnimationType.Trajectory, hitIndex, maxHitCount, user);
+        // BattleAnimationManager.instance.AddTrajectoryAnimation(user, target, attackPattern, hitIndex);
 
         // 「バリア」を持っている場合、一層消費してダメージを無効化
         var barrierBuff = target.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.バリア);
@@ -220,11 +218,10 @@ public static class SkillManager
 
         var hp = target.UpdateHp(-damageValue, HpDisplayUpdateTiming.Delayed);
         target.ReceivedCriticalDamage.Value = isCritical;
-        
-        // HP表示の更新→ ダメージアニメーション
+
+        // ダメージアニメーション→ HP表示の更新
+        BattleAnimationManager.instance.AddHitAnimation(target, attackPattern, hitIndex, hitCount);
         target.SetDisplayedHp(hp, hitIndex * BattleAnimationManager.HIT_DELAY);
-        BattleAnimationManager.instance.AddAnimation(target, AnimationType.Damage, hitIndex, maxHitCount, playTrajectoryEffect: playTrajectoryEffect);
-        BattleAnimationManager.instance.AddAnimation(target, AnimationType.DefaultHit, hitIndex, maxHitCount, playTrajectoryEffect: playTrajectoryEffect);
 
         // 「睡眠」状態を解除
         if (target.Status.Buffs.Any(debuff => debuff.type == BuffType.睡眠))

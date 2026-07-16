@@ -42,17 +42,57 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     [SerializeField] private RectTransform effectRoot;  // 軌跡エフェクトをこれの子として生成する
 
     [SerializeField] private List<EffectObjData> effects = new();  // AnimationType順に順番にプレハブを入れる
-    [SerializeField] private GameObject trajectoryEffect;
+    [SerializeField] private ParticleSystem trajectoryEffect;
 
     private List<UniTask> animationTasks = new();
     
-    public const float TRAJECTORY_DURATION = 0.1f;
+    public const float TRAJECTORY_DURATION = 0.2f;
     public const float HIT_DELAY = 0.17f;  // ヒット間のインターバル
 
 
-    public void AddAnimation(CharaController target, AnimationType animationType, int hitIndex = 0, int maxHitCount = 1, CharaController user = null, bool playTrajectoryEffect = true)
+    public void AddAnimation(CharaController target, AnimationType animationType, int hitIndex = 0, CharaController user = null, bool playLongDamageAniamtion = true)
     {
-        animationTasks.Add(PlayAnimation(target, animationType, hitIndex, maxHitCount, user, playTrajectoryEffect));
+        animationTasks.Add(PlayAnimation(target, animationType, hitIndex, user, playLongDamageAniamtion));
+    }
+
+    // public void AddTrajectoryAnimation(CharaController attacker, CharaController target, AttackPattern attackPattern, int hitIndex)
+    // {
+    //     bool playTrajectory = attackPattern switch
+    //     {
+    //         AttackPattern.Basic => true,
+    //         AttackPattern.Focused => hitIndex == 0,
+    //         AttackPattern.Random => true,
+    //         AttackPattern.Simultaneous => true,
+    //         _ => true
+    //     };
+
+    //     int animationIndex = attackPattern == AttackPattern.Simultaneous ? 0 : hitIndex;
+
+    //     AddAnimation(target, AnimationType.Trajectory, animationIndex, attacker);
+    // }
+
+    /// <summary>
+    /// ダメージアニメーション、ダメージエフェクトをまとめて制御
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="attackPattern"></param>
+    /// <param name="hitIndex"></param>
+    /// <param name="hitCount"></param>
+    public void AddHitAnimation(CharaController target, AttackPattern attackPattern, int hitIndex = 0, int hitCount = 1)
+    {
+        bool playLongDamageAnimation = attackPattern switch
+        {
+            AttackPattern.Basic => true,
+            AttackPattern.Focused => hitIndex == hitCount - 1,
+            AttackPattern.Random => true,
+            AttackPattern.Simultaneous => true,
+            _ => true
+        };
+
+        int animationIndex = attackPattern == AttackPattern.Simultaneous ? 0 : hitIndex;
+
+        AddAnimation(target, AnimationType.Damage, animationIndex, playLongDamageAniamtion: playLongDamageAnimation);
+        AddAnimation(target, AnimationType.DefaultHit, animationIndex);
     }
 
     public async UniTask WaitAllAnimations()
@@ -73,13 +113,12 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
         animationTasks.Clear();
     }
 
-    private async UniTask PlayAnimation(CharaController target, AnimationType animationType, int hitIndex = 0, int maxHitCount = 1, CharaController user = null, bool playTrajectoryEffect = true)
+    private async UniTask PlayAnimation(CharaController target, AnimationType animationType, int hitIndex = 0, CharaController user = null, bool isLongDamageAnimation = true)
     {
-        float delay;
-        if (animationType == AnimationType.Trajectory)
-            delay = hitIndex * HIT_DELAY;
-        else
-            delay = (hitIndex * HIT_DELAY) + TRAJECTORY_DURATION;
+        float delay = hitIndex * HIT_DELAY;
+        
+        if (animationType != AnimationType.Trajectory)
+            delay += TRAJECTORY_DURATION;  // TODO Focusedの場合、2回目以降の攻撃ではこの処理を行わない
 
         if (delay > 0)
             await UniTask.Delay(TimeSpan.FromSeconds(delay));
@@ -94,7 +133,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
                 PlayAttackAnimation(rect,target),
 
             AnimationType.Damage =>
-                PlayDamageAnimation(rect, target, hitIndex, maxHitCount),
+                PlayDamageAnimation(rect, target, isLongDamageAnimation),
 
             AnimationType.DefaultHit
             or AnimationType.SwordHit
@@ -105,8 +144,8 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
             or AnimationType.ReceiveDebuff 
                 => InstantiateEffect(rect, animationType),
             
-            AnimationType.Trajectory when user != null =>
-                InstantiateTrajectoryEffect(user, target),
+            // AnimationType.Trajectory when user != null =>
+            //     InstantiateTrajectoryEffect(user, target),
 
             _ => UniTask.CompletedTask
         });
@@ -120,24 +159,18 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
             .DOPunchAnchorPos(pos, 0.7f, 2).ToUniTask();
     }
 
-    private async UniTask PlayDamageAnimation(RectTransform animePoint, CharaController target, int hitIndex, int maxHitCount)
+    private async UniTask PlayDamageAnimation(RectTransform animePoint, CharaController target, bool isLongAnimation)
     {
         Vector3 pos = new(battleManager.PlayerTeam.Contains(target) ? -15f : 15f, -5f, 0f);
         
-        // 最後のダメージアニメーションだけ長く、それ以外は短くアニメーションさせる  // TODO コメント修正
-        if (hitIndex < maxHitCount - 1)  // indexは0始まりなのでmaxHitCount-1をする
-        {
-            await animePoint
-                .DOPunchAnchorPos(pos, HIT_DELAY, 5).ToUniTask();
-        }
-        else
-        {
-            await animePoint
-                .DOPunchAnchorPos(pos, 0.5f, 8).ToUniTask();
-            
-            // 位置が誤差程度ずれるので、強制的に元の位置に戻す  // TODO タイミング変更
-            animePoint.anchoredPosition = target.CharaStatusPannel.DefaultAnimationRootPos;
-        }
+        float duration = isLongAnimation ? 0.5f : HIT_DELAY;
+        int vibrato = isLongAnimation ? 8 : 5;
+        
+        await animePoint
+            .DOPunchAnchorPos(pos, duration, vibrato).ToUniTask();
+
+        // 位置が誤差程度ずれるので、強制的に元の位置に戻す  // TODO タイミング変更
+        animePoint.anchoredPosition = target.CharaStatusPannel.DefaultAnimationRootPos;
     }
 
     private UniTask InstantiateEffect(RectTransform effectPoint, AnimationType animationType)
@@ -161,17 +194,16 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
         return UniTask.WaitUntil(() => obj == null);
     }
 
-    private async UniTask InstantiateTrajectoryEffect(CharaController attacker, CharaController target)
-    {
-        var attackerRect = attacker.CharaStatusPannel.ImgChara.rectTransform;
-        var targetRect = target.CharaStatusPannel.ImgChara.rectTransform;
+    // private async UniTask InstantiateTrajectoryEffect(CharaController attacker, CharaController target)
+    // {
+    //     var attackerRect = attacker.CharaStatusPannel.ImgChara.rectTransform;
+    //     var targetRect = target.CharaStatusPannel.ImgChara.rectTransform;
 
-        var effect = Instantiate(trajectoryEffect, effectRoot);  // 指定した親の子として生成
-        effect.transform.position = attackerRect.position;  // ローカル位置を親の(0, 0, 0)に合わせる
+    //     var effect = Instantiate(trajectoryEffect, attackerRect.position, Quaternion.identity, effectRoot);  // 指定した親の子として生成
+    //     effect.Clear();
+    //     effect.Play();
 
-        await effect.transform
-            .DOMove(targetRect.position, TRAJECTORY_DURATION).SetEase(Ease.InQuad).ToUniTask();  // DOMove()にはワールド座標を指定する必要がある
-
-        Debug.Log($"Particle Count : {effect.GetComponent<ParticleSystem>().particleCount}");
-    }
+    //     await effect.transform
+    //         .DOMove(targetRect.position, TRAJECTORY_DURATION).SetEase(Ease.InQuad).ToUniTask();  // DOMove()にはワールド座標を指定する必要がある
+    // }
 }

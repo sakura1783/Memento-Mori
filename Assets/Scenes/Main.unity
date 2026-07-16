@@ -12371,7 +12371,7 @@ MonoBehaviour:
     scaleAdjustmentValue: 90
   - effectPrefab: {fileID: 5824670795371433373, guid: f6fd568b816c64943a44efc3add3a881, type: 3}
     scaleAdjustmentValue: 65
-  trajectoryEffect: {fileID: 6358740089057751005, guid: bd3bd1c37e5574e32bf5c35ef183cd6d, type: 3}
+  trajectoryEffect: {fileID: 5440939765215554313, guid: bd3bd1c37e5574e32bf5c35ef183cd6d, type: 3}
 --- !u!1 &1701532777
 GameObject:
   m_ObjectHideFlags: 0

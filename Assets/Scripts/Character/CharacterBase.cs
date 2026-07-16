@@ -1,3 +1,11 @@
+public enum AttackPattern
+{
+    Basic,
+    Focused,   // 一体に集中攻撃
+    Random,  // 無作為攻撃
+    Simultaneous,  // 重複なしの一斉攻撃
+}
+
 public abstract class CharacterBase
 {
     public abstract int Active1CoolTime { get; }  // 外部から参照したいが、値は変更されたくないので、読み取り専用プロパティを定義。
@@ -14,7 +22,7 @@ public abstract class CharacterBase
     public virtual void BasicAttack(CharaController user)
     {
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
-        targets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 100));
+        targets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 100, AttackPattern.Basic));
 
         // アニメーション再生
         BattleAnimationManager.instance.AddAnimation(user, AnimationType.Attack);
