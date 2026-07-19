@@ -221,7 +221,7 @@ public static class SkillManager
 
         // ダメージアニメーション→ HP表示の更新
         BattleAnimationManager.instance.AddHitAnimation(target, attackPattern, hitIndex, hitCount);
-        target.SetDisplayedHp(hp, hitIndex * BattleAnimationManager.HIT_DELAY);
+        target.SetDisplayedHp(hp, BattleAnimationManager.GetHitDelay(attackPattern, hitIndex));
 
         // 「睡眠」状態を解除
         if (target.Status.Buffs.Any(debuff => debuff.type == BuffType.睡眠))

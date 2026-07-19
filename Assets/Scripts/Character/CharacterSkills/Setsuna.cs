@@ -55,7 +55,7 @@ public class Setsuna : CharacterBase
 
             // 最初4回は攻撃力*160%、以降の追加攻撃は攻撃力*210%で攻撃
             int attackRate = attackIndex < 4 ? 160 : 210;
-            SkillManager.Attack(user, target, user.Status.attackPower, attackRate, AttackPattern.Random);
+            SkillManager.Attack(user, target, user.Status.attackPower, attackRate, AttackPattern.Random, attackIndex);
             remainingAttackCount--;
 
             // 戦闘不能にするたび、攻撃回数+1

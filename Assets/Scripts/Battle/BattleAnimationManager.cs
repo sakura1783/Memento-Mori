@@ -47,29 +47,31 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     private List<UniTask> animationTasks = new();
     
     public const float TRAJECTORY_DURATION = 0.2f;
-    public const float HIT_DELAY = 0.17f;  // ヒット間のインターバル
+    public const float SHORT_HIT_DURATION = 0.17f;
+    public const float LONG_HIT_DURATION = 0.5f;
 
 
-    public void AddAnimation(CharaController target, AnimationType animationType, int hitIndex = 0, CharaController user = null, bool playLongDamageAniamtion = true)
+    public void AddAnimation(CharaController target, AnimationType animationType, float delay = 0, CharaController user = null, bool playLongDamageAnimation = true)
     {
-        animationTasks.Add(PlayAnimation(target, animationType, hitIndex, user, playLongDamageAniamtion));
+        animationTasks.Add(PlayAnimation(target, animationType, delay, user, playLongDamageAnimation));
     }
 
-    // public void AddTrajectoryAnimation(CharaController attacker, CharaController target, AttackPattern attackPattern, int hitIndex)
-    // {
-    //     bool playTrajectory = attackPattern switch
-    //     {
-    //         AttackPattern.Basic => true,
-    //         AttackPattern.Focused => hitIndex == 0,
-    //         AttackPattern.Random => true,
-    //         AttackPattern.Simultaneous => true,
-    //         _ => true
-    //     };
+    public void AddTrajectoryAnimation(CharaController attacker, CharaController target, AttackPattern attackPattern, int hitIndex)
+    {
+        bool playTrajectory = attackPattern switch
+        {
+            AttackPattern.Basic => true,
+            AttackPattern.Focused => hitIndex == 0,
+            AttackPattern.Random => true,
+            AttackPattern.Simultaneous => true,
+            _ => true
+        };
 
-    //     int animationIndex = attackPattern == AttackPattern.Simultaneous ? 0 : hitIndex;
+        if (!playTrajectory)
+            return;
 
-    //     AddAnimation(target, AnimationType.Trajectory, animationIndex, attacker);
-    // }
+        AddAnimation(target, AnimationType.Trajectory, GetTrajectoryDelay(attackPattern, hitIndex), attacker);
+    }
 
     /// <summary>
     /// ダメージアニメーション、ダメージエフェクトをまとめて制御
@@ -80,6 +82,8 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     /// <param name="hitCount"></param>
     public void AddHitAnimation(CharaController target, AttackPattern attackPattern, int hitIndex = 0, int hitCount = 1)
     {
+        float delay = GetHitDelay(attackPattern, hitIndex);
+
         bool playLongDamageAnimation = attackPattern switch
         {
             AttackPattern.Basic => true,
@@ -89,10 +93,8 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
             _ => true
         };
 
-        int animationIndex = attackPattern == AttackPattern.Simultaneous ? 0 : hitIndex;
-
-        AddAnimation(target, AnimationType.Damage, animationIndex, playLongDamageAniamtion: playLongDamageAnimation);
-        AddAnimation(target, AnimationType.DefaultHit, animationIndex);
+        AddAnimation(target, AnimationType.Damage, delay, playLongDamageAnimation: playLongDamageAnimation);
+        AddAnimation(target, AnimationType.DefaultHit, delay);
     }
 
     public async UniTask WaitAllAnimations()
@@ -113,13 +115,8 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
         animationTasks.Clear();
     }
 
-    private async UniTask PlayAnimation(CharaController target, AnimationType animationType, int hitIndex = 0, CharaController user = null, bool isLongDamageAnimation = true)
+    private async UniTask PlayAnimation(CharaController target, AnimationType animationType, float delay = 0, CharaController user = null, bool isLongDamageAnimation = true)
     {
-        float delay = hitIndex * HIT_DELAY;
-        
-        if (animationType != AnimationType.Trajectory)
-            delay += TRAJECTORY_DURATION;  // TODO Focusedの場合、2回目以降の攻撃ではこの処理を行わない
-
         if (delay > 0)
             await UniTask.Delay(TimeSpan.FromSeconds(delay));
         
@@ -163,7 +160,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     {
         Vector3 pos = new(battleManager.PlayerTeam.Contains(target) ? -15f : 15f, -5f, 0f);
         
-        float duration = isLongAnimation ? 0.5f : HIT_DELAY;
+        float duration = isLongAnimation ? LONG_HIT_DURATION : SHORT_HIT_DURATION;
         int vibrato = isLongAnimation ? 8 : 5;
         
         await animePoint
@@ -206,4 +203,28 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     //     await effect.transform
     //         .DOMove(targetRect.position, TRAJECTORY_DURATION).SetEase(Ease.InQuad).ToUniTask();  // DOMove()にはワールド座標を指定する必要がある
     // }
+
+    public static float GetHitDelay(AttackPattern attackPattern, int hitIndex)  // クラスインスタンスの状態を何も利用していないため、staticに。
+    {
+        return attackPattern switch
+        {
+            AttackPattern.Basic => TRAJECTORY_DURATION,
+            AttackPattern.Focused => TRAJECTORY_DURATION + (SHORT_HIT_DURATION * hitIndex),
+            AttackPattern.Random => TRAJECTORY_DURATION + (TRAJECTORY_DURATION + LONG_HIT_DURATION) * hitIndex,
+            AttackPattern.Simultaneous => TRAJECTORY_DURATION,
+            _ => 0f
+        };
+    }
+
+    public static float GetTrajectoryDelay(AttackPattern attackPattern, int hitIndex)
+    {
+        return attackPattern switch
+        {
+            AttackPattern.Basic => 0f,
+            AttackPattern.Focused => 0f,
+            AttackPattern.Random => hitIndex * (TRAJECTORY_DURATION + LONG_HIT_DURATION),
+            AttackPattern.Simultaneous => 0f,
+            _ => 0f
+        };
+    }
 }
