@@ -190,7 +190,7 @@ public static class SkillManager
     /// <returns></returns>
     public static int Attack(CharaController user, CharaController target, int baseValue, int rate, AttackPattern attackPattern, int hitIndex = 0, int hitCount = 1)
     {
-        // BattleAnimationManager.instance.AddTrajectoryAnimation(user, target, attackPattern, hitIndex);
+        BattleAnimationManager.instance.AddTrajectoryAnimation(user, target, attackPattern, hitIndex);
 
         // 「バリア」を持っている場合、一層消費してダメージを無効化
         var barrierBuff = target.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.バリア);

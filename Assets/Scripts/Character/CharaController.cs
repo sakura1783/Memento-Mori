@@ -23,7 +23,6 @@ public class CharaController
     public CharacterBase Chara { get; private set; }
 
     private readonly CharaName name;
-    public CharaName Name => name;
 
     private readonly Attribute attribute;  // 属性はずっと変わらない情報なのでreadonly
     public Attribute Attribute => attribute;
@@ -35,7 +34,7 @@ public class CharaController
     public IReadOnlyReactiveProperty<int> DisplayedHp => displayedHp;
 
     public int active1RemainingCoolTime;
-    public int active2RemainingCoolTime = 1;  // スキル1を最初に優先して発動するため、初期値は1に設定  // TODO これいらなくね？
+    public int active2RemainingCoolTime;
 
     private PassiveSkillState passive1State;
     private PassiveSkillState passive2State;
@@ -64,7 +63,7 @@ public class CharaController
         // 計算後の各ステータスの値を受け取り、キャラに反映
         status = statusData;
         displayedHp.Value = status.Hp.Value;
-        name = charaName;  // TODO 削除
+        name = charaName;
 
         // 属性をスクリプタブルオブジェクトから取得
         attribute = DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.FirstOrDefault(data => data.englishName == charaName).attribute;
@@ -225,17 +224,13 @@ public class CharaController
             return;
 
         passive();
-        // Debug.Log(config == chara.Passive1Config ? $"パッシブスキル1が発動しました：{name}" : $"パッシブスキル2が発動しました：{name}");  // TODO 確認終わったら消す
 
         state.remainingDuration = config.duration;
         state.remainingCountForReactivation = config.requiredCountForReactivation;
 
         state.remainingActivationCount--;
         if (state.remainingActivationCount <= 0)
-        {
             state.isDisabled = true;
-            // Debug.Log($"パッシブスキルを無効化：{name}");  // TODO 確認終わったら消す
-        }
     }
 
     /// <summary>

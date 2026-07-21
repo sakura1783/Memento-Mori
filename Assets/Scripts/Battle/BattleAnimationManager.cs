@@ -48,7 +48,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     
     public const float TRAJECTORY_DURATION = 0.2f;
     public const float SHORT_HIT_DURATION = 0.17f;
-    public const float LONG_HIT_DURATION = 0.5f;
+    public const float LONG_HIT_DURATION = 0.3f;
 
 
     public void AddAnimation(CharaController target, AnimationType animationType, float delay = 0, CharaController user = null, bool playLongDamageAnimation = true)
@@ -141,8 +141,8 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
             or AnimationType.ReceiveDebuff 
                 => InstantiateEffect(rect, animationType),
             
-            // AnimationType.Trajectory when user != null =>
-            //     InstantiateTrajectoryEffect(user, target),
+            AnimationType.Trajectory when user != null =>
+                InstantiateTrajectoryEffect(user, target),
 
             _ => UniTask.CompletedTask
         });
@@ -161,12 +161,12 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
         Vector3 pos = new(battleManager.PlayerTeam.Contains(target) ? -15f : 15f, -5f, 0f);
         
         float duration = isLongAnimation ? LONG_HIT_DURATION : SHORT_HIT_DURATION;
-        int vibrato = isLongAnimation ? 8 : 5;
+        int vibrato = isLongAnimation ? 13 : 5;
         
         await animePoint
             .DOPunchAnchorPos(pos, duration, vibrato).ToUniTask();
 
-        // 位置が誤差程度ずれるので、強制的に元の位置に戻す  // TODO タイミング変更
+        // 位置が誤差程度ずれるので、強制的に元の位置に戻す  // TODO タイミング変更？
         animePoint.anchoredPosition = target.CharaStatusPannel.DefaultAnimationRootPos;
     }
 
@@ -191,18 +191,24 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
         return UniTask.WaitUntil(() => obj == null);
     }
 
-    // private async UniTask InstantiateTrajectoryEffect(CharaController attacker, CharaController target)
-    // {
-    //     var attackerRect = attacker.CharaStatusPannel.ImgChara.rectTransform;
-    //     var targetRect = target.CharaStatusPannel.ImgChara.rectTransform;
+    private async UniTask InstantiateTrajectoryEffect(CharaController attacker, CharaController target)
+    {
+        var attackerRect = attacker.CharaStatusPannel.ImgChara.rectTransform;
+        var targetRect = target.CharaStatusPannel.ImgChara.rectTransform;
 
-    //     var effect = Instantiate(trajectoryEffect, attackerRect.position, Quaternion.identity, effectRoot);  // 指定した親の子として生成
-    //     effect.Clear();
-    //     effect.Play();
+        var effect = Instantiate(trajectoryEffect, attackerRect.position, Quaternion.identity, effectRoot);  // 指定した親の子として生成
+        effect.Clear();
+        effect.Play();
 
-    //     await effect.transform
-    //         .DOMove(targetRect.position, TRAJECTORY_DURATION).SetEase(Ease.InQuad).ToUniTask();  // DOMove()にはワールド座標を指定する必要がある
-    // }
+        await effect.transform
+            .DOMove(targetRect.position, TRAJECTORY_DURATION).SetEase(Ease.Linear).ToUniTask();  // DOMove()にはワールド座標を指定する必要がある
+
+        // TODO
+        // effect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+
+        // float distance = Vector3.Distance(attackerRect.position, targetRect.position);
+        // Debug.Log($"Trajectory Distance : {distance}");
+    }
 
     public static float GetHitDelay(AttackPattern attackPattern, int hitIndex)  // クラスインスタンスの状態を何も利用していないため、staticに。
     {
