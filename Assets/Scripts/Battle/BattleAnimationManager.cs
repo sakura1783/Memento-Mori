@@ -28,13 +28,14 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     [Serializable]
     private class EffectObjData
     {
+        [SerializeField] private AnimationType animationType;
+        public AnimationType AnimationType => animationType;
+
         [SerializeField] private GameObject effectPrefab;
         public GameObject Effectprefab => effectPrefab;
 
         [SerializeField] int scaleAdjustmentValue = 1;
         public int ScaleAdjustmentValue => scaleAdjustmentValue;
-
-        // TODO enumと紐付け
     }
 
     [SerializeField] private BattleManager battleManager;
@@ -172,7 +173,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
 
     private UniTask InstantiateEffect(RectTransform effectPoint, AnimationType animationType)
     {
-        var effectData = effects[(int)animationType - 2];  // AnimationType列挙型の最初の2つはDOTweenアニメーションなので、配列要素のインデックスを合わせるために-2する
+        EffectObjData effectData = effects.FirstOrDefault(x => x.AnimationType == animationType);
 
         var obj = Instantiate(effectData.Effectprefab, effectPoint);
         obj.transform.localPosition = Vector3.zero;
