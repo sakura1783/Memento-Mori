@@ -38,6 +38,30 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
         public int ScaleAdjustmentValue => scaleAdjustmentValue;
     }
 
+    /// <summary>
+    /// usingで使うクラス。IDisposableを実装する。
+    /// </summary>
+    private class AnimationTimingScope : IDisposable
+    {
+        private readonly Action onDispose;
+
+        /// コンストラクタ
+        public AnimationTimingScope(Action action)
+        {
+            onDispose = action;
+        }
+
+
+        /// <summary>
+        /// usingの{}内の処理を終えた際に自動的に動く処理。
+        /// (値のセット->何らかの処理->値のリセット、などと単純に処理を回すより安全な方法)
+        /// </summary>
+        public void Dispose()
+        {
+            onDispose?.Invoke();
+        }
+    }
+
     [SerializeField] private BattleManager battleManager;
 
     [SerializeField] private RectTransform effectRoot;  // 軌跡エフェクトをこれの子として生成する
@@ -46,17 +70,35 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     [SerializeField] private ParticleSystem trajectoryEffect;
 
     private List<UniTask> animationTasks = new();
-    
+
+    public float CurrentEffectDelay { get; private set; }  // 現在利用する遅延
+
     public const float TRAJECTORY_DURATION = 0.2f;
     public const float SHORT_HIT_DURATION = 0.17f;
     public const float LONG_HIT_DURATION = 0.3f;
 
 
-    public void AddAnimation(CharaController target, AnimationType animationType, float delay = 0, CharaController user = null, bool playLongDamageAnimation = true)
+    /// <summary>
+    /// 軌跡エフェクト、ダメージアニメーション以外はここからアニメーション処理を行う
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="animationType"></param>
+    /// <param name="delay">省略した場合(=中身がnull)、現在のスコープの遅延を使用し、値を指定した場合、その分だけ遅延する</param>
+    /// <param name="user"></param>
+    /// <param name="playLongDamageAnimation"></param>
+    public void AddAnimation(CharaController target, AnimationType animationType, float? delay = null, CharaController user = null, bool playLongDamageAnimation = true)
     {
-        animationTasks.Add(PlayAnimation(target, animationType, delay, user, playLongDamageAnimation));
+        float actualDelay = delay ?? CurrentEffectDelay;
+        animationTasks.Add(PlayAnimation(target, animationType, actualDelay, user, playLongDamageAnimation));
     }
 
+    /// <summary>
+    /// 軌跡エフェクトはここからアニメーション処理を行う
+    /// </summary>
+    /// <param name="attacker"></param>
+    /// <param name="target"></param>
+    /// <param name="attackPattern"></param>
+    /// <param name="hitIndex"></param>
     public void AddTrajectoryAnimation(CharaController attacker, CharaController target, AttackPattern attackPattern, int hitIndex)
     {
         bool playTrajectory = attackPattern switch
@@ -75,7 +117,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     }
 
     /// <summary>
-    /// ダメージアニメーション、ダメージエフェクトをまとめて制御
+    /// ダメージアニメーション->ダメージエフェクト用。まとめてここから処理を実行
     /// </summary>
     /// <param name="target"></param>
     /// <param name="attackPattern"></param>
@@ -233,5 +275,19 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
             AttackPattern.Simultaneous => 0f,
             _ => 0f
         };
+    }
+
+    /// <summary>
+    /// using(UseHitTiming()){}で、中括弧内に書いたアニメーションを全て同じタイミングで実行する
+    /// </summary>
+    /// <param name="attackPattern"></param>
+    /// <param name="hitIndex"></param>
+    /// <returns></returns>
+    public IDisposable UseHitTiming(AttackPattern attackPattern, int hitIndex)
+    {
+        float previousDelay = CurrentEffectDelay;
+        
+        CurrentEffectDelay = GetHitDelay(attackPattern, hitIndex);
+        return new AnimationTimingScope(() => CurrentEffectDelay = previousDelay);
     }
 }

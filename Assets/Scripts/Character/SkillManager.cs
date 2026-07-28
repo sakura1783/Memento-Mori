@@ -312,6 +312,8 @@ public static class SkillManager
     /// <param name="effectValue">効果の量。「シールド」などで利用。(デフォルト値として-1を設定。0になるとRemoveBuff()が動くので、値を減らす際は0以下にならないように制御する)</param>
     public static void AddBuff(CharaController target, BuffType buffType, bool isPositiveEffect, bool isIrremovable, int duration = 100, int effectRate = 0, int effectValue = -1)
     {
+        BattleAnimationManager.instance.AddAnimation(target, isPositiveEffect ? AnimationType.ReceiveBuff : AnimationType.ReceiveDebuff);
+        
         // 重ね掛け不可。継続時間とダメージ割合を置き換えて、処理を終了
         var duplicateBuff = target.Status.Buffs.FirstOrDefault(x => x.type == buffType);
         if (duplicateBuff != null)
