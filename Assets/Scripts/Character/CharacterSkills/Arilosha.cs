@@ -15,7 +15,7 @@ public class Arilosha : CharacterBase
         base.BasicAttack(user);
 
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
-        targets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 220, AttackPattern.Basic));
+        targets.ForEach(target => SkillManager.SingleAttack(user, target, user.Status.attackPower, 220, AttackPattern.Single));
     }
 
     /// <summary>
@@ -27,7 +27,7 @@ public class Arilosha : CharacterBase
         user.UpdateHp(-CalculateManager.CalculateValueByRate(user.Status.Hp.Value, 10));
 
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1, ValueType.ByCurrentHp, false);
-        targets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 480, AttackPattern.Basic));
+        targets.ForEach(target => SkillManager.SingleAttack(user, target, user.Status.attackPower, 480, AttackPattern.Single));
     }
 
     /// <summary>

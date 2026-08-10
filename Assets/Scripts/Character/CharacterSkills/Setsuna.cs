@@ -19,13 +19,13 @@ public class Setsuna : CharacterBase
         int criticalCount = 0;
 
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 3, allowDuplicates: true);
-        for (int i = 0; i < targets.Count; i++)
+        
+        SkillManager.RandomAttack(user, targets, user.Status.attackPower, 200);
+        targets.ForEach(target =>
         {
-            SkillManager.Attack(user, targets[i], user.Status.attackPower, 200, AttackPattern.Random, i, targets.Count);
-            
-            if (targets[i].ReceivedCriticalDamage.Value)
+            if (target.ReceivedCriticalDamage.Value)
                 criticalCount++;
-        }
+        });
 
         if (criticalCount > 0)
         {
@@ -49,17 +49,17 @@ public class Setsuna : CharacterBase
         while (remainingAttackCount > 0 && attackIndex < 8)
         {   
             // 最初4回はランダムな敵、以降の追加攻撃はHP割合が最も低い敵を選択
-            CharaController target = attackIndex < 4
-                ? SkillManager.PickTarget(user, TargetType.Opponent, 1).FirstOrDefault()
-                : SkillManager.PickTarget(user, TargetType.Opponent, 1, ValueType.ByCurrentHp, false).FirstOrDefault();
+            List<CharaController> target = attackIndex < 4
+                ? SkillManager.PickTarget(user, TargetType.Opponent, 1)
+                : SkillManager.PickTarget(user, TargetType.Opponent, 1, ValueType.ByCurrentHp, false);
 
             // 最初4回は攻撃力*160%、以降の追加攻撃は攻撃力*210%で攻撃
             int attackRate = attackIndex < 4 ? 160 : 210;
-            SkillManager.Attack(user, target, user.Status.attackPower, attackRate, AttackPattern.Random, attackIndex);
+            SkillManager.RandomAttack(user, target, user.Status.attackPower, attackRate);
             remainingAttackCount--;
 
             // 戦闘不能にするたび、攻撃回数+1
-            if (target.Status.Hp.Value <= 0)
+            if (target.FirstOrDefault().Status.Hp.Value <= 0)
                 remainingAttackCount++;
 
             attackIndex++;

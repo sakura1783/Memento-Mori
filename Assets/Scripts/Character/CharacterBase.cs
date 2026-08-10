@@ -1,6 +1,6 @@
 public enum AttackPattern
 {
-    Basic,
+    Single,  // (Simultaneousと挙動は同じだが、名前を分けてコード内に明示した方がわかりやすいため、合体せず両方残す)
     Focused,   // 一体に集中攻撃
     Random,  // 無作為攻撃
     Simultaneous,  // 重複なしの一斉攻撃
@@ -22,7 +22,7 @@ public abstract class CharacterBase
     public virtual void BasicAttack(CharaController user)
     {
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
-        targets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 100, AttackPattern.Basic));
+        targets.ForEach(target => SkillManager.SingleAttack(user, target, user.Status.attackPower, 100, AttackPattern.Single, HitSequencePosition.single));
 
         // アニメーション再生
         BattleAnimationManager.instance.AddAnimation(user, AnimationType.Attack);

@@ -4,6 +4,7 @@ using System.Linq;
 using UniRx;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using JetBrains.Annotations;
 
 /// <summary>
 /// スキルのターゲットの種類
@@ -179,18 +180,19 @@ public static class SkillManager
     }
 
     /// <summary>
-    /// 攻撃
+    /// 1回攻撃
     /// </summary>
     /// <param name="user"></param>
     /// <param name="target"></param>
     /// <param name="baseValue"></param>
     /// <param name="rate"></param>
-    /// <param name="hitIndex"></param>
-    /// <param name="hitCount">〃</param>
+    /// <param name="attackPattern"></param>
+    /// <param name="hit"></param>
     /// <returns></returns>
-    public static int Attack(CharaController user, CharaController target, int baseValue, int rate, AttackPattern attackPattern, int hitIndex = 0, int hitCount = 1)
+    public static int SingleAttack(CharaController user, CharaController target, int baseValue, int rate, AttackPattern attackPattern, HitSequencePosition? hit = null)
     {
-        BattleAnimationManager.instance.AddTrajectoryAnimation(user, target, attackPattern, hitIndex);
+        // TODO 軌跡エフェクトは必ず再生
+        // BattleAnimationManager.instance.AddTrajectoryAnimation(user, target, attackPattern, hitIndex);
 
         // 「バリア」を持っている場合、一層消費してダメージを無効化
         var barrierBuff = target.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.バリア);
@@ -213,23 +215,70 @@ public static class SkillManager
             damageValue = Mathf.Max(damageValue - shieldValue, 0);
         }
 
-        // ダメージ補正 
-        target.ModifyIncomingDamage(damageValue);
+        // キャラ固有スキルなどによる被ダメージ補正を適用
+        damageValue = target.ModifyIncomingDamage(damageValue);
 
-        var hp = target.UpdateHp(-damageValue, HpDisplayUpdateTiming.Delayed);
+        target.UpdateHp(-damageValue, HpDisplayUpdateTiming.Delayed);
         target.ReceivedCriticalDamage.Value = isCritical;
 
-        // ダメージアニメーション→ HP表示の更新
-        BattleAnimationManager.instance.AddHitAnimation(target, attackPattern, hitIndex, hitCount);
-        target.SetDisplayedHp(hp, BattleAnimationManager.GetHitDelay(attackPattern, hitIndex));
+        // 攻撃に伴う一連の演出を処理 (アニメーション再生、HP表示更新など)
+        AttackSequencePlan plan = AttackSequencePlanBuilder.Build(attackPattern, hit ?? HitSequencePosition.single);
+        BattleAnimationManager.instance.CurrentEffectDelay = plan.HitDelay;
+        AttackSequenceScheduler.Schedule(user, target, plan, target.Status.Hp.Value);
 
         // 「睡眠」状態を解除
         if (target.Status.Buffs.Any(debuff => debuff.type == BuffType.睡眠))
-        {
             RemoveBuff(target, BuffType.睡眠);
-        }
 
         return damageValue;
+    }
+
+    /// <summary>
+    /// 1体に集中攻撃
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="target"></param>
+    /// <param name="baseValue"></param>
+    /// <param name="rate"></param>
+    /// <param name="hitCount"></param>
+    /// <returns></returns>
+    public static List<int> FocusedAttack(CharaController user, CharaController target, int baseValue, int rate, int hitCount)
+    {
+        var damageValues = new List<int>(hitCount);
+
+        for (int i = 0; i < hitCount; i++)
+        {
+            var hit = new HitSequencePosition(i, hitCount);
+            int damage = SingleAttack(user, target, baseValue, rate, AttackPattern.Focused, hit);
+
+            damageValues.Add(damage);
+        }
+
+        return damageValues;
+    }
+
+    /// <summary>
+    /// 複数体に無作為攻撃
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="targets"></param>
+    /// <param name="baseValue"></param>
+    /// <param name="rate"></param>
+    /// <returns></returns>
+    public static List<int> RandomAttack(CharaController user, List<CharaController> targets, int baseValue, int rate)
+    {
+        var damageValues = new List<int>(targets.Count);
+
+        for (int i = 0; i < targets.Count; i++)
+        {
+            CharaController target = targets[i];
+            var hit = new HitSequencePosition(i, targets.Count);
+
+            int damage = SingleAttack(user, target, baseValue, rate, AttackPattern.Random, hit);
+            damageValues.Add(damage);
+        }
+
+        return damageValues;
     }
 
     /// <summary>
@@ -313,7 +362,7 @@ public static class SkillManager
     public static void AddBuff(CharaController target, BuffType buffType, bool isPositiveEffect, bool isIrremovable, int duration = 100, int effectRate = 0, int effectValue = -1)
     {
         BattleAnimationManager.instance.AddAnimation(target, isPositiveEffect ? AnimationType.ReceiveBuff : AnimationType.ReceiveDebuff);
-        
+
         // 重ね掛け不可。継続時間とダメージ割合を置き換えて、処理を終了
         var duplicateBuff = target.Status.Buffs.FirstOrDefault(x => x.type == buffType);
         if (duplicateBuff != null)

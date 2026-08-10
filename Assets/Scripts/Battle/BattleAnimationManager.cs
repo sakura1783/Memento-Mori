@@ -71,7 +71,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
 
     private List<UniTask> animationTasks = new();
 
-    public float CurrentEffectDelay { get; private set; }  // 現在利用する遅延
+    public float CurrentEffectDelay { get; set; }  // 現在利用する遅延
 
     public const float TRAJECTORY_DURATION = 0.2f;
     public const float SHORT_HIT_DURATION = 0.17f;
@@ -92,53 +92,53 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
         animationTasks.Add(PlayAnimation(target, animationType, actualDelay, user, playLongDamageAnimation));
     }
 
-    /// <summary>
-    /// 軌跡エフェクトはここからアニメーション処理を行う
-    /// </summary>
-    /// <param name="attacker"></param>
-    /// <param name="target"></param>
-    /// <param name="attackPattern"></param>
-    /// <param name="hitIndex"></param>
-    public void AddTrajectoryAnimation(CharaController attacker, CharaController target, AttackPattern attackPattern, int hitIndex)
-    {
-        bool playTrajectory = attackPattern switch
-        {
-            AttackPattern.Basic => true,
-            AttackPattern.Focused => hitIndex == 0,
-            AttackPattern.Random => true,
-            AttackPattern.Simultaneous => true,
-            _ => true
-        };
+    // /// <summary>
+    // /// 軌跡エフェクトはここからアニメーション処理を行う
+    // /// </summary>
+    // /// <param name="attacker"></param>
+    // /// <param name="target"></param>
+    // /// <param name="attackPattern"></param>
+    // /// <param name="hitIndex"></param>
+    // public void AddTrajectoryAnimation(CharaController attacker, CharaController target, AttackPattern attackPattern, int hitIndex)
+    // {
+    //     bool playTrajectory = attackPattern switch
+    //     {
+    //         AttackPattern.Basic => true,
+    //         AttackPattern.Focused => hitIndex == 0,
+    //         AttackPattern.Random => true,
+    //         AttackPattern.Simultaneous => true,
+    //         _ => true
+    //     };
 
-        if (!playTrajectory)
-            return;
+    //     if (!playTrajectory)
+    //         return;
 
-        AddAnimation(target, AnimationType.Trajectory, GetTrajectoryDelay(attackPattern, hitIndex), attacker);
-    }
+    //     AddAnimation(target, AnimationType.Trajectory, GetTrajectoryDelay(attackPattern, hitIndex), attacker);
+    // }
 
-    /// <summary>
-    /// ダメージアニメーション->ダメージエフェクト用。まとめてここから処理を実行
-    /// </summary>
-    /// <param name="target"></param>
-    /// <param name="attackPattern"></param>
-    /// <param name="hitIndex"></param>
-    /// <param name="hitCount"></param>
-    public void AddHitAnimation(CharaController target, AttackPattern attackPattern, int hitIndex = 0, int hitCount = 1)
-    {
-        float delay = GetHitDelay(attackPattern, hitIndex);
+    // /// <summary>
+    // /// ダメージアニメーション->ダメージエフェクト用。まとめてここから処理を実行
+    // /// </summary>
+    // /// <param name="target"></param>
+    // /// <param name="attackPattern"></param>
+    // /// <param name="hitIndex"></param>
+    // /// <param name="hitCount"></param>
+    // public void AddHitAnimation(CharaController target, AttackPattern attackPattern, int hitIndex = 0, int hitCount = 1)
+    // {
+    //     float delay = GetHitDelay(attackPattern, hitIndex);
 
-        bool playLongDamageAnimation = attackPattern switch
-        {
-            AttackPattern.Basic => true,
-            AttackPattern.Focused => hitIndex == hitCount - 1,
-            AttackPattern.Random => true,
-            AttackPattern.Simultaneous => true,
-            _ => true
-        };
+    //     bool playLongDamageAnimation = attackPattern switch
+    //     {
+    //         AttackPattern.Basic => true,
+    //         AttackPattern.Focused => hitIndex == hitCount - 1,
+    //         AttackPattern.Random => true,
+    //         AttackPattern.Simultaneous => true,
+    //         _ => true
+    //     };
 
-        AddAnimation(target, AnimationType.Damage, delay, playLongDamageAnimation: playLongDamageAnimation);
-        AddAnimation(target, AnimationType.DefaultHit, delay);
-    }
+    //     AddAnimation(target, AnimationType.Damage, delay, playLongDamageAnimation: playLongDamageAnimation);
+    //     AddAnimation(target, AnimationType.DefaultHit, delay);
+    // }
 
     public async UniTask WaitAllAnimations()
     {
@@ -253,41 +253,41 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
         // Debug.Log($"Trajectory Distance : {distance}");
     }
 
-    public static float GetHitDelay(AttackPattern attackPattern, int hitIndex)  // クラスインスタンスの状態を何も利用していないため、staticに。
-    {
-        return attackPattern switch
-        {
-            AttackPattern.Basic => TRAJECTORY_DURATION,
-            AttackPattern.Focused => TRAJECTORY_DURATION + (SHORT_HIT_DURATION * hitIndex),
-            AttackPattern.Random => TRAJECTORY_DURATION + (TRAJECTORY_DURATION + LONG_HIT_DURATION) * hitIndex,
-            AttackPattern.Simultaneous => TRAJECTORY_DURATION,
-            _ => 0f
-        };
-    }
+    // public static float GetHitDelay(AttackPattern attackPattern, int hitIndex)  // クラスインスタンスの状態を何も利用していないため、staticに。
+    // {
+    //     return attackPattern switch
+    //     {
+    //         AttackPattern.Basic => TRAJECTORY_DURATION,
+    //         AttackPattern.Focused => TRAJECTORY_DURATION + (SHORT_HIT_DURATION * hitIndex),
+    //         AttackPattern.Random => TRAJECTORY_DURATION + (TRAJECTORY_DURATION + LONG_HIT_DURATION) * hitIndex,
+    //         AttackPattern.Simultaneous => TRAJECTORY_DURATION,
+    //         _ => 0f
+    //     };
+    // }
 
-    public static float GetTrajectoryDelay(AttackPattern attackPattern, int hitIndex)
-    {
-        return attackPattern switch
-        {
-            AttackPattern.Basic => 0f,
-            AttackPattern.Focused => 0f,
-            AttackPattern.Random => hitIndex * (TRAJECTORY_DURATION + LONG_HIT_DURATION),
-            AttackPattern.Simultaneous => 0f,
-            _ => 0f
-        };
-    }
+    // public static float GetTrajectoryDelay(AttackPattern attackPattern, int hitIndex)
+    // {
+    //     return attackPattern switch
+    //     {
+    //         AttackPattern.Basic => 0f,
+    //         AttackPattern.Focused => 0f,
+    //         AttackPattern.Random => hitIndex * (TRAJECTORY_DURATION + LONG_HIT_DURATION),
+    //         AttackPattern.Simultaneous => 0f,
+    //         _ => 0f
+    //     };
+    // }
 
-    /// <summary>
-    /// using(UseHitTiming()){}で、中括弧内に書いたアニメーションを全て同じタイミングで実行する
-    /// </summary>
-    /// <param name="attackPattern"></param>
-    /// <param name="hitIndex"></param>
-    /// <returns></returns>
-    public IDisposable UseHitTiming(AttackPattern attackPattern, int hitIndex)
-    {
-        float previousDelay = CurrentEffectDelay;
-        
-        CurrentEffectDelay = GetHitDelay(attackPattern, hitIndex);
-        return new AnimationTimingScope(() => CurrentEffectDelay = previousDelay);
-    }
+    // /// <summary>
+    // /// using(UseHitTiming()){}で、中括弧内に書いたアニメーションを全て同じタイミングで実行する
+    // /// </summary>
+    // /// <param name="attackPattern"></param>
+    // /// <param name="hitIndex"></param>
+    // /// <returns></returns>
+    // public IDisposable UseHitTiming(AttackPattern attackPattern, int hitIndex)
+    // {
+    //     float previousDelay = CurrentEffectDelay;
+
+    //     CurrentEffectDelay = GetHitDelay(attackPattern, hitIndex);
+    //     return new AnimationTimingScope(() => CurrentEffectDelay = previousDelay);
+    // }
 }

@@ -1,3 +1,6 @@
+using System.Linq;
+
+
 /// <summary>
 /// ローゼヴィリアのスキル
 /// 各スキルメソッドには、SkillManagerのメソッドを組み合わせて処理を作る
@@ -17,18 +20,20 @@ public class Rosevillea : CharacterBase
     public override void ActiveSkill1(CharaController user)
     {
         // ターゲットを取得(戻り値はList<CharaController>型)    
-        var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
+        var target = SkillManager.PickTarget(user, TargetType.Opponent, 1).FirstOrDefault();
 
         // スキル処理
-        targets.ForEach(target =>
-        {
-            // usingを利用して、ダメージと同時にバフエフェクトを再生
-            using (BattleAnimationManager.instance.UseHitTiming(AttackPattern.Basic, 0))
-            {
-                SkillManager.Attack(user, target, user.Status.attackPower, 390, AttackPattern.Basic);
-                SkillManager.AddBuff(target, BuffType.気絶, false, false, 2);
-            }
-        });
+        // targets.ForEach(target =>
+        // {
+        //     // usingを利用して、ダメージと同時にバフエフェクトを再生
+        //     using (BattleAnimationManager.instance.UseHitTiming(AttackPattern.Basic, 0))
+        //     {
+        //         SkillManager.SingleAttack(user, target, user.Status.attackPower, 390, AttackPattern.Basic, );
+        //         SkillManager.AddBuff(target, BuffType.気絶, false, false, 2);
+        //     }
+        // });
+        SkillManager.SingleAttack(user, target, user.Status.attackPower, 390, AttackPattern.Single);
+        SkillManager.AddBuff(target, BuffType.気絶, false, false, 2);
     }
 
     /// <summary>
@@ -39,7 +44,7 @@ public class Rosevillea : CharacterBase
     {
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
 
-        targets.ForEach(target => SkillManager.Attack(user, target, user.Status.attackPower, 420, AttackPattern.Basic));
+        targets.ForEach(target => SkillManager.SingleAttack(user, target, user.Status.attackPower, 420, AttackPattern.Single));
     }
 
     /// <summary>
