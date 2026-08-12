@@ -9,10 +9,10 @@ public readonly struct HitSequencePosition
     public int Index { get; }
     public int Count { get; }
 
-    public bool isFirst => Index == 0;
-    public bool isLast => Index == Count - 1;
+    public bool IsFirst => Index == 0;
+    public bool IsLast => Index == Count - 1;
 
-    public static readonly HitSequencePosition single = new(0, 1);
+    public static readonly HitSequencePosition Single = new(0, 1);
 
     public HitSequencePosition(int index, int count)
     {

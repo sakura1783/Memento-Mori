@@ -287,8 +287,6 @@ public class CharaController
         // パッシブスキル再発動に必要な行動回数を減少
         ReduceRequiredCountForPassiveReactivation(chara.Passive1Config, passive1State, PassiveReactivationBasis.Action);
         ReduceRequiredCountForPassiveReactivation(chara.Passive2Config, passive2State, PassiveReactivationBasis.Action);
-
-        BattleAnimationManager.instance.CurrentEffectDelay = 0f;
     }
 
     /// <summary>

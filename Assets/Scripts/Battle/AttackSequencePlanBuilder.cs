@@ -33,8 +33,8 @@ public static class AttackSequencePlanBuilder
         return new AttackSequencePlan(
             0f, 
             TRAJECTORY_DURATION + (SHORT_HIT_DURATION * hit.Index),
-            hit.isFirst,
-            hit.isLast);
+            hit.IsFirst,
+            hit.IsLast);
     }
 
     private static AttackSequencePlan CreateRandomPlan(HitSequencePosition hit)

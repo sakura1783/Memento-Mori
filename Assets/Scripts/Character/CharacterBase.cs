@@ -22,7 +22,7 @@ public abstract class CharacterBase
     public virtual void BasicAttack(CharaController user)
     {
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
-        targets.ForEach(target => SkillManager.SingleAttack(user, target, user.Status.attackPower, 100, AttackPattern.Single, HitSequencePosition.single));
+        targets.ForEach(target => SkillManager.SingleAttack(user, target, user.Status.attackPower, 100, AttackPattern.Single, HitSequencePosition.Single));
 
         // アニメーション再生
         BattleAnimationManager.instance.AddAnimation(user, AnimationType.Attack);

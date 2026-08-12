@@ -23,16 +23,7 @@ public class Rosevillea : CharacterBase
         var target = SkillManager.PickTarget(user, TargetType.Opponent, 1).FirstOrDefault();
 
         // スキル処理
-        // targets.ForEach(target =>
-        // {
-        //     // usingを利用して、ダメージと同時にバフエフェクトを再生
-        //     using (BattleAnimationManager.instance.UseHitTiming(AttackPattern.Basic, 0))
-        //     {
-        //         SkillManager.SingleAttack(user, target, user.Status.attackPower, 390, AttackPattern.Basic, );
-        //         SkillManager.AddBuff(target, BuffType.気絶, false, false, 2);
-        //     }
-        // });
-        SkillManager.SingleAttack(user, target, user.Status.attackPower, 390, AttackPattern.Single);
+        SkillManager.SingleAttack(user, target, user.Status.attackPower, 390, AttackPattern.Single, registerAdditionalEffect: () => SkillManager.AddBuffEffect(target, false));
         SkillManager.AddBuff(target, BuffType.気絶, false, false, 2);
     }
 

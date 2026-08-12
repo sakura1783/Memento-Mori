@@ -20,6 +20,7 @@ public class Elliot : CharacterBase
         List<int> increaseValues = new();
         
         var targets = SkillManager.PickTarget(user, TargetType.Ally);
+        // TODO 普通にAddBuffEffect()すればいい？攻撃後のModify()であれば、、？
         targets.ForEach(target => increaseValues.Add(SkillManager.ModifyAttackPower(target, user.Status.attackPower, 15, true)));
 
         await SkillManager.WaitTurnsAsync(2);
@@ -41,6 +42,7 @@ public class Elliot : CharacterBase
         var attackTargets = SkillManager.PickTarget(user, TargetType.Opponent, 3);
         attackTargets.ForEach(target => SkillManager.SingleAttack(user, target, user.Status.attackPower, 200, AttackPattern.Simultaneous));
 
+        // TODO 攻撃とそれに付随するアニメの終了を待ってから、以降の処理を行う
         var healTargets = SkillManager.PickTarget(user, TargetType.Ally, 2, ValueType.ByCurrentHp, false);
         healTargets.ForEach(target =>
         {
