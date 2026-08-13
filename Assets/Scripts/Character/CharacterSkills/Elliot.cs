@@ -42,12 +42,11 @@ public class Elliot : CharacterBase
         var attackTargets = SkillManager.PickTarget(user, TargetType.Opponent, 3);
         attackTargets.ForEach(target => SkillManager.SingleAttack(user, target, user.Status.attackPower, 200, AttackPattern.Simultaneous));
 
-        // TODO 攻撃とそれに付随するアニメの終了を待ってから、以降の処理を行う
         var healTargets = SkillManager.PickTarget(user, TargetType.Ally, 2, ValueType.ByCurrentHp, false);
         healTargets.ForEach(target =>
         {
             SkillManager.Heal(target, user.Status.attackPower, 50);
-            SkillManager.AddBuff(target, BuffType.再生, true, false, 1, 3);
+            SkillManager.ApplyBuff(target, BuffType.再生, true, false, 1, 3);
         });
     }
 

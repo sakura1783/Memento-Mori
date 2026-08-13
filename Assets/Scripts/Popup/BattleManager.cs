@@ -71,7 +71,7 @@ public class BattleManager : PopupBase
 
         CreateTeamCharacters(teamAssemblyPop.playerTeamInfo, playerTeam, playerTran);
         CreateTeamCharacters(teamAssemblyPop.opponentTeamInfo, opponentTeam, opponentTran);
-        
+
         // LayoutGroupの更新を確定させる
         LayoutRebuilder.ForceRebuildLayoutImmediate(playerTran);
         LayoutRebuilder.ForceRebuildLayoutImmediate(opponentTran);
@@ -161,13 +161,12 @@ public class BattleManager : PopupBase
                 previousActChara = playerTeam[count];
 
                 playerTeam[count].ExecuteActiveSkill(this);
+                await BattleActionTimeline.instance.WaitAllAsync();
                 playerTeam[count].OnActionEnded();
 
                 // 1キャラの行動終了ごとに、receivedCriticalDamageをfalseにリセット(次のキャラの行動に影響しないようにする)。競合が起きるため、各キャラクラスのスキルメソッド内ではいじらない。
                 foreach (var chara in playerTeam.Concat(opponentTeam))
                     chara.ReceivedCriticalDamage.Value = false;
-
-                await BattleAnimationManager.instance.WaitAllAnimations();
 
                 // 行動後、バトル終了かどうかを判定。終了の場合trueを返し、Battle()内の処理によって、Battle()内からも抜け出す
                 if (IsBattleOver()) return;
@@ -179,12 +178,11 @@ public class BattleManager : PopupBase
                 previousActChara = opponentTeam[count];
 
                 opponentTeam[count].ExecuteActiveSkill(this);
+                await BattleActionTimeline.instance.WaitAllAsync();
                 opponentTeam[count].OnActionEnded();
 
                 foreach (var chara in playerTeam.Concat(opponentTeam))
                     chara.ReceivedCriticalDamage.Value = false;
-
-                await BattleAnimationManager.instance.WaitAllAnimations();
 
                 if (IsBattleOver()) return;
             }

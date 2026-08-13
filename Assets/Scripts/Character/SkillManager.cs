@@ -231,8 +231,9 @@ public static class SkillManager
         // ヒットに付随するバフ等の追加演出をhitDelayと同じタイミングで登録
         if (registerAdditionalEffect != null)
         {
-            using (BattleAnimationManager.instance.UseHitTiming(plan.HitDelay))
-                registerAdditionalEffect();
+            // TODO 一旦コメントアウト
+            // using (BattleAnimationManager.instance.UseHitTiming(plan.HitDelay))
+            //     registerAdditionalEffect();
         }
 
         // 「睡眠」状態を解除
@@ -360,7 +361,7 @@ public static class SkillManager
     }
 
     /// <summary>
-    /// 状態効果(バフ・デバフ)を追加
+    /// 状態効果(バフ・デバフ)を適用
     /// </summary>
     /// <param name="target"></param>
     /// <param name="buffType"></param>
@@ -369,8 +370,11 @@ public static class SkillManager
     /// <param name="duration">解除不可バフは、デフォルト値で大きな値を設定(値減らさないけど、一応)</param>
     /// <param name="effectRate">基準値の?%分の影響を与えるか。「再生」「毒」「侵食」などで使用する</param>
     /// <param name="effectValue">効果の量。「シールド」などで利用。(デフォルト値として-1を設定。0になるとRemoveBuff()が動くので、値を減らす際は0以下にならないように制御する)</param>
-    public static void AddBuff(CharaController target, BuffType buffType, bool isPositiveEffect, bool isIrremovable, int duration = 100, int effectRate = 0, int effectValue = -1)
+    public static void ApplyBuff(CharaController target, BuffType buffType, bool isPositiveEffect, bool isIrremovable, int duration = 100, int effectRate = 0, int effectValue = -1)
     {
+        // 再生するエフェクトの登録
+        BattleAnimationManager.instance.AddAnimation(target, isPositiveEffect ? AnimationType.ReceiveBuff : AnimationType.ReceiveDebuff);
+
         // 重ね掛け不可。継続時間とダメージ割合を置き換えて、処理を終了
         var duplicateBuff = target.Status.Buffs.FirstOrDefault(x => x.type == buffType);
         if (duplicateBuff != null)
@@ -381,7 +385,7 @@ public static class SkillManager
             return;
         }
 
-        // バフを生成して、追加
+        // バフを生成して、適用
         var buff = new Buff(buffType, isPositiveEffect, isIrremovable, duration, effectRate, effectValue);
         target.Status.Buffs.Add(buff);
 
@@ -390,16 +394,6 @@ public static class SkillManager
             .Where(x => x == 0)
             .Take(1)  // 最初の一度だけイベントを通す。その後、監視処理も終了される
             .Subscribe(_ => RemoveBuff(target, buff.type));
-    }
-
-    /// <summary>
-    /// バフデバフ付与時に再生するエフェクトを「登録」
-    /// </summary>
-    /// <param name="target"></param>
-    /// <param name="isPositiveEffect"></param>
-    public static void AddBuffEffect(CharaController target, bool isPositiveEffect)
-    {
-        BattleAnimationManager.instance.AddAnimation(target, isPositiveEffect ? AnimationType.ReceiveBuff : AnimationType.ReceiveDebuff);
     }
 
     /// <summary>

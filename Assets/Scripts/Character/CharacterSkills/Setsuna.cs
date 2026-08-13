@@ -19,7 +19,7 @@ public class Setsuna : CharacterBase
         int criticalCount = 0;
 
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 3, allowDuplicates: true);
-        
+
         SkillManager.RandomAttack(user, targets, user.Status.attackPower, 200);
         targets.ForEach(target =>
         {
@@ -72,7 +72,7 @@ public class Setsuna : CharacterBase
     /// <param name="user"></param>
     public override void PassiveSkill1(CharaController user)
     {
-        SkillManager.AddBuff(user, BuffType.シールド, true, false, 3, effectValue: CalculateManager.CalculateValueByRate(user.Status.attackPower, 250));
+        SkillManager.ApplyBuff(user, BuffType.シールド, true, false, 3, effectValue: CalculateManager.CalculateValueByRate(user.Status.attackPower, 250));
     }
 
     /// <summary>

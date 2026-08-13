@@ -5,14 +5,16 @@ public readonly struct AttackSequencePlan
 {
     public float TrajectoryDelay { get; }
     public float HitDelay { get; }
+    public float EndDelay { get; }
 
     public bool PlayTrajectory { get; }
     public bool PlayLongDamageAnimation { get; }
 
-    public AttackSequencePlan(float trajectoryDelay, float hitDelay, bool playTrajectory, bool playLongDamageAnimation)
+    public AttackSequencePlan(float trajectoryDelay, float hitDelay, float endDelay, bool playTrajectory, bool playLongDamageAnimation)
     {
         TrajectoryDelay = trajectoryDelay;
         HitDelay = hitDelay;
+        EndDelay = endDelay;
         PlayTrajectory = playTrajectory;
         PlayLongDamageAnimation = playLongDamageAnimation;
     }

@@ -1,10 +1,11 @@
 /// <summary>
-/// 攻撃に伴う一連の演出の処理を登録
+/// 攻撃に伴う一連の演出処理を登録
 /// </summary>
 public static class AttackSequenceScheduler
 {
     public static void Schedule(CharaController attacker, CharaController target, AttackSequencePlan plan, int displayedHp)
     {
+        var timeline = BattleActionTimeline.instance;
         var animationManager = BattleAnimationManager.instance;
         
         // 軌跡エフェクト再生

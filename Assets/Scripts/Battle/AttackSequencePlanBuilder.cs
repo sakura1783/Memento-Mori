@@ -25,7 +25,12 @@ public static class AttackSequencePlanBuilder
 
     private static AttackSequencePlan CreateBasicPlan()
     {
-        return new AttackSequencePlan(0f, TRAJECTORY_DURATION, true, true);
+        return new AttackSequencePlan(
+            0f, 
+            TRAJECTORY_DURATION, 
+            TRAJECTORY_DURATION + LONG_HIT_DURATION, 
+            true, 
+            true);
     }
 
     private static AttackSequencePlan CreateFocusedPlan(HitSequencePosition hit)
@@ -33,6 +38,7 @@ public static class AttackSequencePlanBuilder
         return new AttackSequencePlan(
             0f, 
             TRAJECTORY_DURATION + (SHORT_HIT_DURATION * hit.Index),
+            TRAJECTORY_DURATION + (SHORT_HIT_DURATION * hit.Index) + LONG_HIT_DURATION,  // TODO 多分違う
             hit.IsFirst,
             hit.IsLast);
     }
@@ -42,6 +48,7 @@ public static class AttackSequencePlanBuilder
         return new AttackSequencePlan(
             hit.Index * (TRAJECTORY_DURATION + LONG_HIT_DURATION),
             TRAJECTORY_DURATION + (hit.Index * (TRAJECTORY_DURATION + LONG_HIT_DURATION)),
+            TRAJECTORY_DURATION + (hit.Index * (TRAJECTORY_DURATION + LONG_HIT_DURATION)) + LONG_HIT_DURATION,  // TODO ここも多分違うか、簡潔に書けるかも
             true,
             true);
     }

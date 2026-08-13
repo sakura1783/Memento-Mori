@@ -38,40 +38,12 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
         public int ScaleAdjustmentValue => scaleAdjustmentValue;
     }
 
-    /// <summary>
-    /// usingで使うクラス。IDisposableを実装する。
-    /// </summary>
-    private class AnimationTimingScope : IDisposable
-    {
-        private readonly Action onDispose;
-
-        /// コンストラクタ
-        public AnimationTimingScope(Action action)
-        {
-            onDispose = action;
-        }
-
-
-        /// <summary>
-        /// usingの{}内の処理を終えた際に自動的に動く処理。
-        /// (値のセット->何らかの処理->値のリセット、などと単純に処理を回すより安全な方法)
-        /// </summary>
-        public void Dispose()
-        {
-            onDispose?.Invoke();
-        }
-    }
-
     [SerializeField] private BattleManager battleManager;
 
     [SerializeField] private RectTransform effectRoot;  // 軌跡エフェクトをこれの子として生成する
 
     [SerializeField] private List<EffectObjData> effects = new();  // AnimationType順に順番にプレハブを入れる
     [SerializeField] private ParticleSystem trajectoryEffect;
-
-    private List<UniTask> animationTasks = new();
-
-    public float CurrentDefaultDelay { get; private set; }  // usingスコープ内で、delayを省略したエフェクトに適用する遅延
 
     public const float TRAJECTORY_DURATION = 0.2f;
     public const float SHORT_HIT_DURATION = 0.17f;
@@ -86,36 +58,13 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     /// <param name="delay">省略した場合(=中身がnull)、現在のスコープの遅延を使用し、値を指定した場合、その分だけ遅延する</param>
     /// <param name="user"></param>
     /// <param name="playLongDamageAnimation"></param>
-    public void AddAnimation(CharaController target, AnimationType animationType, float? delay = null, CharaController user = null, bool playLongDamageAnimation = true)
+    public void AddAnimation(CharaController target, AnimationType animationType, float additionalDelay = 0f, CharaController user = null, bool playLongDamageAnimation = true)
     {
-        float actualDelay = delay ?? CurrentDefaultDelay;
-        animationTasks.Add(PlayAnimation(target, animationType, actualDelay, user, playLongDamageAnimation));
+        BattleActionTimeline.instance.Schedule(()=> PlayAnimation(target, animationType, user, playLongDamageAnimation), additionalDelay);
     }
 
-    public async UniTask WaitAllAnimations()
+    private async UniTask PlayAnimation(CharaController target, AnimationType animationType, CharaController user = null, bool isLongDamageAnimation = true)
     {
-        if (animationTasks.Count == 0)
-            return;
-
-        var waitAnimations = UniTask.WhenAll(animationTasks);
-        var waitMinimumTime = UniTask.Create(async () =>  // UniTask.Createで、メソッド化せずその場で記述
-        {
-            // 最低でも1秒は待つ
-            await UniTask.Delay(TimeSpan.FromSeconds(0.8f));
-            await battleManager.SkillUserImageGroup.DOFade(0, 0.2f).SetEase(Ease.Linear).AsyncWaitForCompletion();  // DOTweenの完了を待ちたいときは、AsyncWaitForCompletion()を使う
-        });
-        
-        await UniTask.WhenAll(waitAnimations, waitMinimumTime);
-        animationTasks.Clear();
-
-        CurrentDefaultDelay = 0f;
-    }
-
-    private async UniTask PlayAnimation(CharaController target, AnimationType animationType, float delay = 0, CharaController user = null, bool isLongDamageAnimation = true)
-    {
-        if (delay > 0)
-            await UniTask.Delay(TimeSpan.FromSeconds(delay));
-        
         var rect = animationType == AnimationType.Attack || animationType == AnimationType.Damage
             ? target.CharaStatusPannel.AnimationRoot
             : target.CharaStatusPannel.ImgChara.rectTransform;
@@ -199,23 +148,10 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
         await effect.transform
             .DOMove(targetRect.position, TRAJECTORY_DURATION).SetEase(Ease.Linear).ToUniTask();  // DOMove()にはワールド座標を指定する必要がある
 
-        // TODO
+        // TODO これ以外にも色々やってみたけど、だめ
         // effect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
 
         // float distance = Vector3.Distance(attackerRect.position, targetRect.position);
         // Debug.Log($"Trajectory Distance : {distance}");
-    }
-
-    /// <summary>
-    /// using(UseHitTiming()){}で、中括弧内に書いたアニメーションを全て指定したタイミングで実行する
-    /// </summary>
-    /// <param name="delay"></param>
-    /// <returns></returns>
-    public IDisposable UseHitTiming(float delay)
-    {
-        float previousDelay = CurrentDefaultDelay;
-        CurrentDefaultDelay = delay;
-
-        return new AnimationTimingScope(() => CurrentDefaultDelay = previousDelay);  // TODO これはどのような処理か
     }
 }
