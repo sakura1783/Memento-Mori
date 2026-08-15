@@ -5,7 +5,6 @@ public static class AttackSequenceScheduler
 {
     public static void Schedule(CharaController attacker, CharaController target, AttackSequencePlan plan, int displayedHp)
     {
-        var timeline = BattleActionTimeline.instance;
         var animationManager = BattleAnimationManager.instance;
         
         // 軌跡エフェクト再生
