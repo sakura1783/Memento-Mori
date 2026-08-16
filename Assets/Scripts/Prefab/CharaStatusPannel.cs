@@ -30,23 +30,23 @@ public class CharaStatusPannel : MonoBehaviour
     private readonly Dictionary<Buff, Image> buffs = new();
 
 
-    public void Setup(CharaController charaController, GameData.CharaConstData charaData)
+    public void Setup(CharaController chara, GameData.CharaConstData charaData)
     {
-        charaController.CharaStatusPannel = this;
+        chara.CharaStatusPannel = this;
 
         imgChara.sprite = SpriteManager.instance.GetCharaSprite(charaData.name, CharaSpriteType.Face);
         txtCharaInfo.text = $"Lv{charaData.level} {DataBaseManager.instance.charaInitialDataSO.charaInitialDataList.FirstOrDefault(data => data.englishName == charaData.name).name}";
-        txtHpValue.text = $"{charaController.Status.Hp} / {charaController.Status.MaxHp}";
+        txtHpValue.text = $"{chara.Status.Hp} / {chara.Status.MaxHp}";
         hpSlider.value = 1;
 
         DefaultAnimationRootPos = animationRoot.anchoredPosition;
 
         // 購読処理
-        Observable.Merge(charaController.DisplayedHp, charaController.Status.MaxHp)  // Observable.Merge()で、括弧内の値いずれかが変更された場合にSubscribe()の処理が動く
+        Observable.Merge(chara.Status.Hp, chara.Status.MaxHp)  // Observable.Merge()で、括弧内の値いずれかが変更された場合にSubscribe()の処理が動く
             .Subscribe(_ =>
             {
-                int hp = charaController.DisplayedHp.Value;
-                int maxHp = charaController.Status.MaxHp.Value;
+                int hp = chara.Status.Hp.Value;
+                int maxHp = chara.Status.MaxHp.Value;
 
                 txtHpValue.text = $"{hp} / {maxHp}";
                 hpSlider.value = (float)hp / maxHp;
@@ -63,7 +63,7 @@ public class CharaStatusPannel : MonoBehaviour
             })
             .AddTo(this);
 
-        charaController.Status.Buffs
+        chara.Status.Buffs
             .ObserveAdd()
             .Subscribe(eventData =>  // <= ObserveAddが提供するイベントデータ
             {
@@ -73,7 +73,7 @@ public class CharaStatusPannel : MonoBehaviour
             })
             .AddTo(this);
 
-        charaController.Status.Buffs
+        chara.Status.Buffs
             .ObserveRemove()
             .Subscribe(eventData =>
             {
@@ -87,7 +87,7 @@ public class CharaStatusPannel : MonoBehaviour
             })
             .AddTo(this);
 
-        charaController.Status.Buffs
+        chara.Status.Buffs
             .ObserveReset()  // Clear()された時(= キャラが戦闘不能になった時)
             .Subscribe(_ =>
             {

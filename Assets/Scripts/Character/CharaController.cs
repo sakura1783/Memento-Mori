@@ -5,15 +5,6 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 
 /// <summary>
-/// HP表示の更新タイミング
-/// </summary>
-public enum HpDisplayUpdateTiming
-{
-    Immediate,
-    Delayed,
-}
-
-/// <summary>
 /// バトル時、キャラクター制御クラス
 /// (このクラスはバトルで使われるキャラクターの数だけインスタンスが作られるので、singletonやstaticにはしない)
 /// </summary>
@@ -29,9 +20,6 @@ public class CharaController
 
     private CalculateManager.VariableStatus status = new();
     public CalculateManager.VariableStatus Status => status;
-
-    private ReactiveProperty<int> displayedHp = new();  // 内部処理のHPと、ゲーム画面に表示されるHPを分けて考える
-    public IReadOnlyReactiveProperty<int> DisplayedHp => displayedHp;
 
     public int active1RemainingCoolTime;
     public int active2RemainingCoolTime;
@@ -62,7 +50,6 @@ public class CharaController
     {
         // 計算後の各ステータスの値を受け取り、キャラに反映
         status = statusData;
-        displayedHp.Value = status.Hp.Value;
         name = charaName;
 
         // 属性をスクリプタブルオブジェクトから取得
@@ -106,31 +93,18 @@ public class CharaController
     /// HPの更新
     /// </summary>
     /// <param name="amount"></param>
-    public int UpdateHp(int amount, HpDisplayUpdateTiming displayUpdateTiming = HpDisplayUpdateTiming.Immediate)
+    /// <returns>HP変化量</returns>
+    public int UpdateHp(int amount)
     {
         // 「ダメージ無効」状態の場合、ダメージを受けない
         if (amount < 0 && status.Buffs.Any(buff => buff.type == BuffType.ダメージ無効))
-            return status.Hp.Value;
+            return 0;
         
-        // HPの実データを更新
+        var hpBefore = status.Hp.Value;
+        // HPを更新
         status.Hp.Value = Mathf.Clamp(status.Hp.Value + amount, 0, status.MaxHp.Value);
 
-        if (displayUpdateTiming == HpDisplayUpdateTiming.Immediate)
-            SetDisplayedHp(status.Hp.Value);  // HP表示の更新
-
-        return status.Hp.Value;
-    }
-
-    /// <summary>
-    /// 表示用HPを更新
-    /// </summary>
-    /// <param name="hp"></param>
-    public async void SetDisplayedHp(int hp, float delay = 0f)
-    {
-        if (delay > 0f)
-            await UniTask.Delay(TimeSpan.FromSeconds(delay));
-
-        displayedHp.Value = Mathf.Clamp(hp, 0, status.MaxHp.Value);
+        return hpBefore - status.Hp.Value;
     }
 
     /// <summary>

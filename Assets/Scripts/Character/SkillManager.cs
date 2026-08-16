@@ -258,9 +258,8 @@ public static class SkillManager
         // キャラ固有スキルなどによる被ダメージ補正
         damageValue = target.ModifyIncomingDamage(damageValue);
 
-        int hpBefore = target.Status.Hp.Value;
-        target.UpdateHp(damageValue);  // TODO UpdateHpは常に即時更新に修正
-        int appliedDamage = hpBefore - target.Status.Hp.Value;  // 実際に与えたダメージを計算(オーバーキル、ダメージ無効などを考慮)
+        // ターゲットのHP減少
+        var appliedDamage = target.UpdateHp(damageValue);
         
         target.ReceivedCriticalDamage.Value = isCritical;
 
