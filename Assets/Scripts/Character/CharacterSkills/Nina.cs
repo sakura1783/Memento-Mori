@@ -13,7 +13,7 @@ public class Nina : CharacterBase
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 4);
         int totalDamage = 0;
 
-        targets.ForEach(target => totalDamage += SkillManager.SingleAttack(user, target, user.Status.attackPower, 290, AttackPattern.Simultaneous));
+        // TODO targets.ForEach(target => totalDamage += SkillManager.SingleAttack(user, target, user.Status.attackPower, 290, AttackPattern.Simultaneous));
 
         SkillManager.Heal(user, totalDamage, 10);
     }

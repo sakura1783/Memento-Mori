@@ -5,6 +5,7 @@ using UniRx;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
+using Unity.VisualScripting;
 
 /// <summary>
 /// スキルのターゲットの種類
@@ -188,24 +189,60 @@ public static class SkillManager
     /// <param name="rate"></param>
     /// <param name="attackPattern"></param>
     /// <param name="hit"></param>
-    /// <returns></returns>
-    public static int SingleAttack(CharaController user, CharaController target, int baseValue, int rate, AttackPattern attackPattern, HitSequencePosition? hit = null, Action registerAdditionalEffect = null)
+    /// <param name="onHitResolved">ヒット結果が確定した後に行う処理</param>
+    /// <returns>全ての処理が終了する時間(EndDelay)</returns>
+    public static float SingleAttack(CharaController user, CharaController target, int baseValue, int rate, AttackPattern attackPattern, HitSequencePosition? hit = null, Action<HitResult> onHitResolved = null)
     {
         AttackSequencePlan plan = AttackSequencePlanBuilder.Build(attackPattern, hit ?? HitSequencePosition.Single);
+
+        // 軌跡エフェクト登録
+        BattleAnimationManager.instance.AddAnimation(target, AnimationType.Trajectory, plan.TrajectoryDelay, user);
+
+        BattleActionTimeline.instance.Schedule(()=>
+        {
+            var result = ResolveHit(user, target, baseValue, rate);
+
+            // バリアで攻撃がブロックされていない場合、ダメージアニメーションを登録
+            if (!result.WasBlocked)
+            {
+                BattleAnimationManager.instance.AddAnimation(target, AnimationType.Damage, plan.HitDelay, playLongDamageAnimation: plan.PlayLongDamageAnimation);
+                BattleAnimationManager.instance.AddAnimation(target, AnimationType.DefaultHit, plan.HitDelay);
+            }
+
+            // 攻撃結果を利用し行う処理があれば、実行
+            onHitResolved?.Invoke(result);
+
+        }, plan.HitDelay);
+
+        return plan.EndDelay;
+        
+
+        // TODO バフエフェクトどうなってる？ →おそらく、バフ付与と同時に
+        // TODO AddAnimationのplan.HitDelayいる？二重に遅延時間が計算されるのでは
+    }
+
+    /// <summary>
+    /// 攻撃の実処理
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="target"></param>
+    /// <param name="baseValue"></param>
+    /// <param name="rate"></param>
+    /// <returns></returns>
+    private static HitResult ResolveHit(CharaController user, CharaController target, int baseValue, int rate)
+    {
+        // ダメージ計算
+        (int damageValue, bool isCritical) = CalculateManager.CalculateAttackDamage(user, baseValue, rate, target);
 
         // 「バリア」を持っている場合、一層消費してダメージを無効化
         var barrierBuff = target.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.バリア);
         if (barrierBuff != null)
         {
-            BattleAnimationManager.instance.AddAnimation(target, AnimationType.Trajectory, plan.TrajectoryDelay, user);
-            // TODO バリア適用時のエフェクトを追加
+            // TODO バリア適用時のエフェクト
 
             barrierBuff.EffectValue.Value--;
-            return 0;
+            return new HitResult(0, isCritical, true);
         }
-
-        // baseValueのrate分の値を計算(攻撃力の200%の攻撃なら、baseValue=攻撃力、rate=200)
-        (int damageValue, bool isCritical) = CalculateManager.CalculateAttackDamage(user, baseValue, rate, target);
 
         // 「シールド」を持っている場合、ダメージを軽減
         var shieldBuff = target.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.シールド);
@@ -217,30 +254,18 @@ public static class SkillManager
             damageValue = Mathf.Max(damageValue - shieldValue, 0);
         }
 
-        // キャラ固有スキルなどによる被ダメージ補正を適用
+        // キャラ固有スキルなどによる被ダメージ補正
         damageValue = target.ModifyIncomingDamage(damageValue);
 
-        target.UpdateHp(-damageValue, HpDisplayUpdateTiming.Delayed);
+        int appliedDamage = Mathf.Min(damageValue, target.Status.Hp.Value);  // 実際に与えるダメージを計算(敵の残りHPと計算上のダメージとを考慮)
+        target.UpdateHp(-appliedDamage);  // TODO UpdateHpは常に即時更新に修正
         target.ReceivedCriticalDamage.Value = isCritical;
-
-        // BattleAnimationManager.instance.CurrentEffectDelay = plan.HitDelay;
-
-        // 攻撃に伴う一連の演出を処理
-        AttackSequenceScheduler.Schedule(user, target, plan, target.Status.Hp.Value);
-
-        // ヒットに付随するバフ等の追加演出をhitDelayと同じタイミングで登録
-        if (registerAdditionalEffect != null)
-        {
-            // TODO 一旦コメントアウト
-            // using (BattleAnimationManager.instance.UseHitTiming(plan.HitDelay))
-            //     registerAdditionalEffect();
-        }
 
         // 「睡眠」状態を解除
         if (target.Status.Buffs.Any(debuff => debuff.type == BuffType.睡眠))
             RemoveBuff(target, BuffType.睡眠);
 
-        return damageValue;
+        return new HitResult(appliedDamage, isCritical, false);
     }
 
     /// <summary>
@@ -251,21 +276,23 @@ public static class SkillManager
     /// <param name="baseValue"></param>
     /// <param name="rate"></param>
     /// <param name="hitCount"></param>
+    /// <param name="onAttackResolved">集中攻撃の全ヒット結果が確定した後に行う処理</param>
     /// <returns></returns>
-    public static List<int> FocusedAttack(CharaController user, CharaController target, int baseValue, int rate, int hitCount, Action registerAdditionalEffect = null)
+    public static float FocusedAttack(CharaController user, CharaController target, int baseValue, int rate, int hitCount, Action<int> onAttackResolved = null)
     {
-        var damageValues = new List<int>(hitCount);
+        int totalDamage = 0;
+        float endDelay = 0f;
 
         for (int i = 0; i < hitCount; i++)
         {
             var hit = new HitSequencePosition(i, hitCount);
-            var effect = hit.IsFirst ? registerAdditionalEffect : null;
-            int damage = SingleAttack(user, target, baseValue, rate, AttackPattern.Focused, hit, effect);
-
-            damageValues.Add(damage);
+            endDelay = SingleAttack(user, target, baseValue, rate, AttackPattern.Focused, hit, onHitResolved: result => totalDamage += result.Damage);
         }
 
-        return damageValues;
+        if (onAttackResolved != null)
+            BattleActionTimeline.instance.Schedule(()=> onAttackResolved(totalDamage), endDelay);
+
+        return endDelay;
     }
 
     /// <summary>
@@ -276,20 +303,23 @@ public static class SkillManager
     /// <param name="baseValue"></param>
     /// <param name="rate"></param>
     /// <returns></returns>
-    public static List<int> RandomAttack(CharaController user, List<CharaController> targets, int baseValue, int rate, Action registerAdditionalEffect = null)
+    public static float RandomAttack(CharaController user, List<CharaController> targets, int baseValue, int rate, Action<int> onAttackResolved = null)
     {
-        var damageValues = new List<int>(targets.Count);
+        int totalDamage = 0;
+        float endDelay = 0f;
 
         for (int i = 0; i < targets.Count; i++)
         {
             CharaController target = targets[i];
             var hit = new HitSequencePosition(i, targets.Count);
 
-            int damage = SingleAttack(user, target, baseValue, rate, AttackPattern.Random, hit, registerAdditionalEffect);
-            damageValues.Add(damage);
+            endDelay = SingleAttack(user, target, baseValue, rate, AttackPattern.Random, hit, onHitResolved: result => totalDamage += result.Damage);
         }
 
-        return damageValues;
+        if (onAttackResolved != null)
+            BattleActionTimeline.instance.Schedule(()=> onAttackResolved(totalDamage), endDelay);
+
+        return endDelay;
     }
 
     /// <summary>
