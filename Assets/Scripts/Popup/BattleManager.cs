@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -161,7 +162,7 @@ public class BattleManager : PopupBase
                 previousActChara = playerTeam[count];
 
                 playerTeam[count].ExecuteActiveSkill(this);
-                await BattleActionTimeline.instance.WaitAllAsync();
+                await WaitForActionCompletion();
                 playerTeam[count].OnActionEnded();
 
                 // 1キャラの行動終了ごとに、receivedCriticalDamageをfalseにリセット(次のキャラの行動に影響しないようにする)。競合が起きるため、各キャラクラスのスキルメソッド内ではいじらない。
@@ -178,7 +179,7 @@ public class BattleManager : PopupBase
                 previousActChara = opponentTeam[count];
 
                 opponentTeam[count].ExecuteActiveSkill(this);
-                await BattleActionTimeline.instance.WaitAllAsync();
+                await WaitForActionCompletion();
                 opponentTeam[count].OnActionEnded();
 
                 foreach (var chara in playerTeam.Concat(opponentTeam))
@@ -193,6 +194,25 @@ public class BattleManager : PopupBase
 
         // 次のターンへ(全てのキャラが一回攻撃し終えたらターンを進める)
         return;
+    }
+
+    /// <summary>
+    /// キャラの行動終了を待つ
+    /// </summary>
+    /// <returns></returns>
+    private async UniTask WaitForActionCompletion()
+    {
+        var waitTimeline = BattleActionTimeline.instance.WaitAllAsync();
+        var waitMinimumTime = UniTask.Delay(TimeSpan.FromSeconds(0.8f));
+        // var waitMinimumTime = UniTask.Create(async () => // UniTask.Createで、メソッド化せずその場で記述
+        // {
+        //     // 最低でも1秒待つ
+        //     await UniTask.Delay(TimeSpan.FromSeconds(0.8f));
+        //     await SkillUserImageGroup.DOFade(0, 0.2f).SetEase(Ease.Linear).AsyncWaitForCompletion();  // DOTweenの完了を待ちたいときは、AsyncWaitForCompletion()を使う
+        // });
+        await UniTask.WhenAll(waitTimeline, waitMinimumTime);
+
+        await SkillUserImageGroup.DOFade(0, 0.2f).SetEase(Ease.Linear).AsyncWaitForCompletion();
     }
 
     /// <summary>

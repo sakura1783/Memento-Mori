@@ -196,8 +196,10 @@ public static class SkillManager
         AttackSequencePlan plan = AttackSequencePlanBuilder.Build(attackPattern, hit ?? HitSequencePosition.Single);
 
         // 軌跡エフェクト登録
-        BattleAnimationManager.instance.AddAnimation(target, AnimationType.Trajectory, plan.TrajectoryDelay, user);
+        if (plan.PlayTrajectory)
+            BattleAnimationManager.instance.AddAnimation(target, AnimationType.Trajectory, plan.TrajectoryDelay, user);
 
+        // 攻撃の実処理を登録
         BattleActionTimeline.instance.Schedule(()=>
         {
             var result = ResolveHit(user, target, baseValue, rate);
@@ -205,8 +207,8 @@ public static class SkillManager
             // バリアで攻撃がブロックされていない場合、ダメージアニメーションを登録
             if (!result.WasBlocked)
             {
-                BattleAnimationManager.instance.AddAnimation(target, AnimationType.Damage, plan.HitDelay, playLongDamageAnimation: plan.PlayLongDamageAnimation);
-                BattleAnimationManager.instance.AddAnimation(target, AnimationType.DefaultHit, plan.HitDelay);
+                BattleAnimationManager.instance.AddAnimation(target, AnimationType.Damage, playLongDamageAnimation: plan.PlayLongDamageAnimation);
+                BattleAnimationManager.instance.AddAnimation(target, AnimationType.DefaultHit);
             }
 
             // 攻撃結果を利用し行う処理があれば、実行
@@ -218,7 +220,6 @@ public static class SkillManager
         
 
         // TODO バフエフェクトどうなってる？ →おそらく、バフ付与と同時に
-        // TODO AddAnimationのplan.HitDelayいる？二重に遅延時間が計算されるのでは
     }
 
     /// <summary>
@@ -257,8 +258,10 @@ public static class SkillManager
         // キャラ固有スキルなどによる被ダメージ補正
         damageValue = target.ModifyIncomingDamage(damageValue);
 
-        int appliedDamage = Mathf.Min(damageValue, target.Status.Hp.Value);  // 実際に与えるダメージを計算(敵の残りHPと計算上のダメージとを考慮)
-        target.UpdateHp(-appliedDamage);  // TODO UpdateHpは常に即時更新に修正
+        int hpBefore = target.Status.Hp.Value;
+        target.UpdateHp(damageValue);  // TODO UpdateHpは常に即時更新に修正
+        int appliedDamage = hpBefore - target.Status.Hp.Value;  // 実際に与えたダメージを計算(オーバーキル、ダメージ無効などを考慮)
+        
         target.ReceivedCriticalDamage.Value = isCritical;
 
         // 「睡眠」状態を解除
@@ -278,7 +281,7 @@ public static class SkillManager
     /// <param name="hitCount"></param>
     /// <param name="onAttackResolved">集中攻撃の全ヒット結果が確定した後に行う処理</param>
     /// <returns></returns>
-    public static float FocusedAttack(CharaController user, CharaController target, int baseValue, int rate, int hitCount, Action<int> onAttackResolved = null)
+    public static void FocusedAttack(CharaController user, CharaController target, int baseValue, int rate, int hitCount, Action<int> onAttackResolved = null)
     {
         int totalDamage = 0;
         float endDelay = 0f;
@@ -291,8 +294,6 @@ public static class SkillManager
 
         if (onAttackResolved != null)
             BattleActionTimeline.instance.Schedule(()=> onAttackResolved(totalDamage), endDelay);
-
-        return endDelay;
     }
 
     /// <summary>
@@ -303,7 +304,7 @@ public static class SkillManager
     /// <param name="baseValue"></param>
     /// <param name="rate"></param>
     /// <returns></returns>
-    public static float RandomAttack(CharaController user, List<CharaController> targets, int baseValue, int rate, Action<int> onAttackResolved = null)
+    public static void RandomAttack(CharaController user, List<CharaController> targets, int baseValue, int rate, Action<int> onAttackResolved = null)
     {
         int totalDamage = 0;
         float endDelay = 0f;
@@ -318,8 +319,6 @@ public static class SkillManager
 
         if (onAttackResolved != null)
             BattleActionTimeline.instance.Schedule(()=> onAttackResolved(totalDamage), endDelay);
-
-        return endDelay;
     }
 
     /// <summary>

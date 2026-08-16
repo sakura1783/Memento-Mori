@@ -36,7 +36,7 @@ public static class AttackSequencePlanBuilder
     private static AttackSequencePlan CreateFocusedPlan(HitSequencePosition hit)
     {
         float hitDelay = TRAJECTORY_DURATION + (SHORT_HIT_DURATION * hit.Index);
-        float lastHitDuration = hit.IsLast ? SHORT_HIT_DURATION : LONG_HIT_DURATION;
+        float lastHitDuration = hit.IsLast ? LONG_HIT_DURATION : SHORT_HIT_DURATION;
 
         return new AttackSequencePlan(
             0f, 
