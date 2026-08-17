@@ -11,11 +11,16 @@ public class Nina : CharacterBase
     public override void ActiveSkill1(CharaController user)
     {
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 4);
+
+        // TODO この変数どうにかできないか。特にtotalDamageなどはこちらで受け取れるようにした方がわかりやすい気がする
         int totalDamage = 0;
+        float endDelay = 0f;
 
-        // TODO targets.ForEach(target => totalDamage += SkillManager.SingleAttack(user, target, user.Status.attackPower, 290, AttackPattern.Simultaneous));
+        // TODO targets.ForEach(
+        //     target => endDelay = SkillManager.SingleAttack(user, target, user.Status.attackPower, 290, AttackPattern.Simultaneous,
+        //     onHitResolved: result => totalDamage += result.Damage));
 
-        SkillManager.Heal(user, totalDamage, 10);
+        BattleActionTimeline.instance.Schedule(()=> SkillManager.Heal(user, totalDamage, 10), endDelay);
     }
 
     /// <summary>
