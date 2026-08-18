@@ -116,6 +116,9 @@ public class BattleManager : PopupBase
         {
             await ExecuteTurn();
 
+            if (battleState != BattleState.Continue)
+                break;
+
             foreach (var chara in playerTeam.Concat(opponentTeam))
                 chara.OnTurnEnded();
 
@@ -137,9 +140,8 @@ public class BattleManager : PopupBase
 
         foreach (var chara in playerTeam.Concat(opponentTeam))  // Concat()でリスト2つを結合し、処理を簡素化
         {
-            if (chara.Status.Hp.Value <= 0)
-            continue;
-            
+            if (!chara.IsAlive) continue;
+
             // 「毒」状態の場合、現在HP*?%のダメージを受ける
             var poisonDebuff = chara.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.毒);
             if (poisonDebuff != null) 
@@ -150,6 +152,8 @@ public class BattleManager : PopupBase
             if (regenerationBuff != null) 
                 chara.UpdateHp(CalculateManager.CalculateValueByRate(chara.Status.MaxHp.Value, regenerationBuff.effectRate));
         }
+
+        if (IsBattleOver()) return;
         
         int count = 0;  // do-while文が何回回ったか
         // 味方1番手→敵1番手→味方2番手...の順に行動  // TODO 素早さの順に攻撃、リファクタリング
@@ -160,7 +164,7 @@ public class BattleManager : PopupBase
             {
                 var actingChara = playerTeam[count];
 
-                if (actingChara.Status.Hp.Value > 0)
+                if (actingChara.IsAlive)
                 {
                     previousActChara = actingChara;
 
@@ -182,7 +186,7 @@ public class BattleManager : PopupBase
             {
                 var actingChara = opponentTeam[count];
 
-                if (actingChara.Status.Hp.Value > 0)
+                if (actingChara.IsAlive)
                 {
                     previousActChara = actingChara;
 
@@ -229,12 +233,12 @@ public class BattleManager : PopupBase
     /// <returns></returns>
     private bool IsBattleOver()
     {
-        if (playerTeam.All(chara => chara.Status.Hp.Value <= 0))  // All(条件)で、要素全てがその条件を満たしているかを判定する
+        if (playerTeam.All(chara => !chara.IsAlive))  // All(条件)で、要素全てがその条件を満たしているかを判定する
         {
             battleState = BattleState.Lose;
             return true;
         }
-        else if (opponentTeam.All(chara => chara.Status.Hp.Value <= 0))
+        else if (opponentTeam.All(chara => !chara.IsAlive))
         {
             battleState = BattleState.Win;
             return true;

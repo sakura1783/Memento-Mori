@@ -82,7 +82,7 @@ public class Setsuna : CharacterBase
     public override void PassiveSkill2(CharaController user)
     {
         user.Status.Hp
-            .Where(value => value < user.Status.MaxHp.Value / 2)
+            .Where(value => user.IsAlive && value < user.Status.MaxHp.Value / 2)
             .Take(1)  // 最初の一度だけイベントを通す
             .Subscribe(_ => SkillManager.IncreaseCriticalRate(user, 30));
     }

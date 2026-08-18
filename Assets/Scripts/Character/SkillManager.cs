@@ -88,7 +88,7 @@ public static class SkillManager
         }
 
         // 戦闘不能キャラをターゲット候補から除外
-        targetList = targetList.Where(chara => chara.Status.Hp.Value > 0).ToList();
+        targetList = targetList.Where(chara => chara.IsAlive).ToList();
 
         if (targetList.Count == 0)
             return targetList;
@@ -174,19 +174,10 @@ public static class SkillManager
         
         List<CharaController> neighbors = new();
 
-        // if (userIndex - 1 >= 0)  // 左隣にキャラが存在したら
-        // {
-        //     neighbors.Add(team[userIndex - 1]);
-        // }
-        // if (userIndex + 1 < team.Count)  // 右隣にキャラが存在したら
-        // {
-        //     neighbors.Add(team[userIndex + 1]);
-        // }
-
         // 左側、右側からそれぞれ一番近いキャラを探す
         for (int i = userIndex - 1; i >= 0; i--)
         {
-            if (team[i].Status.Hp.Value <= 0)
+            if (!team[i].IsAlive)
                 continue;
 
             neighbors.Add(team[i]);
@@ -194,13 +185,13 @@ public static class SkillManager
         }
         for (int i = userIndex + 1; i < team.Count; i++)
         {
-            if (team[i].Status.Hp.Value <= 0)
+            if (!team[i].IsAlive)
                 continue;
             
             neighbors.Add(team[i]);
             break;
         }
-        
+
         return neighbors;
     }
 
@@ -278,10 +269,10 @@ public static class SkillManager
         // キャラ固有スキルなどによる被ダメージ補正
         damageValue = target.ModifyIncomingDamage(damageValue);
         
-        bool wasAlive = target.Status.Hp.Value > 0;
+        bool wasAlive = target.IsAlive;
         // ターゲットのHP減少
         var appliedDamage = target.UpdateHp(-damageValue);
-        bool defeatedTarget = wasAlive && target.Status.Hp.Value <= 0;  // 集中攻撃などでのKillCountの重複追加を防ぐ形でdefeatedTargetの値を決定
+        bool defeatedTarget = wasAlive && !target.IsAlive;  // 集中攻撃などでのKillCountの重複追加を防ぐ形でdefeatedTargetの値を決定
         
         target.ReceivedCriticalDamage.Value = isCritical;
 
@@ -304,7 +295,7 @@ public static class SkillManager
     public static void FocusedAttack(CharaController user, CharaController target, int baseValue, int rate, int hitCount, Action<HitSequenceResult> onAttackCompletion = null)
     {
         var targets = Enumerable.Repeat(target, hitCount).ToList();
-        ExecuteHitSequence(user, targets, baseValue, rate, onAttackCompletion);
+        ExecuteHitSequence(user, targets, baseValue, rate, AttackPattern.Focused, onAttackCompletion);
     }
 
     /// <summary>
@@ -316,7 +307,7 @@ public static class SkillManager
     /// <param name="rate"></param>
     public static void RandomAttack(CharaController user, List<CharaController> targets, int baseValue, int rate, Action<HitSequenceResult> onAttackCompletion = null)
     {
-        ExecuteHitSequence(user, targets, baseValue, rate, onAttackCompletion);
+        ExecuteHitSequence(user, targets, baseValue, rate, AttackPattern.Random, onAttackCompletion);
     }
 
     /// <summary>
@@ -329,7 +320,7 @@ public static class SkillManager
     /// <param name="onAttackCompletion"></param>
     public static void SimultaneousAttack(CharaController user, List<CharaController> targets, int baseValue, int rate, Action<HitSequenceResult> onAttackCompletion = null)
     {
-        ExecuteHitSequence(user, targets, baseValue, rate, onAttackCompletion);
+        ExecuteHitSequence(user, targets, baseValue, rate, AttackPattern.Simultaneous, onAttackCompletion);
     }
 
     /// <summary>
@@ -340,7 +331,7 @@ public static class SkillManager
     /// <param name="baseValue"></param>
     /// <param name="rate"></param>
     /// <param name="onAttackCompletion"></param>
-    private static void ExecuteHitSequence(CharaController user, IReadOnlyList<CharaController> targets, int baseValue, int rate, Action<HitSequenceResult> onAttackCompletion = null)
+    private static void ExecuteHitSequence(CharaController user, IReadOnlyList<CharaController> targets, int baseValue, int rate, AttackPattern attackPattern, Action<HitSequenceResult> onAttackCompletion = null)
     {
         int totalDamage = 0;
         int criticalCount = 0;
@@ -353,7 +344,7 @@ public static class SkillManager
             CharaController target = targets[i];
             var hit = new HitSequencePosition(i, targets.Count);
 
-            SingleAttack(user, target, baseValue, rate, AttackPattern.Random, hit,
+            SingleAttack(user, target, baseValue, rate, attackPattern, hit,
                 onHitCompletion: result =>
                 {
                     totalDamage += result.Damage;
@@ -451,6 +442,8 @@ public static class SkillManager
     /// <param name="effectValue">効果の量。「シールド」などで利用。(デフォルト値として-1を設定。0になるとRemoveBuff()が動くので、値を減らす際は0以下にならないように制御する)</param>
     public static void ApplyBuff(CharaController target, BuffType buffType, bool isPositiveEffect, bool isIrremovable, int duration = 100, int effectRate = 0, int effectValue = -1)
     {
+        if (!target.IsAlive) return;
+
         // 再生するエフェクトの登録
         BattleAnimationManager.instance.AddAnimation(target, isPositiveEffect ? AnimationType.ReceiveBuff : AnimationType.ReceiveDebuff);
 

@@ -21,6 +21,8 @@ public class CharaController
     private CalculateManager.VariableStatus status = new();
     public CalculateManager.VariableStatus Status => status;
 
+    public bool IsAlive => status.Hp.Value > 0;  // 参照したタイミングでHpの値に従い毎回判定される
+
     public int active1RemainingCoolTime;
     public int active2RemainingCoolTime;
 
@@ -175,6 +177,8 @@ public class CharaController
     /// <param name="currentTurnCount"></param>
     public void ExecutePassiveSkill(PassiveActivationTiming activationTiming, BattleManager battleManager)
     {
+        if (!IsAlive) return;
+        
         TryExecutePassiveSkill(chara.Passive1Config, passive1State, activationTiming, battleManager.TurnCount, () => chara.MeetsPassive1ActivationCondition(this), () => chara.PassiveSkill1(this));
         TryExecutePassiveSkill(chara.Passive2Config, passive2State, activationTiming, battleManager.TurnCount, () => chara.MeetsPassive2ActivationCondition(this), () => chara.PassiveSkill2(this));
     }
@@ -238,6 +242,8 @@ public class CharaController
     /// </summary>
     public void OnTurnEnded()
     {
+        if (!IsAlive) return;
+
         active1RemainingCoolTime--;
         active2RemainingCoolTime--;
 
