@@ -190,8 +190,7 @@ public static class SkillManager
     /// <param name="attackPattern"></param>
     /// <param name="hit"></param>
     /// <param name="onHitCompletion">ヒットの一連の処理終了後に動かす処理</param>
-    /// <returns>全ての処理が終了する時間(EndDelay)</returns>
-    public static float SingleAttack(CharaController user, CharaController target, int baseValue, int rate, AttackPattern attackPattern, HitSequencePosition? hit = null, Action<HitResult> onHitCompletion = null)
+    public static void SingleAttack(CharaController user, CharaController target, int baseValue, int rate, AttackPattern attackPattern, HitSequencePosition? hit = null, Action<HitResult> onHitCompletion = null)
     {
         AttackSequencePlan plan = AttackSequencePlanBuilder.Build(attackPattern, hit ?? HitSequencePosition.Single);
 
@@ -217,8 +216,6 @@ public static class SkillManager
         // ヒット終了後の処理
         if (onHitCompletion != null)
             BattleActionTimeline.instance.Schedule(()=> onHitCompletion(result), plan.EndDelay);
-
-        return plan.EndDelay;
     }
 
     /// <summary>
@@ -259,7 +256,7 @@ public static class SkillManager
         
         bool wasAlive = target.Status.Hp.Value > 0;
         // ターゲットのHP減少
-        var appliedDamage = target.UpdateHp(damageValue);
+        var appliedDamage = target.UpdateHp(-damageValue);
         bool defeatedTarget = wasAlive && target.Status.Hp.Value <= 0;  // 集中攻撃などでのKillCountの重複追加を防ぐ形でdefeatedTargetの値を決定
         
         target.ReceivedCriticalDamage.Value = isCritical;
@@ -268,7 +265,7 @@ public static class SkillManager
         if (target.Status.Buffs.Any(debuff => debuff.type == BuffType.睡眠))
             RemoveBuff(target, BuffType.睡眠);
 
-        return new HitResult(appliedDamage, isCritical, false, wasAlive);
+        return new HitResult(appliedDamage, isCritical, false, defeatedTarget);
     }
 
     /// <summary>
@@ -282,30 +279,8 @@ public static class SkillManager
     /// <param name="onAttackCompletion">集中攻撃の一連の処理が終了した後に行う処理</param>
     public static void FocusedAttack(CharaController user, CharaController target, int baseValue, int rate, int hitCount, Action<HitSequenceResult> onAttackCompletion = null)
     {
-        int totalDamage = 0;
-        int criticalCount = 0;
-        int killCount = 0;
-
-        float endDelay = 0f;
-
-        for (int i = 0; i < hitCount; i++)
-        {
-            var hit = new HitSequencePosition(i, hitCount);
-            endDelay = SingleAttack(user, target, baseValue, rate, AttackPattern.Focused, hit, 
-                onHitCompletion: result =>
-                {
-                    totalDamage += result.Damage;
-                    if (result.IsCritical) criticalCount++;
-                    if (result.DefeatedTarget) killCount++;
-                });
-        }
-
-        if (onAttackCompletion != null)
-            BattleActionTimeline.instance.Schedule(()=>
-            {
-                var result = new HitSequenceResult(totalDamage, criticalCount, killCount);
-                onAttackCompletion(result);
-            }, endDelay);
+        var targets = Enumerable.Repeat(target, hitCount).ToList();
+        ExecuteHitSequence(user, targets, baseValue, rate, onAttackCompletion);
     }
 
     /// <summary>
@@ -317,32 +292,7 @@ public static class SkillManager
     /// <param name="rate"></param>
     public static void RandomAttack(CharaController user, List<CharaController> targets, int baseValue, int rate, Action<HitSequenceResult> onAttackCompletion = null)
     {
-        int totalDamage = 0;
-        int criticalCount = 0;
-        int killCount = 0;
-
-        float endDelay = 0f;
-
-        for (int i = 0; i < targets.Count; i++)
-        {
-            CharaController target = targets[i];
-            var hit = new HitSequencePosition(i, targets.Count);
-
-            endDelay = SingleAttack(user, target, baseValue, rate, AttackPattern.Random, hit,
-                onHitCompletion: result =>
-                {
-                    totalDamage += result.Damage;
-                    if (result.IsCritical) criticalCount++;
-                    if (result.DefeatedTarget) killCount++;
-                });
-        }
-
-        if (onAttackCompletion != null)
-            BattleActionTimeline.instance.Schedule(()=>
-            {
-                var result = new HitSequenceResult(totalDamage, criticalCount, killCount);
-                onAttackCompletion(result);
-            }, endDelay);
+        ExecuteHitSequence(user, targets, baseValue, rate, onAttackCompletion);
     }
 
     /// <summary>
@@ -355,32 +305,46 @@ public static class SkillManager
     /// <param name="onAttackCompletion"></param>
     public static void SimultaneousAttack(CharaController user, List<CharaController> targets, int baseValue, int rate, Action<HitSequenceResult> onAttackCompletion = null)
     {
+        ExecuteHitSequence(user, targets, baseValue, rate, onAttackCompletion);
+    }
+
+    /// <summary>
+    /// 上記3つのAttackメソッドの共通処理をまとめて記述
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="targets">Listの中身は変更しない。IReadOnlyList型を利用。</param>
+    /// <param name="baseValue"></param>
+    /// <param name="rate"></param>
+    /// <param name="onAttackCompletion"></param>
+    private static void ExecuteHitSequence(CharaController user, IReadOnlyList<CharaController> targets, int baseValue, int rate, Action<HitSequenceResult> onAttackCompletion = null)
+    {
         int totalDamage = 0;
         int criticalCount = 0;
         int killCount = 0;
 
-        float endDelay = 0f;
+        int completedHitCount = 0;
 
         for (int i = 0; i < targets.Count; i++)
         {
             CharaController target = targets[i];
             var hit = new HitSequencePosition(i, targets.Count);
 
-            endDelay = SingleAttack(user, target, baseValue, rate, AttackPattern.Simultaneous, hit,
+            SingleAttack(user, target, baseValue, rate, AttackPattern.Random, hit,
                 onHitCompletion: result =>
                 {
                     totalDamage += result.Damage;
                     if (result.IsCritical) criticalCount++;
                     if (result.DefeatedTarget) killCount++;
+
+                    completedHitCount++;
+
+                    if (completedHitCount == targets.Count)
+                    {
+                        var sequenceResult = new HitSequenceResult(totalDamage, criticalCount, killCount);
+                        onAttackCompletion?.Invoke(sequenceResult);
+                    }
                 });
         }
-
-        if (onAttackCompletion != null)
-            BattleActionTimeline.instance.Schedule(()=>
-            {
-                var result = new HitSequenceResult(totalDamage, criticalCount, killCount);
-                onAttackCompletion(result);
-            }, endDelay);
     }
 
     /// <summary>
