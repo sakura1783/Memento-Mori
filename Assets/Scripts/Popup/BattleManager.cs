@@ -99,12 +99,6 @@ public class BattleManager : PopupBase
             var charaPannel = Instantiate(panelPrefab, generateTran);
             charaPannel.Setup(chara, data);
             generatedObjs.Add(charaPannel.gameObject);
-
-            // キャラが戦闘不能になったら、リストから削除
-            chara.Status.Hp
-                .Where(value => value <= 0)
-                .Subscribe(_ => team.Remove(chara))
-                .AddTo(battleDisposables);
         }
     }
 
@@ -143,13 +137,18 @@ public class BattleManager : PopupBase
 
         foreach (var chara in playerTeam.Concat(opponentTeam))  // Concat()でリスト2つを結合し、処理を簡素化
         {
+            if (chara.Status.Hp.Value <= 0)
+            continue;
+            
             // 「毒」状態の場合、現在HP*?%のダメージを受ける
             var poisonDebuff = chara.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.毒);
-            if (poisonDebuff != null) chara.UpdateHp(-CalculateManager.CalculateValueByRate(chara.Status.Hp.Value, poisonDebuff.effectRate));
+            if (poisonDebuff != null) 
+                chara.UpdateHp(-CalculateManager.CalculateValueByRate(chara.Status.Hp.Value, poisonDebuff.effectRate));
  
             // 「再生」状態の場合、HPを最大HP*?%回復
             var regenerationBuff = chara.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.再生);
-            if (regenerationBuff != null) chara.UpdateHp(CalculateManager.CalculateValueByRate(chara.Status.MaxHp.Value, regenerationBuff.effectRate));
+            if (regenerationBuff != null) 
+                chara.UpdateHp(CalculateManager.CalculateValueByRate(chara.Status.MaxHp.Value, regenerationBuff.effectRate));
         }
         
         int count = 0;  // do-while文が何回回ったか
@@ -159,38 +158,47 @@ public class BattleManager : PopupBase
             // 味方の行動
             if (playerTeam.Count > count)
             {
-                previousActChara = playerTeam[count];
+                var actingChara = playerTeam[count];
 
-                playerTeam[count].ExecuteActiveSkill(this);
-                await WaitForActionCompletion();
-                playerTeam[count].OnActionEnded();
+                if (actingChara.Status.Hp.Value > 0)
+                {
+                    previousActChara = actingChara;
 
-                // 1キャラの行動終了ごとに、receivedCriticalDamageをfalseにリセット(次のキャラの行動に影響しないようにする)。競合が起きるため、各キャラクラスのスキルメソッド内ではいじらない。
-                foreach (var chara in playerTeam.Concat(opponentTeam))
-                    chara.ReceivedCriticalDamage.Value = false;
+                    actingChara.ExecuteActiveSkill(this);
+                    await WaitForActionCompletion();
+                    actingChara.OnActionEnded();
 
-                // 行動後、バトル終了かどうかを判定。終了の場合trueを返し、Battle()内の処理によって、Battle()内からも抜け出す
-                if (IsBattleOver()) return;
+                    // 1キャラの行動終了ごとに、receivedCriticalDamageをfalseにリセット(次のキャラの行動に影響しないようにする)。競合が起きるため、各キャラクラスのスキルメソッド内ではいじらない。
+                    foreach (var chara in playerTeam.Concat(opponentTeam))
+                        chara.ReceivedCriticalDamage.Value = false;
+
+                    // 行動後、バトル終了かどうかを判定。終了の場合trueを返し、Battle()内の処理によって、Battle()内からも抜け出す
+                    if (IsBattleOver()) return;
+                }
             }
 
             // 敵の行動
             if (opponentTeam.Count > count)
             {
-                previousActChara = opponentTeam[count];
+                var actingChara = opponentTeam[count];
 
-                opponentTeam[count].ExecuteActiveSkill(this);
-                await WaitForActionCompletion();
-                opponentTeam[count].OnActionEnded();
+                if (actingChara.Status.Hp.Value > 0)
+                {
+                    previousActChara = actingChara;
 
-                foreach (var chara in playerTeam.Concat(opponentTeam))
-                    chara.ReceivedCriticalDamage.Value = false;
+                    actingChara.ExecuteActiveSkill(this);
+                    await WaitForActionCompletion();
+                    actingChara.OnActionEnded();
 
-                if (IsBattleOver()) return;
+                    foreach (var chara in playerTeam.Concat(opponentTeam))
+                        chara.ReceivedCriticalDamage.Value = false;
+
+                    if (IsBattleOver()) return;
+                }
             }
-
             count++;
 
-        } while (count < playerTeam.Count && count < opponentTeam.Count);  // 全員が1回行動するまで繰り返す
+        } while (count < playerTeam.Count || count < opponentTeam.Count);  // 全員が1回行動するまで繰り返す
 
         // 次のターンへ(全てのキャラが一回攻撃し終えたらターンを進める)
         return;

@@ -4,7 +4,6 @@ using System.Linq;
 using UniRx;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
-using JetBrains.Annotations;
 using Unity.VisualScripting;
 
 /// <summary>
@@ -88,6 +87,12 @@ public static class SkillManager
                 break;
         }
 
+        // 戦闘不能キャラをターゲット候補から除外
+        targetList = targetList.Where(chara => chara.Status.Hp.Value > 0).ToList();
+
+        if (targetList.Count == 0)
+            return targetList;
+
         // ValueTypeの優劣で並び替え
         if (valueType != ValueType.None)
         {
@@ -168,15 +173,34 @@ public static class SkillManager
         (var team,var userIndex) = PopupManager.instance.GetPopup<BattleManager>().GetCharaTeamAndIndex(user);
         
         List<CharaController> neighbors = new();
-        if (userIndex - 1 >= 0)  // 左隣にキャラが存在したら
-        {
-            neighbors.Add(team[userIndex - 1]);
-        }
-        if (userIndex + 1 < 4)  // 右隣にキャラが存在したら
-        {
-            neighbors.Add(team[userIndex + 1]);
-        }
 
+        // if (userIndex - 1 >= 0)  // 左隣にキャラが存在したら
+        // {
+        //     neighbors.Add(team[userIndex - 1]);
+        // }
+        // if (userIndex + 1 < team.Count)  // 右隣にキャラが存在したら
+        // {
+        //     neighbors.Add(team[userIndex + 1]);
+        // }
+
+        // 左側、右側からそれぞれ一番近いキャラを探す
+        for (int i = userIndex - 1; i >= 0; i--)
+        {
+            if (team[i].Status.Hp.Value <= 0)
+                continue;
+
+            neighbors.Add(team[i]);
+            break;
+        }
+        for (int i = userIndex + 1; i < team.Count; i++)
+        {
+            if (team[i].Status.Hp.Value <= 0)
+                continue;
+            
+            neighbors.Add(team[i]);
+            break;
+        }
+        
         return neighbors;
     }
 
