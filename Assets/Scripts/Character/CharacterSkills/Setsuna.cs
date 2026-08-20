@@ -16,25 +16,24 @@ public class Setsuna : CharacterBase
     /// <param name="user"></param>
     public override async void ActiveSkill1(CharaController user)
     {
+        // TODO できたらリファクタリングしたい
         int criticalCount = 0;
+        int increaseValue = 0;
 
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 3, allowDuplicates: true);
 
-        SkillManager.RandomAttack(user, targets, user.Status.attackPower, 200);
-        targets.ForEach(target =>
-        {
-            if (target.ReceivedCriticalDamage.Value)
-                criticalCount++;
-        });
+        SkillManager.RandomAttack(user, targets, user.Status.attackPower, 200,
+            onAttackCompletion: result =>
+            {
+                criticalCount = result.CriticalCount;
+                increaseValue = SkillManager.ModifyAttackPower(user, user.Status.attackPower, 30, true);
 
-        if (criticalCount > 0)
-        {
-            int increaseValue = SkillManager.ModifyAttackPower(user, user.Status.attackPower, 30, true);
+                // TODO 下の処理を入れたら、ターン経過待機処理で無限ループになるよね？
+            });
 
-            await SkillManager.WaitTurnsAsync(criticalCount);
+        await SkillManager.WaitTurnsAsync(criticalCount);
 
-            if (user != null) user.Status.attackPower -= increaseValue;
-        }
+        user.Status.attackPower -= increaseValue;
     }
 
     /// <summary>
@@ -43,26 +42,31 @@ public class Setsuna : CharacterBase
     /// <param name="user"></param>
     public override void ActiveSkill2(CharaController user)
     {
-        int remainingAttackCount = 4;
-        int attackIndex = 0;  // 現在何回目の攻撃か
+        // TODO もう少し簡単にできないか、また、RandomAttack()をうまく利用できないか検討。処理が煩雑でわかりにくい。
 
-        while (remainingAttackCount > 0 && attackIndex < 8)
+        int remainingAttackCount = 4;
+        int currentHitIndex = 0;  // 現在何回目の攻撃か
+
+        while (remainingAttackCount > 0 && currentHitIndex < 8)
         {   
             // 最初4回はランダムな敵、以降の追加攻撃はHP割合が最も低い敵を選択
-            List<CharaController> target = attackIndex < 4
-                ? SkillManager.PickTarget(user, TargetType.Opponent, 1)
-                : SkillManager.PickTarget(user, TargetType.Opponent, 1, ValueType.ByCurrentHp, false);
+            CharaController target = currentHitIndex < 4
+                ? SkillManager.PickTarget(user, TargetType.Opponent, 1).FirstOrDefault()
+                : SkillManager.PickTarget(user, TargetType.Opponent, 1, ValueType.ByCurrentHp, false).FirstOrDefault();
 
             // 最初4回は攻撃力*160%、以降の追加攻撃は攻撃力*210%で攻撃
-            int attackRate = attackIndex < 4 ? 160 : 210;
-            SkillManager.RandomAttack(user, target, user.Status.attackPower, attackRate);
-            remainingAttackCount--;
+            int attackRate = currentHitIndex < 4 ? 160 : 210;
 
-            // 戦闘不能にするたび、攻撃回数+1
-            if (target.FirstOrDefault().Status.Hp.Value <= 0)
-                remainingAttackCount++;
+            SkillManager.SingleAttack(user, target, user.Status.attackPower, attackRate, AttackPattern.Single,
+                onHitCompletion: result =>
+                {
+                    remainingAttackCount--;
 
-            attackIndex++;
+                    // 戦闘不能にするたび、攻撃回数+1
+                    if (result.DefeatedTarget) remainingAttackCount++;
+
+                    currentHitIndex++;
+                });
         }
     }
 

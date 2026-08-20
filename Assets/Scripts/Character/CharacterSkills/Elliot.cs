@@ -20,7 +20,6 @@ public class Elliot : CharacterBase
         List<int> increaseValues = new();
         
         var targets = SkillManager.PickTarget(user, TargetType.Ally);
-        // TODO 普通にAddBuffEffect()すればいい？攻撃後のModify()であれば、、？
         targets.ForEach(target => increaseValues.Add(SkillManager.ModifyAttackPower(target, user.Status.attackPower, 15, true)));
 
         await SkillManager.WaitTurnsAsync(2);
@@ -40,14 +39,18 @@ public class Elliot : CharacterBase
     public override void ActiveSkill2(CharaController user)
     {
         var attackTargets = SkillManager.PickTarget(user, TargetType.Opponent, 3);
-        attackTargets.ForEach(target => SkillManager.SingleAttack(user, target, user.Status.attackPower, 200, AttackPattern.Simultaneous));
-
-        var healTargets = SkillManager.PickTarget(user, TargetType.Ally, 2, ValueType.ByCurrentHp, false);
-        healTargets.ForEach(target =>
-        {
-            SkillManager.Heal(target, user.Status.attackPower, 50);
-            SkillManager.ApplyBuff(target, BuffType.再生, true, false, 1, 3);
-        });
+   
+        SkillManager.SimultaneousAttack(user, attackTargets, user.Status.attackPower, 200,
+            onAttackCompletion: result =>
+            {
+                var healTargets = SkillManager.PickTarget(user, TargetType.Ally, 2, ValueType.ByCurrentHp, false);
+                
+                healTargets.ForEach(target =>
+                {
+                    SkillManager.Heal(target, user.Status.attackPower, 50);
+                    SkillManager.ApplyBuff(target, BuffType.再生, true, false, 1, 3);
+                });
+            });
     }
 
     /// <summary>
@@ -71,6 +74,7 @@ public class Elliot : CharacterBase
             {
                 int decreaseValue = 0;
 
+                // TODO ここは即時でいいか。Timeline.Schedule()に登録して、Aggressorの次に行動できるようにした方がいい？適切なタイミングで実行されるか。特に、WaitAllAsync()が動くまでに登録されるか。
                 var targets = SkillManager.PickTarget(user, TargetType.Aggressor);
                 targets.ForEach(target => decreaseValue = SkillManager.ModifyAttackPower(target, target.Status.attackPower, 15, false));
 

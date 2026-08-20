@@ -14,7 +14,7 @@ public class Rosevillea : CharacterBase
 
 
     /// <summary>
-    /// ランダムな敵1体に攻撃力*390%の攻撃。さらに、2ターンの間「気絶」を付与
+    /// ランダムな敵1体に攻撃力*190%の攻撃。さらに、2ターンの間「気絶」を付与
     /// </summary>
     /// <param name="user"></param>
     public override void ActiveSkill1(CharaController user)
@@ -23,19 +23,19 @@ public class Rosevillea : CharacterBase
         var target = SkillManager.PickTarget(user, TargetType.Opponent, 1).FirstOrDefault();
 
         // スキル処理
-        // TODO SkillManager.SingleAttack(user, target, user.Status.attackPower, 390, AttackPattern.Single, 
-        //     onHitResolved: result => SkillManager.ApplyBuff(target, BuffType.気絶, false, false, 2));
+        SkillManager.SingleAttack(user, target, user.Status.attackPower, 190, AttackPattern.Single, 
+            onHitCompletion: result => SkillManager.ApplyBuff(target, BuffType.気絶, false, false, 2));
     }
 
     /// <summary>
-    /// ランダムな敵1体に攻撃力*420%の攻撃。
+    /// ランダムな敵1体に攻撃力*320%の攻撃。
     /// </summary>
     /// <param name="user"></param>
     public override void ActiveSkill2(CharaController user)
     {
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
 
-        targets.ForEach(target => SkillManager.SingleAttack(user, target, user.Status.attackPower, 420, AttackPattern.Single));
+        targets.ForEach(target => SkillManager.SingleAttack(user, target, user.Status.attackPower, 320, AttackPattern.Single));
     }
 
     /// <summary>
