@@ -25,6 +25,9 @@ public class Setsuna : CharacterBase
         SkillManager.RandomAttack(user, targets, user.Status.attackPower, 200,
             onAttackCompletion: result =>
             {
+                if (result.CriticalCount <= 0)
+                    return;
+
                 criticalCount = result.CriticalCount;
                 increaseValue = SkillManager.ModifyAttackPower(user, user.Status.attackPower, 30, true);
 
@@ -44,15 +47,26 @@ public class Setsuna : CharacterBase
     {
         // TODO もう少し簡単にできないか、また、RandomAttack()をうまく利用できないか検討。処理が煩雑でわかりにくい。
 
-        int remainingAttackCount = 4;
-        int currentHitIndex = 0;  // 現在何回目の攻撃か
+        const int initialHitCount = 4;
+        const int maxHitCount = 8;
 
-        while (remainingAttackCount > 0 && currentHitIndex < 8)
-        {   
+        int remainingAttackCount = initialHitCount;
+        int currentHitIndex = 0;
+
+        void ExecuteNextHit()
+        {
+            if (remainingAttackCount <= 0 || currentHitIndex < maxHitCount)
+                return;
+
+            bool isAdditionalHit = currentHitIndex >= initialHitCount;
+
             // 最初4回はランダムな敵、以降の追加攻撃はHP割合が最も低い敵を選択
             CharaController target = currentHitIndex < 4
                 ? SkillManager.PickTarget(user, TargetType.Opponent, 1).FirstOrDefault()
-                : SkillManager.PickTarget(user, TargetType.Opponent, 1, ValueType.ByCurrentHp, false).FirstOrDefault();
+                : SkillManager.PickTarget(user, TargetType.Opponent, 1, ValueType.ByCurrentHpRate, false).FirstOrDefault();
+
+            if (target == null)
+                return;
 
             // 最初4回は攻撃力*160%、以降の追加攻撃は攻撃力*210%で攻撃
             int attackRate = currentHitIndex < 4 ? 160 : 210;
@@ -61,11 +75,12 @@ public class Setsuna : CharacterBase
                 onHitCompletion: result =>
                 {
                     remainingAttackCount--;
+                    currentHitIndex++;
 
                     // 戦闘不能にするたび、攻撃回数+1
                     if (result.DefeatedTarget) remainingAttackCount++;
 
-                    currentHitIndex++;
+                    ExecuteNextHit();
                 });
         }
     }
