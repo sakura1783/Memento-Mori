@@ -5,9 +5,9 @@ using System;
 /// </summary>
 public static class AttackSequencePlanBuilder
 {
-    private const float TRAJECTORY_DURATION = 0.2f;
-    private const float SHORT_HIT_DURATION = 0.17f;
-    private const float LONG_HIT_DURATION = 0.3f;
+    public const float TRAJECTORY_DURATION = 0.12f;
+    public const float SHORT_HIT_DURATION = 0.10f;
+    public const float LONG_HIT_DURATION = 0.15f;
 
 
     public static AttackSequencePlan Build(AttackPattern attackPattern, HitSequencePosition hit)
@@ -48,13 +48,13 @@ public static class AttackSequencePlanBuilder
 
     private static AttackSequencePlan CreateRandomPlan(HitSequencePosition hit)
     {
-        float hitDelay = TRAJECTORY_DURATION + (hit.Index * (TRAJECTORY_DURATION + LONG_HIT_DURATION));
+        float hitDelay = TRAJECTORY_DURATION + (hit.Index * SHORT_HIT_DURATION);
 
         return new AttackSequencePlan(
-            hit.Index * (TRAJECTORY_DURATION + LONG_HIT_DURATION),
+            0f,
             hitDelay,
-            hitDelay + LONG_HIT_DURATION,
-            true,
-            true);
+            hitDelay + SHORT_HIT_DURATION,
+            hit.IsFirst,
+            false);
     }
 }

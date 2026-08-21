@@ -45,10 +45,6 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     [SerializeField] private List<EffectObjData> effects = new();  // AnimationType順に順番にプレハブを入れる
     [SerializeField] private ParticleSystem trajectoryEffect;
 
-    public const float TRAJECTORY_DURATION = 0.2f;
-    public const float SHORT_HIT_DURATION = 0.17f;
-    public const float LONG_HIT_DURATION = 0.3f;
-
 
     /// <summary>
     /// アニメーション登録
@@ -105,8 +101,8 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     {
         Vector3 pos = new(battleManager.PlayerTeam.Contains(target) ? -15f : 15f, -5f, 0f);
         
-        float duration = isLongAnimation ? LONG_HIT_DURATION : SHORT_HIT_DURATION;
-        int vibrato = isLongAnimation ? 13 : 5;
+        float duration = isLongAnimation ? AttackSequencePlanBuilder.LONG_HIT_DURATION : AttackSequencePlanBuilder.SHORT_HIT_DURATION;
+        int vibrato = isLongAnimation ? 5 : 3;
         
         await animePoint
             .DOPunchAnchorPos(pos, duration, vibrato).ToUniTask();
@@ -146,7 +142,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
         effect.Play();
 
         await effect.transform
-            .DOMove(targetRect.position, TRAJECTORY_DURATION).SetEase(Ease.Linear).ToUniTask();  // DOMove()にはワールド座標を指定する必要がある
+            .DOMove(targetRect.position, AttackSequencePlanBuilder.TRAJECTORY_DURATION).SetEase(Ease.InQuad).ToUniTask();  // DOMove()にはワールド座標を指定する必要がある
 
         // TODO これ以外にも色々やってみたけど、だめ
         // effect.Stop(true, ParticleSystemStopBehavior.StopEmitting);
