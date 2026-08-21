@@ -9,6 +9,9 @@ public class Setsuna : CharacterBase
     public override int Active1CoolTime => 5;
     public override int Active2CoolTime => 4;
 
+    private const int ACTIVE2_INITIAL_HIT_COUNT = 4;
+    private const int ACTIVE2_MAX_HIT_COUNT = 8;
+
 
     /// <summary>
     /// ランダムな敵に3回攻撃力*200%の攻撃。クリティカルヒットした場合、1ターンの間自身の攻撃力が30%増加する。クリティカルヒットするたび攻撃力増加のターン数が1ターン多くなる。
@@ -45,44 +48,40 @@ public class Setsuna : CharacterBase
     /// <param name="user"></param>
     public override void ActiveSkill2(CharaController user)
     {
-        // TODO もう少し簡単にできないか、また、RandomAttack()をうまく利用できないか検討。処理が煩雑でわかりにくい。
-
-        const int initialHitCount = 4;
-        const int maxHitCount = 8;
-
-        int remainingAttackCount = initialHitCount;
-        int currentHitIndex = 0;
+        int allowedHitCount = ACTIVE2_INITIAL_HIT_COUNT;
+        int hitIndex = 0;
 
         void ExecuteNextHit()
         {
-            if (remainingAttackCount <= 0 || currentHitIndex < maxHitCount)
-                return;
+            if (hitIndex >= allowedHitCount)
+            return;
 
-            bool isAdditionalHit = currentHitIndex >= initialHitCount;
+            bool isAdditionalHit = hitIndex >= ACTIVE2_INITIAL_HIT_COUNT;
 
             // 最初4回はランダムな敵、以降の追加攻撃はHP割合が最も低い敵を選択
-            CharaController target = currentHitIndex < 4
-                ? SkillManager.PickTarget(user, TargetType.Opponent, 1).FirstOrDefault()
-                : SkillManager.PickTarget(user, TargetType.Opponent, 1, ValueType.ByCurrentHpRate, false).FirstOrDefault();
+            CharaController target = isAdditionalHit
+                ? SkillManager.PickTarget(user, TargetType.Opponent, 1, ValueType.ByCurrentHpRate, false).FirstOrDefault()
+                : SkillManager.PickTarget(user, TargetType.Opponent, 1).FirstOrDefault();
 
             if (target == null)
                 return;
 
             // 最初4回は攻撃力*160%、以降の追加攻撃は攻撃力*210%で攻撃
-            int attackRate = currentHitIndex < 4 ? 160 : 210;
+            int attackRate = isAdditionalHit ? 210 : 160;
 
             SkillManager.SingleAttack(user, target, user.Status.attackPower, attackRate, AttackPattern.Single,
                 onHitCompletion: result =>
                 {
-                    remainingAttackCount--;
-                    currentHitIndex++;
-
                     // 戦闘不能にするたび、攻撃回数+1
-                    if (result.DefeatedTarget) remainingAttackCount++;
+                    if (result.DefeatedTarget)
+                        allowedHitCount = Mathf.Min(allowedHitCount + 1, ACTIVE2_MAX_HIT_COUNT);
+
+                    hitIndex++;
 
                     ExecuteNextHit();
                 });
         }
+        ExecuteNextHit();
     }
 
     /// <summary>
