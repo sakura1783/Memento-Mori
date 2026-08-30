@@ -204,8 +204,9 @@ public static class SkillManager
     /// <param name="rate"></param>
     /// <param name="attackPattern"></param>
     /// <param name="hit"></param>
-    /// <param name="onHitCompletion">ヒットの一連の処理終了後に動かす処理</param>
-    public static void SingleAttack(CharaController user, CharaController target, int baseValue, int rate, AttackPattern attackPattern, HitSequencePosition? hit = null, Action<HitResult> onHitCompletion = null)
+    /// <param name="onHitResolved">ヒット結果が確定した瞬間に動かす処理</param>
+    /// <param name="onHitCompletion">演出まで全て終了した瞬間に動かす処理</param>
+    public static void SingleAttack(CharaController user, CharaController target, int baseValue, int rate, AttackPattern attackPattern, HitSequencePosition? hit = null, Action<HitResult> onHitResolved = null, Action<HitResult> onHitCompletion = null)
     {
         AttackSequencePlan plan = AttackSequencePlanBuilder.Build(attackPattern, hit ?? HitSequencePosition.Single);
 
@@ -215,10 +216,12 @@ public static class SkillManager
         if (plan.PlayTrajectory)
             BattleAnimationManager.instance.AddAnimation(target, AnimationType.Trajectory, plan.TrajectoryDelay, user);
 
-        // ヒットの実処理を登録
+        // ヒットとそれに付随する一連の処理全てを登録
         BattleActionTimeline.instance.Schedule(()=>
         {
             result = ResolveHit(user, target, baseValue, rate);
+
+            onHitResolved?.Invoke(result);
 
             // バリアで攻撃がブロックされていない場合、ダメージアニメーションを登録
             if (!result.WasBlocked)
@@ -228,7 +231,6 @@ public static class SkillManager
             }
         }, plan.HitDelay);
 
-        // ヒット終了後の処理
         if (onHitCompletion != null)
             BattleActionTimeline.instance.Schedule(()=> onHitCompletion(result), plan.EndDelay);
     }
@@ -368,18 +370,16 @@ public static class SkillManager
     /// <param name="target"></param>
     /// <param name="baseValue"></param>
     /// <param name="rate"></param>
-    public static void Heal(CharaController target, int baseValue, int rate)
+    public static void Heal(CharaController target, int baseValue, int rate, CharaController source = null)
     {
         // 「不治」状態の場合、HPを回復できない
         if (target.Status.Buffs.Any(debuff => debuff.type == BuffType.不治))  // Any()で、List内に条件に一致する要素があるかどうか判定
-        {
             return;
-        }
-
+        
         target.UpdateHp(CalculateManager.CalculateValueByRate(baseValue, rate));
 
         // エフェクト再生
-        BattleAnimationManager.instance.AddAnimation(target, AnimationType.Heal);
+        BattleAnimationManager.instance.AddAnimation(target, AnimationType.Heal, user: source);
     }
 
     /// <summary>
@@ -440,12 +440,12 @@ public static class SkillManager
     /// <param name="duration">解除不可バフは、デフォルト値で大きな値を設定(値減らさないけど、一応)</param>
     /// <param name="effectRate">基準値の?%分の影響を与えるか。「再生」「毒」「侵食」などで使用する</param>
     /// <param name="effectValue">効果の量。「シールド」などで利用。(デフォルト値として-1を設定。0になるとRemoveBuff()が動くので、値を減らす際は0以下にならないように制御する)</param>
-    public static void ApplyBuff(CharaController target, BuffType buffType, bool isPositiveEffect, bool isIrremovable, int duration = 100, int effectRate = 0, int effectValue = -1)
+    public static void ApplyBuff(CharaController user, CharaController target, BuffType buffType, bool isPositiveEffect, bool isIrremovable, int duration = 100, int effectRate = 0, int effectValue = -1)
     {
         if (!target.IsAlive) return;
 
         // 再生するエフェクトの登録
-        BattleAnimationManager.instance.AddAnimation(target, isPositiveEffect ? AnimationType.ReceiveBuff : AnimationType.ReceiveDebuff);
+        BattleAnimationManager.instance.AddAnimation(target, isPositiveEffect ? AnimationType.ReceiveBuff : AnimationType.ReceiveDebuff, user: user);
 
         // 重ね掛け不可。継続時間とダメージ割合を置き換えて、処理を終了
         var duplicateBuff = target.Status.Buffs.FirstOrDefault(x => x.type == buffType);

@@ -111,6 +111,8 @@ public class BattleManager : PopupBase
         playerTeam.Concat(opponentTeam).ToList()
             .ForEach(chara => chara.ExecutePassiveSkill(PassiveActivationTiming.BattleStart, this));
 
+        await BattleActionTimeline.instance.WaitAllAsync();
+
         // 勝敗がつくまでターンをループ
         do
         {
@@ -137,6 +139,8 @@ public class BattleManager : PopupBase
     {
         playerTeam.Concat(opponentTeam).ToList()
             .ForEach(chara => chara.ExecutePassiveSkill(PassiveActivationTiming.TurnStart, this));
+
+        await BattleActionTimeline.instance.WaitAllAsync();
 
         foreach (var chara in playerTeam.Concat(opponentTeam))  // Concat()でリスト2つを結合し、処理を簡素化
         {
@@ -168,6 +172,7 @@ public class BattleManager : PopupBase
                 {
                     previousActChara = actingChara;
 
+                    BattleAnimationManager.instance.ResetEffectTypeDelays();
                     actingChara.ExecuteActiveSkill(this);
                     await WaitForActionCompletion();
                     actingChara.OnActionEnded();
@@ -190,6 +195,7 @@ public class BattleManager : PopupBase
                 {
                     previousActChara = actingChara;
 
+                    BattleAnimationManager.instance.ResetEffectTypeDelays();
                     actingChara.ExecuteActiveSkill(this);
                     await WaitForActionCompletion();
                     actingChara.OnActionEnded();

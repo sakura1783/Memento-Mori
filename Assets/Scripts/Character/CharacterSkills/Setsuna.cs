@@ -70,7 +70,7 @@ public class Setsuna : CharacterBase
             int attackRate = isAdditionalHit ? 210 : 160;
 
             SkillManager.SingleAttack(user, target, user.Status.attackPower, attackRate, AttackPattern.Single,
-                onHitCompletion: result =>
+                onHitResolved: result =>
                 {
                     // 戦闘不能にするたび、攻撃回数+1
                     if (result.DefeatedTarget)

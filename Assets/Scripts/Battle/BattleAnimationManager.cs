@@ -45,6 +45,12 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     [SerializeField] private List<EffectObjData> effects = new();  // AnimationType順に順番にプレハブを入れる
     [SerializeField] private ParticleSystem trajectoryEffect;
 
+    private const float EFFECT_INTERVAL = 0.1f;
+    private const float MAX_EFFECT_DELAY = 0.3f;
+    private readonly Dictionary<AnimationType, float> effectTypeDelays = new();
+    private readonly Dictionary<AnimationType, List<CharaController>> effectUsersByType = new();
+    private int nextEffectTypeIndex;
+
 
     /// <summary>
     /// アニメーション登録
@@ -56,7 +62,7 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     /// <param name="playLongDamageAnimation"></param>
     public void AddAnimation(CharaController target, AnimationType animationType, float additionalDelay = 0f, CharaController user = null, bool playLongDamageAnimation = true)
     {
-        BattleActionTimeline.instance.Schedule(()=> PlayAnimation(target, animationType, user, playLongDamageAnimation), additionalDelay);
+        BattleActionTimeline.instance.Schedule(()=> PlayAnimation(target, animationType, user, playLongDamageAnimation), additionalDelay + GetEffectTypeDelay(user, animationType));
     }
 
     private async UniTask PlayAnimation(CharaController target, AnimationType animationType, CharaController user = null, bool isLongDamageAnimation = true)
@@ -128,8 +134,8 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
                 renderer.sortingOrder = 1;
         }
 
-        // パーティクルの再生が終了し、破棄されるまで待つ
-        return UniTask.WaitUntil(() => obj == null);
+        // Particleの終了は行動完了条件に含めない
+        return UniTask.CompletedTask;
     }
 
     private async UniTask InstantiateTrajectoryEffect(CharaController attacker, CharaController target)
@@ -149,5 +155,49 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
 
         // float distance = Vector3.Distance(attackerRect.position, targetRect.position);
         // Debug.Log($"Trajectory Distance : {distance}");
+    }
+
+    /// <summary>
+    /// エフェクトの種類ごとに0.1秒エフェクト再生を遅らせる
+    /// </summary>
+    /// <param name="animationType"></param>
+    /// <returns></returns>
+    private float GetEffectTypeDelay(CharaController user, AnimationType animationType)
+    {
+        if (animationType is not
+            (AnimationType.Heal or AnimationType.ReceiveBuff or AnimationType.ReceiveDebuff))
+            return 0f;
+
+        // すでに同じAnimationTypeが存在している場合、前に割り当てた遅延を利用。見つからなかった場合、新しく遅延を計算して登録
+        if (!effectTypeDelays.TryGetValue(animationType, out float typeDelay))
+        {
+            typeDelay = Mathf.Min(nextEffectTypeIndex * EFFECT_INTERVAL, MAX_EFFECT_DELAY);
+            effectTypeDelays.Add(animationType, typeDelay);
+
+            nextEffectTypeIndex++;
+        }
+
+        if (user == null)
+            return typeDelay;  // TODO この処理により、userが指定されていない場合(ターン開始時バフなど)はtypeDelayだけを利用するように制御。以下user!= null部分を削除？
+
+        if (!effectUsersByType.TryGetValue(animationType, out var users))
+        {   
+            // 同じAnimationTypeが存在しない場合、Dicに新しく要素を追加
+            users = new List<CharaController>();
+            effectUsersByType.Add(animationType, users);
+        }
+
+        if (!users.Contains(user)) users.Add(user);
+
+        // 付与者が異なるごとに0.1秒追加
+        float userDelay = users.IndexOf(user) * EFFECT_INTERVAL;
+
+        return Mathf.Min(typeDelay + userDelay, MAX_EFFECT_DELAY);
+    }
+
+    public void ResetEffectTypeDelays()
+    {
+        effectTypeDelays.Clear();
+        nextEffectTypeIndex = 0;
     }
 }
