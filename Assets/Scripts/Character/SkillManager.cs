@@ -370,6 +370,7 @@ public static class SkillManager
     /// <param name="target"></param>
     /// <param name="baseValue"></param>
     /// <param name="rate"></param>
+    /// <param name="source"></param>
     public static void Heal(CharaController target, int baseValue, int rate, CharaController source = null)
     {
         // 「不治」状態の場合、HPを回復できない
@@ -440,12 +441,12 @@ public static class SkillManager
     /// <param name="duration">解除不可バフは、デフォルト値で大きな値を設定(値減らさないけど、一応)</param>
     /// <param name="effectRate">基準値の?%分の影響を与えるか。「再生」「毒」「侵食」などで使用する</param>
     /// <param name="effectValue">効果の量。「シールド」などで利用。(デフォルト値として-1を設定。0になるとRemoveBuff()が動くので、値を減らす際は0以下にならないように制御する)</param>
-    public static void ApplyBuff(CharaController user, CharaController target, BuffType buffType, bool isPositiveEffect, bool isIrremovable, int duration = 100, int effectRate = 0, int effectValue = -1)
+    public static void ApplyBuff(CharaController source, CharaController target, BuffType buffType, bool isPositiveEffect, bool isIrremovable, int duration = 100, int effectRate = 0, int effectValue = -1)
     {
         if (!target.IsAlive) return;
 
         // 再生するエフェクトの登録
-        BattleAnimationManager.instance.AddAnimation(target, isPositiveEffect ? AnimationType.ReceiveBuff : AnimationType.ReceiveDebuff, user: user);
+        BattleAnimationManager.instance.AddAnimation(target, isPositiveEffect ? AnimationType.ReceiveBuff : AnimationType.ReceiveDebuff, user: source);
 
         // 重ね掛け不可。継続時間とダメージ割合を置き換えて、処理を終了
         var duplicateBuff = target.Status.Buffs.FirstOrDefault(x => x.type == buffType);
