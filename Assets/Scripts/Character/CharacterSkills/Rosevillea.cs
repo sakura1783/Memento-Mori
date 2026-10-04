@@ -24,7 +24,7 @@ public class Rosevillea : CharacterBase
 
         // スキル処理
         SkillManager.SingleAttack(user, target, user.Status.attackPower, 190, AttackPattern.Single, 
-            onHitCompletion: result => SkillManager.ApplyBuff(target, BuffType.気絶, false, false, 2));
+            onHitCompletion: result => SkillManager.ApplyBuff(user, target, BuffType.気絶, false, false, 2));
     }
 
     /// <summary>

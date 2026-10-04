@@ -370,8 +370,8 @@ public static class SkillManager
     /// <param name="target"></param>
     /// <param name="baseValue"></param>
     /// <param name="rate"></param>
-    /// <param name="source"></param>
-    public static void Heal(CharaController target, int baseValue, int rate, CharaController source = null)
+    /// <param name="context">スキルによる回復と「再生」バフによる自動回復を区別</param>
+    public static void Heal(CharaController target, int baseValue, int rate, EffectContext context)
     {
         // 「不治」状態の場合、HPを回復できない
         if (target.Status.Buffs.Any(debuff => debuff.type == BuffType.不治))  // Any()で、List内に条件に一致する要素があるかどうか判定
@@ -380,7 +380,7 @@ public static class SkillManager
         target.UpdateHp(CalculateManager.CalculateValueByRate(baseValue, rate));
 
         // エフェクト再生
-        BattleAnimationManager.instance.AddAnimation(target, AnimationType.Heal, user: source);
+        BattleAnimationManager.instance.AddEffect(target, AnimationType.Heal, context);
     }
 
     /// <summary>
@@ -446,7 +446,7 @@ public static class SkillManager
         if (!target.IsAlive) return;
 
         // 再生するエフェクトの登録
-        BattleAnimationManager.instance.AddAnimation(target, isPositiveEffect ? AnimationType.ReceiveBuff : AnimationType.ReceiveDebuff, user: source);
+        BattleAnimationManager.instance.AddEffect(target, isPositiveEffect ? AnimationType.ReceiveBuff : AnimationType.ReceiveDebuff, EffectContext.AppliedBy(source));
 
         // 重ね掛け不可。継続時間とダメージ割合を置き換えて、処理を終了
         var duplicateBuff = target.Status.Buffs.FirstOrDefault(x => x.type == buffType);
@@ -454,6 +454,8 @@ public static class SkillManager
         {
             duplicateBuff.Duration.Value = duration;
             duplicateBuff.effectRate = effectRate;
+            // TODO バリアとシールドの量は重ね掛け可。effectValueはデフォルト値-1なので下を検討する
+            // duplicateBuff.EffectValue.Value += effectValue;
 
             return;
         }

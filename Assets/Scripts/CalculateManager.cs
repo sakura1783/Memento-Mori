@@ -40,8 +40,7 @@ public static class CalculateManager
             combatPower = charaData.initialCombatPower,
             attackPower = charaData.initialAttackPower,
             defencePower = charaData.initialDefencePower,
-            //Hp.Value = charaData.initialHp,
-            Hp = { Value = charaData.initialHp },  // ReactivePropertyの場合、初期化はこのように記述する。↑だとエラーになる
+            Hp = { Value = charaData.initialHp },  // ReactivePropertyの場合、初期化はこのように記述する
             MaxHp = { Value = charaData.initialHp},
             criticalRate = charaData.initialCriticalRate,
         };
@@ -69,6 +68,8 @@ public static class CalculateManager
                 status.defencePower += (int)Math.Round(status.defencePower * ConstData.POWER_INC_RATE, 0, MidpointRounding.AwayFromZero);
                 status.Hp.Value += (int)Math.Round(status.Hp.Value * ConstData.POWER_INC_RATE, 0, MidpointRounding.AwayFromZero);
             }
+        
+            status.MaxHp.Value = status.Hp.Value;
 
             // 上で求めた各ステータスから、戦闘力を計算。
             // 戦闘力 = 攻撃力+防御力+補正後HP+補正後クリティカル率

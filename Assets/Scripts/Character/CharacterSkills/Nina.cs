@@ -13,7 +13,7 @@ public class Nina : CharacterBase
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 4);
 
         SkillManager.SimultaneousAttack(user, targets, user.Status.attackPower, 290,
-            onAttackCompletion: result => SkillManager.Heal(user, user.Status.attackPower, 10));
+            onAttackCompletion: result => SkillManager.Heal(user, result.TotalDamage, 10, EffectContext.AppliedBy(user)));
     }
 
     /// <summary>
@@ -25,7 +25,7 @@ public class Nina : CharacterBase
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 2);
 
         SkillManager.SimultaneousAttack(user, targets, user.Status.attackPower, 420,
-            onAttackCompletion: result => SkillManager.ApplyBuff(user, BuffType.ダメージ無効, true, false, 1));
+            onAttackCompletion: result => SkillManager.ApplyBuff(user, user, BuffType.ダメージ無効, true, false, 1));
     }
 
     /// <summary>
@@ -34,6 +34,6 @@ public class Nina : CharacterBase
     /// <param name="user"></param>
     public override void PassiveSkill1(CharaController user)
     {
-        SkillManager.ApplyBuff(user, BuffType.再生, true, true, effectRate: 5);  // 引数:値とすることで、必要な引数のみ指定することができる
+        SkillManager.ApplyBuff(user, user, BuffType.再生, true, true, effectRate: 5);  // 引数:値とすることで、必要な引数のみ指定することができる
     }
 }

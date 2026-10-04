@@ -43,12 +43,12 @@ public class Elliot : CharacterBase
         SkillManager.SimultaneousAttack(user, attackTargets, user.Status.attackPower, 200,
             onAttackCompletion: result =>
             {
-                var healTargets = SkillManager.PickTarget(user, TargetType.Ally, 2, ValueType.ByCurrentHp, false);
+                var healTargets = SkillManager.PickTarget(user, TargetType.Ally, 2, ValueType.ByCurrentHpRate, false);
                 
                 healTargets.ForEach(target =>
                 {
-                    SkillManager.Heal(target, user.Status.attackPower, 50);
-                    SkillManager.ApplyBuff(target, BuffType.再生, true, false, 1, 3);
+                    SkillManager.Heal(target, user.Status.attackPower, 50, EffectContext.AppliedBy(user));
+                    SkillManager.ApplyBuff(user, target, BuffType.再生, true, false, 1, 3);
                 });
             });
     }

@@ -10,12 +10,9 @@ public class Arilosha : CharacterBase
     /// 通常攻撃時、ランダムな敵1体に攻撃力*220%の攻撃を行う(パッシブ1効果)
     /// </summary>
     /// <param name="user"></param>
-    public override void BasicAttack(CharaController user)
+    public override void BasicAttack(CharaController user, int rate = 220)
     {
-        base.BasicAttack(user);
-
-        var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
-        targets.ForEach(target => SkillManager.SingleAttack(user, target, user.Status.attackPower, 220, AttackPattern.Single));
+        base.BasicAttack(user, rate);
     }
 
     /// <summary>
@@ -40,10 +37,11 @@ public class Arilosha : CharacterBase
 
         float hpRatio = (float)user.Status.Hp.Value / user.Status.MaxHp.Value;
         int hpPercentage = (int)Math.Round(hpRatio * 100, 0, MidpointRounding.AwayFromZero);  // HP割合 = HP(%)
-        var increaseValue = SkillManager.ModifyAttackPower(user, hpPercentage, 10, true);
+        var increaseRate = CalculateManager.CalculateValueByRate(hpPercentage, 10);  // 攻撃力増加率 = HP割合*10%
+        var increaseValue = SkillManager.ModifyAttackPower(user, user.Status.attackPower, increaseRate, true);
 
         await SkillManager.WaitTurnsAsync(4);
-
-        if (user != null) user.Status.attackPower -= increaseValue;
+        if (user != null) 
+            user.Status.attackPower -= increaseValue;
     }
 }

@@ -1,5 +1,3 @@
-// TODO 後日実装？一応用意しておく
-
 /// <summary>
 /// HitResultクラスが1回のヒット結果を返すのに対し、こちらはRandomAttackやFocusedAttackなどで、複数回ヒットの攻撃結果を返す
 /// </summary>

@@ -70,6 +70,8 @@ public class BattleManager : PopupBase
         turnCount = 0;
         battleState = BattleState.Continue;
 
+        BattleAnimationManager.instance.ResetEffectTypeDelays();
+
         CreateTeamCharacters(teamAssemblyPop.playerTeamInfo, playerTeam, playerTran);
         CreateTeamCharacters(teamAssemblyPop.opponentTeamInfo, opponentTeam, opponentTran);
 
@@ -137,6 +139,8 @@ public class BattleManager : PopupBase
     /// <returns>バトルを終わるかどうか。trueでバトル続行(ターンを繰り返す)、trueでバトル終了(このメソッドだけでなく、Battle()からも抜ける)</returns>
     private async UniTask ExecuteTurn()
     {
+        BattleAnimationManager.instance.ResetEffectTypeDelays();
+
         playerTeam.Concat(opponentTeam).ToList()
             .ForEach(chara => chara.ExecutePassiveSkill(PassiveActivationTiming.TurnStart, this));
 
@@ -146,6 +150,8 @@ public class BattleManager : PopupBase
         {
             if (!chara.IsAlive) continue;
 
+            BattleAnimationManager.instance.ResetEffectTypeDelays();
+
             // 「毒」状態の場合、現在HP*?%のダメージを受ける
             var poisonDebuff = chara.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.毒);
             if (poisonDebuff != null) 
@@ -154,7 +160,7 @@ public class BattleManager : PopupBase
             // 「再生」状態の場合、HPを最大HP*?%回復
             var regenerationBuff = chara.Status.Buffs.FirstOrDefault(buff => buff.type == BuffType.再生);
             if (regenerationBuff != null) 
-                chara.UpdateHp(CalculateManager.CalculateValueByRate(chara.Status.MaxHp.Value, regenerationBuff.effectRate));
+                SkillManager.Heal(chara, chara.Status.MaxHp.Value, regenerationBuff.effectRate, EffectContext.AutoTriggered());
         }
 
         if (IsBattleOver()) return;

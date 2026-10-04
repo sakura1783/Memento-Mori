@@ -17,29 +17,20 @@ public class Setsuna : CharacterBase
     /// ランダムな敵に3回攻撃力*200%の攻撃。クリティカルヒットした場合、1ターンの間自身の攻撃力が30%増加する。クリティカルヒットするたび攻撃力増加のターン数が1ターン多くなる。
     /// </summary>
     /// <param name="user"></param>
-    public override async void ActiveSkill1(CharaController user)
+    public override void ActiveSkill1(CharaController user)
     {
-        // TODO できたらリファクタリングしたい
-        int criticalCount = 0;
-        int increaseValue = 0;
-
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 3, allowDuplicates: true);
 
         SkillManager.RandomAttack(user, targets, user.Status.attackPower, 200,
-            onAttackCompletion: result =>
+            onAttackCompletion: async result =>
             {
                 if (result.CriticalCount <= 0)
                     return;
+                int increaseValue = SkillManager.ModifyAttackPower(user, user.Status.attackPower, 30, true);
 
-                criticalCount = result.CriticalCount;
-                increaseValue = SkillManager.ModifyAttackPower(user, user.Status.attackPower, 30, true);
-
-                // TODO 下の処理を入れたら、ターン経過待機処理で無限ループになるよね？
+                await SkillManager.WaitTurnsAsync(result.CriticalCount);
+                user.Status.attackPower -= increaseValue;
             });
-
-        await SkillManager.WaitTurnsAsync(criticalCount);
-
-        user.Status.attackPower -= increaseValue;
     }
 
     /// <summary>
@@ -90,7 +81,7 @@ public class Setsuna : CharacterBase
     /// <param name="user"></param>
     public override void PassiveSkill1(CharaController user)
     {
-        SkillManager.ApplyBuff(user, BuffType.シールド, true, false, 3, effectValue: CalculateManager.CalculateValueByRate(user.Status.attackPower, 250));
+        SkillManager.ApplyBuff(user, user, BuffType.シールド, true, false, 3, effectValue: CalculateManager.CalculateValueByRate(user.Status.attackPower, 250));
     }
 
     /// <summary>

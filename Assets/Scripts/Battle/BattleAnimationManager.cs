@@ -177,20 +177,21 @@ public class BattleAnimationManager : AbstractSingleton<BattleAnimationManager>
     /// <returns></returns>
     private float GetEffectDelay(AnimationType animationType, EffectContext context)
     {
-        if (animationType is not AnimationType.Heal or AnimationType.ReceiveBuff or AnimationType.ReceiveDebuff)
+        if (animationType is not (AnimationType.Heal or AnimationType.ReceiveBuff or AnimationType.ReceiveDebuff))
             return 0f;
 
-        return context.Trigger switch
+        float delay = context.Trigger switch
         {
-            // TODO MAX_DELAYの制御
             EffectTrigger.Applied
-                => GetSourceDelay(animationType, context.Source),
+                => GetEffectTypeDelay(animationType) + GetSourceDelay(animationType, context.Source),
 
             EffectTrigger.AutoTriggered
                 => GetEffectTypeDelay(animationType),
 
             _ => 0f
         };
+        
+        return Mathf.Min(delay, MAX_EFFECT_DELAY);
     }
 
     private float GetEffectTypeDelay(AnimationType animationType)

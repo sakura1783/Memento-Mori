@@ -19,10 +19,11 @@ public abstract class CharacterBase
     /// 通常攻撃
     /// </summary>
     /// <param name="user"></param>
-    public virtual void BasicAttack(CharaController user)
+    /// <param name="rate"></param>
+    public virtual void BasicAttack(CharaController user, int rate = 100)
     {
         var targets = SkillManager.PickTarget(user, TargetType.Opponent, 1);
-        targets.ForEach(target => SkillManager.SingleAttack(user, target, user.Status.attackPower, 100, AttackPattern.Single, HitSequencePosition.Single));
+        targets.ForEach(target => SkillManager.SingleAttack(user, target, user.Status.attackPower, rate, AttackPattern.Single, HitSequencePosition.Single));
 
         // アニメーション再生
         BattleAnimationManager.instance.AddAnimation(user, AnimationType.Attack);
