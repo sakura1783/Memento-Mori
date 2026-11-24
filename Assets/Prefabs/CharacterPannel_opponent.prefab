@@ -798,6 +798,9 @@ MonoBehaviour:
   buffPrefab: {fileID: 7495721250113956046, guid: 0ce492617120e452c9d90de5a77f2060, type: 3}
   inactiveGroup: {fileID: 6884215380283207646}
   animationRoot: {fileID: 2398814040377212879}
+  floatingMsgRoot: {fileID: 5947072553470113021}
+  floatingMsgPrefab: {fileID: 8933346659001753786, guid: bf5d6223c6ee2478498f70c5bb212644, type: 3}
+  textAlignment: 5
 --- !u!1 &6975827934472303815
 GameObject:
   m_ObjectHideFlags: 0

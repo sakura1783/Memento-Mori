@@ -29,6 +29,10 @@ public class CharaStatusPannel : MonoBehaviour
 
     private readonly Dictionary<Buff, Image> buffs = new();
 
+    [SerializeField] private RectTransform floatingMsgRoot;
+    [SerializeField] private FloatingMessage floatingMsgPrefab;
+    [SerializeField] private TextAnchor textAlignment;
+
 
     public void Setup(CharaController chara, GameData.CharaConstData charaData)
     {
@@ -98,5 +102,26 @@ public class CharaStatusPannel : MonoBehaviour
                 buffs.Clear();
             })
             .AddTo(this);
+    }
+
+    /// <summary>
+    /// フロート表示の生成
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="isCritical"></param>
+    /// <param name="alignment"></param>
+    public void InstantiateFloatingMessage(int value, bool isCritical)
+    {
+        if (value == 0) return;
+
+        var messageType = FloatingMessage.FloatingMessageType.Damage;
+
+        if (value > 0)
+            messageType = FloatingMessage.FloatingMessageType.Heal;
+        else if (isCritical)
+            messageType = FloatingMessage.FloatingMessageType.Critical;
+
+        var message = Instantiate(floatingMsgPrefab, floatingMsgRoot);
+        message.DisplayFloatingMessage(value, messageType, textAlignment);
     }
 }

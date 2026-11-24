@@ -96,7 +96,7 @@ public class CharaController
     /// </summary>
     /// <param name="amount"></param>
     /// <returns>HP変化量</returns>
-    public int UpdateHp(int amount)
+    public int UpdateHp(int amount, bool isCritical = false)
     {
         // 「ダメージ無効」状態の場合、ダメージを受けない
         if (amount < 0 && status.Buffs.Any(buff => buff.type == BuffType.ダメージ無効))
@@ -106,7 +106,11 @@ public class CharaController
         // HPを更新
         status.Hp.Value = Mathf.Clamp(status.Hp.Value + amount, 0, status.MaxHp.Value);
 
-        return hpBefore - status.Hp.Value;
+        // フロート表示の生成
+        var delta = -(hpBefore - status.Hp.Value);
+        CharaStatusPannel?.InstantiateFloatingMessage(delta, isCritical);
+
+        return delta;  // HP変化量を返す
     }
 
     /// <summary>

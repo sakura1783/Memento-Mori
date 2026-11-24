@@ -273,7 +273,7 @@ public static class SkillManager
         
         bool wasAlive = target.IsAlive;
         // ターゲットのHP減少
-        var appliedDamage = target.UpdateHp(-damageValue);
+        var appliedDamage = target.UpdateHp(-damageValue, isCritical);
         bool defeatedTarget = wasAlive && !target.IsAlive;  // 集中攻撃などでのKillCountの重複追加を防ぐ形でdefeatedTargetの値を決定
         
         target.ReceivedCriticalDamage.Value = isCritical;
